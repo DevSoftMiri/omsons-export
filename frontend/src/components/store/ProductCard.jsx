@@ -1,63 +1,34 @@
 import Link from "next/link";
 import { appRoutes } from "@/lib/routes";
+import styles from "./ProductCard.module.css";
 
 export default function ProductCard({ product }) {
+  const variantCount = product.variants?.length || 0;
+  const isInStock = product.variants?.some((variant) => variant.inStock);
+  const image = product.mainImage || product.galleryImages?.[0] || "/omsons-logo.jpg";
+
   return (
-    <article style={styles.card}>
-      <img src={product.mainImage} alt={product.name} style={styles.image} />
-      <div style={styles.body}>
-        <p style={styles.category}>{product.mainCategory || product.category}</p>
-        <h3 style={styles.title}>{product.name}</h3>
-        <p style={styles.description}>{product.shortDescription}</p>
-        <Link href={appRoutes.product(product.slug)} style={styles.button}>
-          View Product
+    <article className={styles.card}>
+      <div className={styles.imageWrap}>
+        <img src={image} alt={product.name} className={styles.image} />
+      </div>
+      <div className={styles.body}>
+        <div className={styles.badgeRow}>
+          {product.category ? <span className={styles.badge}>{product.category}</span> : null}
+          {isInStock ? <span className={`${styles.badge} ${styles.status}`}>In Stock</span> : null}
+        </div>
+        <h3 className={styles.title}>{product.name}</h3>
+        <p className={styles.description}>
+          {product.shortDescription || product.description || "No description available for this item."}
+        </p>
+        <div className={styles.meta}>
+          {product.sku ? <span>SKU: {product.sku}</span> : null}
+          {variantCount ? <span>{variantCount} variant{variantCount !== 1 ? "s" : ""}</span> : null}
+        </div>
+        <Link href={appRoutes.product(product.slug)} className={styles.button}>
+          View Details
         </Link>
       </div>
     </article>
   );
 }
-
-const styles = {
-  card: {
-    display: "grid",
-    gap: "1rem",
-    border: "1px solid #e5e7eb",
-    borderRadius: "0.5rem",
-    background: "#ffffff",
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: "16rem",
-    objectFit: "cover",
-    background: "#f8fafc",
-  },
-  body: {
-    display: "grid",
-    gap: "0.75rem",
-    padding: "1rem",
-  },
-  category: {
-    margin: 0,
-    color: "#64748b",
-    fontSize: "0.9rem",
-  },
-  title: {
-    margin: 0,
-    color: "#0f172a",
-  },
-  description: {
-    margin: 0,
-    color: "#475569",
-    lineHeight: 1.6,
-  },
-  button: {
-    width: "fit-content",
-    padding: "0.75rem 1rem",
-    borderRadius: "0.5rem",
-    background: "#0f172a",
-    color: "#ffffff",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-};

@@ -1,11 +1,12 @@
 export default function ProductGallery({ product }) {
   const images = [product.mainImage, ...(product.galleryImages || [])].filter(Boolean);
+  const normalizedImages = images.length ? images : ["/omsons-logo.jpg"];
 
   return (
     <section style={styles.wrap}>
-      <img src={images[0]} alt={product.name} style={styles.mainImage} />
+      <img src={normalizedImages[0]} alt={product.name} style={styles.mainImage} />
       <div style={styles.thumbGrid}>
-        {images.map((image, index) => (
+        {normalizedImages.map((image, index) => (
           <img key={`${image}-${index}`} src={image} alt={`${product.name} ${index + 1}`} style={styles.thumb} />
         ))}
       </div>
@@ -20,21 +21,21 @@ const styles = {
   },
   mainImage: {
     width: "100%",
-    height: "28rem",
-    objectFit: "cover",
-    borderRadius: "0.5rem",
-    background: "#f8fafc",
+    height: "20rem",
+    objectFit: "contain",
+    borderRadius: "0.9rem",
+    background: "linear-gradient(180deg, #fcfdff 0%, #f3f7fd 100%)",
   },
   thumbGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(6rem, 1fr))",
-    gap: "0.75rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(4.5rem, 1fr))",
+    gap: "0.6rem",
   },
   thumb: {
     width: "100%",
-    height: "6rem",
-    objectFit: "cover",
-    borderRadius: "0.5rem",
-    background: "#f8fafc",
+    height: "4.25rem",
+    objectFit: "contain",
+    borderRadius: "0.7rem",
+    background: "linear-gradient(180deg, #fcfdff 0%, #f3f7fd 100%)",
   },
 };

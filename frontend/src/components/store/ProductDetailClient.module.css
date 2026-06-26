@@ -1,0 +1,297 @@
+.page {
+  display: grid;
+  gap: 18px;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #7a87a3;
+  font-size: 13px;
+}
+
+.breadcrumbs a {
+  color: #4868b0;
+  text-decoration: none;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.05fr) 220px;
+  gap: 16px;
+  align-items: start;
+}
+
+.galleryCard,
+.summary,
+.actionCard,
+.specsCard,
+.relatedCard {
+  border-radius: 16px;
+  border: 1px solid #d9e4f5;
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(17, 37, 79, 0.05);
+}
+
+.galleryCard {
+  padding: 12px;
+}
+
+.summary {
+  padding: 16px;
+  display: grid;
+  gap: 11px;
+}
+
+.taxonomy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.taxonomy span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4667bb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sku {
+  color: #7a87a3;
+  font-size: 12px;
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  color: #11254f;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.15;
+}
+
+.copy {
+  margin: 0;
+  color: #64728f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sectionLabel {
+  margin: 0;
+  color: #7f8ca8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.featureList {
+  margin: 0;
+  padding-left: 18px;
+  color: #41516f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.variantWrap {
+  display: grid;
+  gap: 10px;
+}
+
+.variantGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variantButton {
+  min-height: 32px;
+  padding: 0 9px;
+  border-radius: 8px;
+  border: 1px solid #cddaf1;
+  background: #fff;
+  color: #4a5a78;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.variantButtonActive {
+  border-color: #6c71ec;
+  background: linear-gradient(180deg, #746ef1 0%, #5f57d7 100%);
+  color: #fff;
+}
+
+.actionCard {
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.actionStat {
+  display: grid;
+  gap: 4px;
+}
+
+.actionTitle {
+  margin: 0;
+  color: #7787a5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.actionValue {
+  margin: 0;
+  color: #11254f;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.stock {
+  color: #1f9c55;
+  font-weight: 800;
+}
+
+.stockMuted {
+  color: #a17737;
+  font-weight: 800;
+}
+
+.cta {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 0;
+  background: linear-gradient(180deg, #726ee7 0%, #5f57d7 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ctaSecondary {
+  border: 1px solid #cfdcf1;
+  background: #fff;
+  color: #183163;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+
+.statsGrid dt {
+  color: #7d8aa6;
+  font-size: 12px;
+}
+
+.statsGrid dd {
+  margin: 0;
+  color: #22355f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.specsCard,
+.relatedCard {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.blockTitle {
+  margin: 0;
+  color: #11254f;
+  font-size: 18px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eaf0fa;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  color: #7a87a3;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.table td {
+  color: #2c3f67;
+  font-size: 13px;
+}
+
+.relatedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.relatedHeader a {
+  color: #5962dc;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1440px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1fr) 210px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary,
+  .specsCard,
+  .relatedCard,
+  .galleryCard,
+  .actionCard {
+    padding: 16px;
+  }
+
+  .relatedHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -22,6 +22,16 @@ export async function fetchNavbar() {
   return data?.navbars || [];
 }
 
+export async function fetchAllProducts() {
+  const data = await request("/products");
+  return data?.products || [];
+}
+
+export async function fetchCategories() {
+  const data = await request("/category");
+  return data?.categories || [];
+}
+
 export async function fetchCategoryProducts(categorySlug) {
   const data = await request(`/products/category/${categorySlug}`);
   return data?.products || [];

@@ -115,7 +115,7 @@
   color: var(--ink-2);
 }
 
-.headerAction span,
+.headerActionIconWrap,
 .helpIcon,
 .statIcon,
 .serviceIcon,
@@ -131,6 +131,12 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
+}
+
+.headerActionIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .siteNav {

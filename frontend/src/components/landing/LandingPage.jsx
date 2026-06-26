@@ -6,13 +6,13 @@ import {
   featuredProducts,
   footerColumns,
   helpItems,
-  navItems,
   services,
   stats,
   testimonials,
   whyPillars,
   whyStats,
 } from "./landingData";
+import HomeNavbar from "./HomeNavbar";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
 
@@ -30,6 +30,11 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 
 export default function LandingPage() {
   useLandingEffects();
+  const headerActions = [
+    { icon: "/wishlist.png", label: "Wishlist" },
+    { icon: "/account.png", label: "Account" },
+    { icon: "/cart.png", label: "Cart" },
+  ];
 
   return (
     <main className={styles.pageShell}>
@@ -46,13 +51,11 @@ export default function LandingPage() {
             <button type="button">Search</button>
           </div>
           <div className={styles.headerActions}>
-            {[
-              ["WL", "Wishlist"],
-              ["AC", "Account"],
-              ["CT", "Cart"],
-            ].map(([icon, label]) => (
+            {headerActions.map(({ icon, label }) => (
               <a key={label} className={styles.headerAction} href="#">
-                <span>{icon}</span>
+                <span className={styles.headerActionIconWrap}>
+                  <img src={icon} alt="" className={styles.headerActionIcon} />
+                </span>
                 {label}
               </a>
             ))}
@@ -60,50 +63,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <nav className={styles.siteNav}>
-        <div className={styles.navInner}>
-          <ul className={styles.navList}>
-            {navItems.map((item) => (
-              <li key={item.label} className={styles.navItem}>
-                <a href="#">
-                  {item.label}
-                  {item.groups ? <span className={styles.navCaret}>▼</span> : null}
-                </a>
-                {item.groups ? (
-                  <div className={styles.megaMenu}>
-                    <div className={styles.megaInner}>
-                      <div className={styles.megaColumns}>
-                        {item.groups.map((group) => (
-                          <div key={group.title} className={styles.megaCol}>
-                            <p className={styles.megaColTitle}>{group.title}</p>
-                            {group.links.map((link) => (
-                              <a key={link} href="#">
-                                {link}
-                              </a>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                      <div className={styles.megaPromo}>
-                        <p className={styles.megaPromoLabel}>{item.promo.label}</p>
-                        <h3>{item.promo.title}</h3>
-                        <p className={styles.megaPromoPrice}>
-                          {item.promo.price} <s>{item.promo.strike}</s>
-                        </p>
-                        <img src={item.promo.image} alt={item.promo.title} />
-                        <span className={styles.megaPromoBadge}>{item.promo.badge}</span>
-                        <a href="#" className={styles.megaPromoButton}>
-                          Shop now
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
+      <HomeNavbar />
 
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />

@@ -121,6 +121,8 @@ export default function ProductListClient() {
           width: 100%;
           max-width: 100%;
           box-sizing: border-box;
+          min-width: 0;
+          overflow-x: hidden;
         }
 
         /* ── Page Header ── */
@@ -204,6 +206,8 @@ export default function ProductListClient() {
           width: 100%;
           max-width: 100%;
           box-sizing: border-box;
+          min-width: 0;
+          overflow-x: hidden;
         }
 
         /* ── Section label ── */
@@ -262,11 +266,30 @@ export default function ProductListClient() {
           display: flex;
           gap: 0.5rem;
           overflow-x: auto;
+          overflow-y: hidden;
           padding-bottom: 0.25rem;
           margin-bottom: 1.5rem;
-          scrollbar-width: none;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
+          scrollbar-width: thin;
+          scrollbar-color: #0046AD #dbe7fb;
         }
-        .pl-filter-bar::-webkit-scrollbar { display: none; }
+        .pl-filter-bar::-webkit-scrollbar {
+          height: 10px;
+        }
+        .pl-filter-bar::-webkit-scrollbar-track {
+          background: #dbe7fb;
+          border-radius: 999px;
+        }
+        .pl-filter-bar::-webkit-scrollbar-thumb {
+          background: linear-gradient(90deg, #0f2d6e 0%, #0046AD 100%);
+          border-radius: 999px;
+          border: 2px solid #dbe7fb;
+        }
+        .pl-filter-bar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(90deg, #0b2457 0%, #003a8c 100%);
+        }
 
         .pl-filter-btn {
           display: inline-flex;
@@ -309,7 +332,11 @@ export default function ProductListClient() {
         }
 
         /* ── Product list ── */
-        .pl-list { display: grid; gap: 1rem; }
+        .pl-list {
+          display: grid;
+          gap: 1rem;
+          min-width: 0;
+        }
 
         .pl-product-card {
           border: 1.5px solid #dde6f5;
@@ -318,6 +345,9 @@ export default function ProductListClient() {
           overflow: hidden;
           box-shadow: 0 2px 10px rgba(0,70,173,0.04);
           transition: box-shadow 0.15s;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
         }
         .pl-product-card:hover { box-shadow: 0 4px 20px rgba(0,70,173,0.1); }
 
@@ -329,6 +359,7 @@ export default function ProductListClient() {
           flex-wrap: wrap;
           width: 100%;
           box-sizing: border-box;
+          min-width: 0;
         }
 
         /* thumbnail */
@@ -348,19 +379,25 @@ export default function ProductListClient() {
         .pl-thumb-placeholder { font-size: 1.75rem; }
 
         /* product info */
-        .pl-product-info { flex: 1; min-width: 0; }
+        .pl-product-info {
+          flex: 1 1 18rem;
+          min-width: 0;
+          max-width: 100%;
+        }
         .pl-product-name {
           font-size: 1rem;
           font-weight: 700;
           color: #0f2d6e;
           margin: 0 0 0.5rem;
           line-height: 1.3;
+          overflow-wrap: anywhere;
         }
         .pl-meta-row {
           display: flex;
           flex-wrap: wrap;
           gap: 0.4rem;
           margin-bottom: 0.5rem;
+          min-width: 0;
         }
         .pl-badge {
           display: inline-flex;
@@ -370,11 +407,20 @@ export default function ProductListClient() {
           border-radius: 999px;
           font-size: 0.72rem;
           font-weight: 700;
+          min-width: 0;
+          max-width: 100%;
         }
         .pl-badge-blue { background: #EEF4FF; color: #0046AD; }
         .pl-badge-green { background: #f0fdf4; color: #15803d; }
         .pl-badge-amber { background: #fef3c7; color: #b45309; }
-        .pl-badge-slate { background: #f1f5fb; color: #64748b; font-family: monospace; font-size: 0.7rem; }
+        .pl-badge-slate {
+          background: #f1f5fb;
+          color: #64748b;
+          font-family: monospace;
+          font-size: 0.7rem;
+          white-space: normal;
+          overflow-wrap: anywhere;
+        }
 
         .pl-meta-details {
           display: flex;
@@ -382,6 +428,11 @@ export default function ProductListClient() {
           gap: 0.75rem;
           font-size: 0.8rem;
           color: #64748b;
+          min-width: 0;
+        }
+        .pl-meta-details span {
+          min-width: 0;
+          overflow-wrap: anywhere;
         }
         .pl-meta-detail strong { color: #334155; font-weight: 600; }
 
@@ -389,7 +440,9 @@ export default function ProductListClient() {
         .pl-actions {
           display: flex;
           gap: 0.5rem;
-          flex-shrink: 0;
+          flex: 0 1 auto;
+          min-width: 0;
+          max-width: 100%;
           flex-wrap: wrap;
           align-items: flex-start;
           justify-content: flex-end;
@@ -502,6 +555,7 @@ export default function ProductListClient() {
           color: #334155;
           border-bottom: 1px solid #f1f5fb;
           vertical-align: top;
+          overflow-wrap: anywhere;
         }
         .pl-table tbody tr:last-child td { border-bottom: none; }
 

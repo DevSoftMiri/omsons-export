@@ -7,6 +7,7 @@ export default function AdminShell({ title, description, children }) {
         .admin-shell-layout {
           min-height: 100vh;
           background: #f8fafc;
+          overflow-x: hidden;
         }
 
         .admin-shell-main {
@@ -16,7 +17,9 @@ export default function AdminShell({ title, description, children }) {
           margin-left: 240px;
           min-height: 100vh;
           box-sizing: border-box;
-          width: calc(100% - 240px);
+          min-width: 0;
+          max-width: calc(100vw - 240px);
+          overflow-x: hidden;
         }
 
         .admin-shell-header {
@@ -44,8 +47,8 @@ export default function AdminShell({ title, description, children }) {
         @media (max-width: 900px) {
           .admin-shell-main {
             margin-left: 240px;
-            width: calc(100% - 240px);
             padding: 1rem;
+            max-width: calc(100vw - 240px);
           }
         }
       `}</style>

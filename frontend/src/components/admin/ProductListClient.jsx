@@ -114,10 +114,13 @@ export default function ProductListClient() {
         .pl-root {
           font-family: 'Inter', sans-serif;
           background: #f1f5fb;
-          min-height: 100vh;
-          padding: 2rem;
+          min-height: 100%;
+          padding: 1.5rem;
           display: grid;
           gap: 1.75rem;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
         /* ── Page Header ── */
@@ -198,6 +201,9 @@ export default function ProductListClient() {
           border-radius: 16px;
           padding: 1.75rem;
           box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
         /* ── Section label ── */
@@ -321,6 +327,8 @@ export default function ProductListClient() {
           gap: 1.25rem;
           padding: 1.25rem 1.35rem;
           flex-wrap: wrap;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         /* thumbnail */
@@ -384,6 +392,7 @@ export default function ProductListClient() {
           flex-shrink: 0;
           flex-wrap: wrap;
           align-items: flex-start;
+          justify-content: flex-end;
         }
 
         .pl-btn-view {
@@ -470,7 +479,7 @@ export default function ProductListClient() {
         .pl-table {
           width: 100%;
           border-collapse: collapse;
-          min-width: 46rem;
+          min-width: 40rem;
           font-family: 'Inter', sans-serif;
         }
         .pl-thead th {
@@ -567,6 +576,113 @@ export default function ProductListClient() {
           text-decoration: none;
         }
         .pl-btn-primary-header:hover { transform: translateY(-1px); }
+
+        @media (max-width: 1200px) {
+          .pl-root {
+            padding: 1.25rem;
+          }
+
+          .pl-card {
+            padding: 1.35rem;
+          }
+
+          .pl-product-header {
+            gap: 1rem;
+            padding: 1rem 1.1rem;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .pl-root {
+            padding: 1rem;
+            gap: 1.25rem;
+          }
+
+          .pl-page-header,
+          .pl-card {
+            padding: 1rem;
+          }
+
+          .pl-top-bar {
+            align-items: stretch;
+          }
+
+          .pl-search-wrap {
+            max-width: none;
+          }
+
+          .pl-result-count {
+            white-space: normal;
+          }
+
+          .pl-product-header {
+            display: grid;
+            grid-template-columns: 72px minmax(0, 1fr);
+            align-items: start;
+          }
+
+          .pl-actions {
+            grid-column: 1 / -1;
+            justify-content: flex-start;
+          }
+
+          .pl-btn-view,
+          .pl-btn-edit,
+          .pl-btn-delete {
+            flex: 1 1 10rem;
+            justify-content: center;
+          }
+
+          .pl-table {
+            min-width: 34rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .pl-root {
+            padding: 0.75rem;
+          }
+
+          .pl-page-header {
+            padding: 0.9rem;
+          }
+
+          .pl-page-title {
+            font-size: 1.2rem;
+          }
+
+          .pl-stats-row {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          }
+
+          .pl-product-header {
+            grid-template-columns: 1fr;
+          }
+
+          .pl-thumb-wrap {
+            width: 72px;
+            height: 72px;
+          }
+
+          .pl-actions {
+            width: 100%;
+          }
+
+          .pl-btn-view,
+          .pl-btn-edit,
+          .pl-btn-delete {
+            width: 100%;
+            flex-basis: 100%;
+          }
+
+          .pl-details-panel {
+            padding: 1rem;
+          }
+
+          .pl-table {
+            min-width: 30rem;
+          }
+        }
       `}</style>
 
       <div className="pl-root">

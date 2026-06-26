@@ -13,8 +13,8 @@ export default async function ProductPage({ params }) {
     return <main style={styles.empty}>Product not found.</main>;
   }
 
-  const relatedProducts = product.category
-    ? (await fetchCategoryProducts(product.category))
+  const relatedProducts = product.category?.slug
+    ? (await fetchCategoryProducts(product.category.slug))
         .filter((item) => item.slug !== product.slug)
         .slice(0, 6)
     : [];

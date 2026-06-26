@@ -1,13 +1,13 @@
 import AdminShell from "@/components/admin/AdminShell";
-import ManageCategoriesClient from "@/components/admin/ManageCategoriesClient";
+import CategoryListClient from "@/components/admin/CategoryListClient";
 
 export default function AdminCategoriesPage() {
   return (
     <AdminShell
-      title="Manage Categories"
-      description="Create and maintain the category records used by the live storefront and imported products."
+      title="Catalogue Categories"
+      description="Create and maintain dynamic laboratory catalogue sections, visual assets, and their table structures."
     >
-      <ManageCategoriesClient />
+      <CategoryListClient />
     </AdminShell>
   );
 }

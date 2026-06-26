@@ -32,6 +32,11 @@ export async function fetchCategories() {
   return data?.categories || [];
 }
 
+export async function fetchCatalogueCategories() {
+  const data = await request("/category/catalogue");
+  return data?.categories || [];
+}
+
 export async function fetchCategoryProducts(categorySlug) {
   const data = await request(`/products/category/${categorySlug}`);
   return data?.products || [];
@@ -80,10 +85,10 @@ export function buildCategoryContext(navbars, categorySlug, categoryRecord) {
     title: categoryRecord.name,
     slug: categoryRecord.slug,
     description: categoryRecord.description || `Browse ${categoryRecord.name} products.`,
-    parentTitle: categoryRecord.mainCategory || "Products",
+    parentTitle: "Products",
     parentSlug: categoryRecord.slug,
-    submenuTitle: categoryRecord.submenuTitle || categoryRecord.name,
-    heroImage: categoryRecord.heroImage || "",
+    submenuTitle: categoryRecord.name,
+    heroImage: categoryRecord.imageUrl || "",
     subcategories: [],
   };
 }

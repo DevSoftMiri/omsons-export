@@ -1,262 +1,188 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { appRoutes } from "@/lib/routes";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
-const emptyForm = {
-  externalId: "",
-  sku: "",
-  name: "",
-  slug: "",
-  mainCategory: "",
-  category: "",
-  categories: [],
-  page: "",
-  mainImage: "",
-  galleryImages: [],
-  shortDescription: "",
-  description: "",
-  descriptionHtml: "",
-  features: [],
-  options: [],
-  priceList: [],
-  accessories: [],
-  spareParts: [],
-  advantages: [],
-  chartImages: [],
-  videos: [],
-  reviews: [],
-  variants: [],
-};
+const defaultStatus = { loading: false, error: "", notice: "" };
 
 export default function ManageProductsClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(emptyForm);
-  const [status, setStatus] = useState({ loading: false, error: "", notice: "" });
-  const [importState, setImportState] = useState({
-    text: "",
-    loading: false,
-    error: "",
-    summary: null,
-    errors: [],
-  });
-
   const token = useMemo(() => getCookieValue("admin_token"), []);
+  const editProductId = searchParams.get("edit") || "";
+  const initialCategoryId = searchParams.get("categoryId") || "";
+
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategoryId);
+  const [editingProductId, setEditingProductId] = useState(editProductId);
+  const [form, setForm] = useState(createEmptyForm());
+  const [status, setStatus] = useState(defaultStatus);
+
+  const selectedCategory = useMemo(
+    () => categories.find((item) => item._id === selectedCategoryId) || null,
+    [categories, selectedCategoryId]
+  );
+
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategoryId) {
+      return products;
+    }
+
+    return products.filter((product) => product.categoryId === selectedCategoryId);
+  }, [products, selectedCategoryId]);
 
   useEffect(() => {
-    fetchProducts();
+    loadInitialData();
   }, []);
 
   useEffect(() => {
-    const editId = searchParams.get("edit");
-
-    if (!editId || !products.length) {
+    if (!selectedCategory) {
       return;
     }
 
-    const matchedProduct = products.find((product) => product._id === editId);
+    setForm((current) => syncRowsToColumns(current, selectedCategory.tableColumns || []));
+  }, [selectedCategory]);
 
-    if (matchedProduct) {
-      handleEdit(matchedProduct);
+  useEffect(() => {
+    if (!editProductId) {
+      return;
     }
-  }, [products, searchParams]);
 
-  async function fetchProducts() {
+    loadProduct(editProductId);
+  }, [editProductId]);
+
+  async function loadInitialData() {
     setStatus((current) => ({ ...current, loading: true, error: "" }));
 
     try {
-      const response = await fetch(`${API_BASE_URL}/products`, { cache: "no-store" });
-      const data = await response.json();
+      const [categoriesResponse, productsResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/category`, { cache: "no-store" }),
+        fetch(`${API_BASE_URL}/products`, { cache: "no-store" }),
+      ]);
+      const categoriesData = await categoriesResponse.json();
+      const productsData = await productsResponse.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to load products");
+      if (!categoriesResponse.ok || !categoriesData.success) {
+        throw new Error(categoriesData.message || "Failed to load categories");
       }
 
-      setProducts(data.products || []);
+      if (!productsResponse.ok || !productsData.success) {
+        throw new Error(productsData.message || "Failed to load products");
+      }
+
+      const categoryItems = categoriesData.categories || [];
+      setCategories(categoryItems);
+      setProducts(productsData.products || []);
+
+      if (!selectedCategoryId && categoryItems.length) {
+        setSelectedCategoryId(categoryItems[0]._id);
+      }
+
       setStatus((current) => ({ ...current, loading: false }));
     } catch (error) {
-      setStatus((current) => ({
-        ...current,
+      setStatus({
         loading: false,
-        error: error.message || "Failed to load products",
-      }));
+        error: error.message || "Failed to load product data",
+        notice: "",
+      });
     }
   }
 
-  function generateSlug(text) {
-    return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  }
+  async function loadProduct(productId) {
+    setStatus((current) => ({ ...current, loading: true, error: "" }));
 
-  function handleNameChange(event) {
-    const name = event.target.value;
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/manage/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const data = await response.json();
 
-    setForm((current) => ({
-      ...current,
-      name,
-      slug: generateSlug(name),
-    }));
-  }
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to load product");
+      }
 
-  function addTextItem(field) {
-    setForm((current) => ({
-      ...current,
-      [field]: [...current[field], ""],
-    }));
-  }
-
-  function updateTextItem(field, index, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: current[field].map((item, itemIndex) => (itemIndex === index ? value : item)),
-    }));
-  }
-
-  function removeTextItem(field, index) {
-    setForm((current) => ({
-      ...current,
-      [field]: current[field].filter((_, itemIndex) => itemIndex !== index),
-    }));
-  }
-
-  function addOption() {
-    setForm((current) => ({
-      ...current,
-      options: [...current.options, { title: "", type: "radio", values: [] }],
-    }));
-  }
-
-  function updateOptionTitle(index, value) {
-    setForm((current) => ({
-      ...current,
-      options: current.options.map((option, optionIndex) =>
-        optionIndex === index ? { ...option, title: value } : option
-      ),
-    }));
-  }
-
-  function addOptionValue(optionIndex) {
-    setForm((current) => ({
-      ...current,
-      options: current.options.map((option, index) =>
-        index === optionIndex ? { ...option, values: [...option.values, ""] } : option
-      ),
-    }));
-  }
-
-  function updateOptionValue(optionIndex, valueIndex, value) {
-    setForm((current) => ({
-      ...current,
-      options: current.options.map((option, index) => {
-        if (index !== optionIndex) {
-          return option;
-        }
-
-        return {
-          ...option,
-          values: option.values.map((entry, entryIndex) =>
-            entryIndex === valueIndex ? value : entry
-          ),
-        };
-      }),
-    }));
-  }
-
-  function removeOption(index) {
-    setForm((current) => ({
-      ...current,
-      options: current.options.filter((_, optionIndex) => optionIndex !== index),
-    }));
-  }
-
-  function removeOptionValue(optionIndex, valueIndex) {
-    setForm((current) => ({
-      ...current,
-      options: current.options.map((option, index) =>
-        index === optionIndex
-          ? { ...option, values: option.values.filter((_, entryIndex) => entryIndex !== valueIndex) }
-          : option
-      ),
-    }));
-  }
-
-  function addPrice() {
-    setForm((current) => ({
-      ...current,
-      priceList: [...current.priceList, { model: "", price: "" }],
-    }));
-  }
-
-  function updatePrice(index, field, value) {
-    setForm((current) => ({
-      ...current,
-      priceList: current.priceList.map((item, itemIndex) =>
-        itemIndex === index ? { ...item, [field]: value } : item
-      ),
-    }));
-  }
-
-  function removePrice(index) {
-    setForm((current) => ({
-      ...current,
-      priceList: current.priceList.filter((_, itemIndex) => itemIndex !== index),
-    }));
-  }
-
-  function addReview() {
-    setForm((current) => ({
-      ...current,
-      reviews: [...current.reviews, { name: "", rating: 5, comment: "" }],
-    }));
-  }
-
-  function updateReview(index, field, value) {
-    setForm((current) => ({
-      ...current,
-      reviews: current.reviews.map((review, reviewIndex) =>
-        reviewIndex === index ? { ...review, [field]: value } : review
-      ),
-    }));
-  }
-
-  function removeReview(index) {
-    setForm((current) => ({
-      ...current,
-      reviews: current.reviews.filter((_, reviewIndex) => reviewIndex !== index),
-    }));
+      const product = data.product;
+      setEditingProductId(product._id);
+      setSelectedCategoryId(product.categoryId);
+      setForm({
+        categoryId: product.categoryId,
+        name: product.name || "",
+        slug: product.slug || "",
+        description: product.description || "",
+        imageUrl: product.imageUrl || "",
+        bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
+        icons: product.icons?.length ? product.icons : [{ label: "", imageUrl: "" }],
+        technicalTags: product.technicalTags?.length ? product.technicalTags : [""],
+        rows: product.rows?.length
+          ? product.rows.map((row) => ({
+              values: { ...(row.values || {}) },
+              sortOrder: row.sortOrder,
+              isActive: row.isActive,
+            }))
+          : [{ values: createEmptyRowValues(product.category?.tableColumns || []) }],
+        isActive: Boolean(product.isActive),
+      });
+      setStatus((current) => ({ ...current, loading: false }));
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error.message || "Failed to load product",
+        notice: "",
+      });
+    }
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (!selectedCategoryId) {
+      setStatus({ loading: false, error: "Select a category first", notice: "" });
+      return;
+    }
+
     setStatus({ loading: true, error: "", notice: "" });
 
     try {
-      const url = editingId ? `${API_BASE_URL}/products/${editingId}` : `${API_BASE_URL}/products`;
-      const method = editingId ? "PUT" : "POST";
+      const payload = {
+        ...form,
+        categoryId: selectedCategoryId,
+        rows: normalizeFormRows(form.rows, selectedCategory?.tableColumns || []),
+      };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const response = await fetch(
+        editingProductId ? `${API_BASE_URL}/products/${editingProductId}` : `${API_BASE_URL}/products`,
+        {
+          method: editingProductId ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await response.json();
 
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Failed to save product");
       }
 
-      setForm(emptyForm);
-      setEditingId(null);
-      setStatus({ loading: false, error: "", notice: editingId ? "Product updated" : "Product added" });
-      fetchProducts();
+      await loadInitialData();
+      setEditingProductId("");
+      setSelectedCategoryId(data.product.categoryId);
+      setForm(createEmptyForm(selectedCategory?.tableColumns || []));
+      router.replace(`${appRoutes.adminProducts}?categoryId=${data.product.categoryId}`);
+      setStatus({
+        loading: false,
+        error: "",
+        notice: editingProductId ? "Product updated" : "Product created",
+      });
     } catch (error) {
       setStatus({
         loading: false,
@@ -266,104 +192,17 @@ export default function ManageProductsClient() {
     }
   }
 
-  async function handleImportSubmit(event) {
-    event.preventDefault();
-    setImportState((current) => ({
-      ...current,
-      loading: true,
-      error: "",
-      summary: null,
-      errors: [],
-    }));
-
-    try {
-      const parsed = JSON.parse(importState.text);
-
-      if (!Array.isArray(parsed)) {
-        throw new Error("Import JSON must be an array of products");
-      }
-
-      const response = await fetch(`${API_BASE_URL}/products/import-json`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ products: parsed }),
-      });
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Import failed");
-      }
-
-      setImportState((current) => ({
-        ...current,
-        loading: false,
-        error: "",
-        summary: data.summary,
-        errors: data.errors || [],
-      }));
-      setStatus((current) => ({ ...current, notice: "Products imported successfully" }));
-      fetchProducts();
-    } catch (error) {
-      setImportState((current) => ({
-        ...current,
-        loading: false,
-        error: error.message || "Import failed",
-      }));
-    }
-  }
-
-  async function handleFileChange(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const text = await file.text();
-    setImportState((current) => ({
-      ...current,
-      text,
-      error: "",
-      summary: null,
-      errors: [],
-    }));
-  }
-
-  function handleEdit(product) {
-    setEditingId(product._id);
-    setForm({
-      ...emptyForm,
-      ...product,
-      galleryImages: product.galleryImages || [],
-      categories: product.categories || [],
-      features: product.features || [],
-      options: product.options || [],
-      priceList: product.priceList || [],
-      accessories: product.accessories || [],
-      spareParts: product.spareParts || [],
-      advantages: product.advantages || [],
-      chartImages: product.chartImages || [],
-      videos: product.videos || [],
-      reviews: product.reviews || [],
-      variants: product.variants || [],
-      page: product.page ?? "",
-    });
-  }
-
-  async function handleDelete(id) {
+  async function handleDelete(productId) {
     if (!window.confirm("Delete this product?")) {
       return;
     }
 
+    setStatus({ loading: true, error: "", notice: "" });
+
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
 
@@ -371,8 +210,12 @@ export default function ManageProductsClient() {
         throw new Error(data.message || "Failed to delete product");
       }
 
+      if (editingProductId === productId) {
+        resetForm();
+      }
+
+      await loadInitialData();
       setStatus({ loading: false, error: "", notice: "Product deleted" });
-      fetchProducts();
     } catch (error) {
       setStatus({
         loading: false,
@@ -382,341 +225,549 @@ export default function ManageProductsClient() {
     }
   }
 
-  return (
-    <div style={styles.layout}>
-      <section style={styles.panel}>
-        <h2 style={styles.sectionTitle}>Import Products from JSON</h2>
-        <form onSubmit={handleImportSubmit} style={styles.form}>
-          <label style={styles.fileLabel}>
-            <span>Upload JSON file</span>
-            <input type="file" accept=".json,application/json" onChange={handleFileChange} style={styles.fileInput} />
-          </label>
+  function resetForm() {
+    setEditingProductId("");
+    setForm(createEmptyForm(selectedCategory?.tableColumns || []));
+    const nextCategory = selectedCategoryId ? `?categoryId=${selectedCategoryId}` : "";
+    router.replace(`${appRoutes.adminProducts}${nextCategory}`);
+  }
 
-          <textarea
-            value={importState.text}
-            onChange={(event) =>
-              setImportState((current) => ({
+  function handleCategoryChange(categoryId) {
+    setSelectedCategoryId(categoryId);
+    setForm((current) => ({
+      ...syncRowsToColumns(current, categories.find((item) => item._id === categoryId)?.tableColumns || []),
+      categoryId,
+    }));
+  }
+
+  function handleEdit(product) {
+    setEditingProductId(product._id);
+    setSelectedCategoryId(product.categoryId);
+    setForm({
+      categoryId: product.categoryId,
+      name: product.name || "",
+      slug: product.slug || "",
+      description: product.description || "",
+      imageUrl: product.imageUrl || "",
+      bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
+      icons: product.icons?.length ? product.icons : [{ label: "", imageUrl: "" }],
+      technicalTags: product.technicalTags?.length ? product.technicalTags : [""],
+      rows: product.rows?.length
+        ? product.rows.map((row) => ({
+            values: { ...(row.values || {}) },
+            sortOrder: row.sortOrder,
+            isActive: row.isActive,
+          }))
+        : [{ values: createEmptyRowValues(product.category?.tableColumns || []) }],
+      isActive: Boolean(product.isActive),
+    });
+    router.replace(`${appRoutes.adminProducts}?edit=${product._id}&categoryId=${product.categoryId}`);
+  }
+
+  function addRow() {
+    setForm((current) => ({
+      ...current,
+      rows: [
+        ...current.rows,
+        {
+          values: createEmptyRowValues(selectedCategory?.tableColumns || []),
+          sortOrder: current.rows.length + 1,
+          isActive: true,
+        },
+      ],
+    }));
+  }
+
+  function removeRow(index) {
+    setForm((current) => ({
+      ...current,
+      rows:
+        current.rows.length === 1
+          ? [{ values: createEmptyRowValues(selectedCategory?.tableColumns || []) }]
+          : current.rows.filter((_, rowIndex) => rowIndex !== index),
+    }));
+  }
+
+  function moveRow(fromIndex, toIndex) {
+    if (toIndex < 0 || toIndex >= form.rows.length) {
+      return;
+    }
+
+    setForm((current) => {
+      const reordered = [...current.rows];
+      const [moved] = reordered.splice(fromIndex, 1);
+      reordered.splice(toIndex, 0, moved);
+      return { ...current, rows: reordered };
+    });
+  }
+
+  return (
+    <div className="grid gap-6">
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">
+              Product Catalogue Admin
+            </p>
+            <h2 className="text-3xl font-semibold text-slate-900">
+              Add products under a main category
+            </h2>
+            <p className="max-w-3xl text-sm leading-6 text-slate-500">
+              Select a category, enter the product details, then add dynamic table rows using the
+              table columns defined on that category.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={appRoutes.adminCategories}
+              className="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700"
+            >
+              Manage Categories
+            </Link>
+            <Link
+              href={appRoutes.adminProductList}
+              className="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700"
+            >
+              Open Product List
+            </Link>
+          </div>
+        </div>
+
+        {status.error ? (
+          <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {status.error}
+          </p>
+        ) : null}
+        {status.notice ? (
+          <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {status.notice}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="grid gap-6">
+        <form onSubmit={handleSubmit} className="grid gap-6">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="grid gap-5 md:grid-cols-2">
+              <Field label="Main Category">
+                <select
+                  value={selectedCategoryId}
+                  onChange={(event) => handleCategoryChange(event.target.value)}
+                  className={inputClassName}
+                >
+                  <option value="">Select category</option>
+                  {categories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Product Name">
+                <input
+                  value={form.name}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                      slug: slugify(event.target.value),
+                    }))
+                  }
+                  className={inputClassName}
+                  required
+                />
+              </Field>
+              <Field label="Product Slug">
+                <input
+                  value={form.slug}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, slug: slugify(event.target.value) }))
+                  }
+                  className={inputClassName}
+                  required
+                />
+              </Field>
+              <Field label="Product Image URL">
+                <input
+                  value={form.imageUrl}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, imageUrl: event.target.value }))
+                  }
+                  className={inputClassName}
+                />
+              </Field>
+            </div>
+
+            <div className="mt-5">
+              <Field label="Description">
+                <textarea
+                  value={form.description}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, description: event.target.value }))
+                  }
+                  rows={4}
+                  className={`${inputClassName} min-h-28`}
+                />
+              </Field>
+            </div>
+          </div>
+
+          <DynamicArraySection
+            title="Bullet Points"
+            description="These will appear in the product detail and catalogue section."
+            items={form.bulletPoints}
+            addLabel="Add bullet"
+            onAdd={() =>
+              setForm((current) => ({
                 ...current,
-                text: event.target.value,
-                error: "",
-                summary: null,
-                errors: [],
+                bulletPoints: [...current.bulletPoints, ""],
               }))
             }
-            placeholder="Paste product JSON array here"
-            style={styles.importTextarea}
-          />
-
-          {importState.error ? <p style={styles.error}>{importState.error}</p> : null}
-          {importState.summary ? (
-            <div style={styles.summaryCard}>
-              <strong>Import Summary</strong>
-              <p style={styles.summaryText}>
-                Total: {importState.summary.total} | Created: {importState.summary.created} | Updated: {importState.summary.updated} | Skipped: {importState.summary.skipped} | Errors: {importState.summary.errors}
-              </p>
-              {importState.errors.length ? (
-                <ul style={styles.summaryList}>
-                  {importState.errors.slice(0, 10).map((entry, index) => (
-                    <li key={`${entry.index}-${index}`}>
-                      Row {entry.index + 1}: {entry.message}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ) : null}
-
-          <button type="submit" style={styles.primaryButton} disabled={importState.loading}>
-            {importState.loading ? "Importing..." : "Import JSON"}
-          </button>
-        </form>
-      </section>
-
-      <section style={styles.panel}>
-        <h2 style={styles.sectionTitle}>{editingId ? "Edit Product" : "Add Product"}</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <h3 style={styles.subheading}>Basic Details</h3>
-          <Input
-            value={form.externalId}
-            onChange={(event) => setForm((current) => ({ ...current, externalId: event.target.value }))}
-            placeholder="External ID"
-          />
-          <Input
-            value={form.sku}
-            onChange={(event) => setForm((current) => ({ ...current, sku: event.target.value }))}
-            placeholder="SKU"
-          />
-          <Input value={form.name} onChange={handleNameChange} placeholder="Product Name" required />
-          <Input
-            value={form.slug}
-            onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-            placeholder="Slug"
-            required
-          />
-          <Input
-            value={form.mainCategory}
-            onChange={(event) => setForm((current) => ({ ...current, mainCategory: event.target.value }))}
-            placeholder="Main Category"
-          />
-          <Input
-            value={form.category}
-            onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
-            placeholder="Category Slug"
-          />
-          <Input
-            value={form.mainImage}
-            onChange={(event) => setForm((current) => ({ ...current, mainImage: event.target.value }))}
-            placeholder="Main Image URL"
-          />
-          <TextArea
-            value={form.shortDescription}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, shortDescription: event.target.value }))
+            onChange={(index, value) =>
+              setForm((current) => ({
+                ...current,
+                bulletPoints: current.bulletPoints.map((item, itemIndex) =>
+                  itemIndex === index ? value : item
+                ),
+              }))
             }
-            placeholder="Short Description"
-          />
-          <TextArea
-            value={form.description}
-            onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-            placeholder="Full Description"
-          />
-
-          <ArraySection
-            title="Gallery Images"
-            buttonLabel="Add Gallery Image"
-            items={form.galleryImages}
-            onAdd={() => addTextItem("galleryImages")}
-            onChange={(index, value) => updateTextItem("galleryImages", index, value)}
-            onRemove={(index) => removeTextItem("galleryImages", index)}
-            placeholder="Image URL"
+            onRemove={(index) =>
+              setForm((current) => ({
+                ...current,
+                bulletPoints:
+                  current.bulletPoints.length === 1
+                    ? [""]
+                    : current.bulletPoints.filter((_, itemIndex) => itemIndex !== index),
+              }))
+            }
           />
 
-          <ArraySection
-            title="Features"
-            buttonLabel="Add Feature"
-            items={form.features}
-            onAdd={() => addTextItem("features")}
-            onChange={(index, value) => updateTextItem("features", index, value)}
-            onRemove={(index) => removeTextItem("features", index)}
-            placeholder="Feature"
+          <DynamicObjectArraySection
+            title="Icons / Tags"
+            description="Add icon labels and optional image URLs for the product."
+            items={form.icons}
+            onAdd={() =>
+              setForm((current) => ({
+                ...current,
+                icons: [...current.icons, { label: "", imageUrl: "" }],
+              }))
+            }
+            onChange={(index, key, value) =>
+              setForm((current) => ({
+                ...current,
+                icons: current.icons.map((item, itemIndex) =>
+                  itemIndex === index ? { ...item, [key]: value } : item
+                ),
+              }))
+            }
+            onRemove={(index) =>
+              setForm((current) => ({
+                ...current,
+                icons:
+                  current.icons.length === 1
+                    ? [{ label: "", imageUrl: "" }]
+                    : current.icons.filter((_, itemIndex) => itemIndex !== index),
+              }))
+            }
           />
 
-          <section style={styles.group}>
-            <div style={styles.groupHeader}>
-              <h3 style={styles.subheading}>Product Options / Radio Buttons</h3>
-              <button type="button" onClick={addOption} style={styles.secondaryButton}>
-                Add Option
+          <DynamicArraySection
+            title="Technical Tags"
+            description="Optional small labels to surface on the product."
+            items={form.technicalTags}
+            addLabel="Add tag"
+            onAdd={() =>
+              setForm((current) => ({
+                ...current,
+                technicalTags: [...current.technicalTags, ""],
+              }))
+            }
+            onChange={(index, value) =>
+              setForm((current) => ({
+                ...current,
+                technicalTags: current.technicalTags.map((item, itemIndex) =>
+                  itemIndex === index ? value : item
+                ),
+              }))
+            }
+            onRemove={(index) =>
+              setForm((current) => ({
+                ...current,
+                technicalTags:
+                  current.technicalTags.length === 1
+                    ? [""]
+                    : current.technicalTags.filter((_, itemIndex) => itemIndex !== index),
+              }))
+            }
+          />
+
+          <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">
+                  Product Table Rows
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold text-slate-900">
+                  Dynamic rows from category columns
+                </h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                  {selectedCategory
+                    ? `These fields come from ${selectedCategory.name}: ${selectedCategory.tableColumns.join(", ")}.`
+                    : "Select a category to generate the table row fields."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={addRow}
+                disabled={!selectedCategory}
+                className="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Add Row
               </button>
             </div>
 
-            {form.options.map((option, optionIndex) => (
-              <div key={`${optionIndex}-${option.title}`} style={styles.nestedCard}>
-                <Input
-                  value={option.title}
-                  onChange={(event) => updateOptionTitle(optionIndex, event.target.value)}
-                  placeholder="Option Title"
-                />
-                <div style={styles.inlineActions}>
-                  <button type="button" onClick={() => addOptionValue(optionIndex)} style={styles.secondaryButton}>
-                    Add Value
-                  </button>
-                  <button type="button" onClick={() => removeOption(optionIndex)} style={styles.ghostButton}>
-                    Remove Option
-                  </button>
-                </div>
-                {option.values.map((value, valueIndex) => (
-                  <div key={`${valueIndex}-${value}`} style={styles.arrayRow}>
-                    <input
-                      value={value}
-                      onChange={(event) => updateOptionValue(optionIndex, valueIndex, event.target.value)}
-                      placeholder="Option Value"
-                      style={styles.input}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeOptionValue(optionIndex, valueIndex)}
-                      style={styles.ghostButton}
-                    >
-                      Remove
-                    </button>
+            <div className="mt-5 grid gap-4">
+              {form.rows.map((row, rowIndex) => (
+                <div
+                  key={`row-${rowIndex}`}
+                  className="rounded-[22px] border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-slate-900">Row {rowIndex + 1}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => moveRow(rowIndex, rowIndex - 1)}
+                        className="rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+                      >
+                        Up
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveRow(rowIndex, rowIndex + 1)}
+                        className="rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+                      >
+                        Down
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeRow(rowIndex)}
+                        className="rounded-full border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ))}
+
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {(selectedCategory?.tableColumns || []).map((column) => (
+                      <Field key={`${column}-${rowIndex}`} label={column}>
+                        <input
+                          value={row.values?.[column] || ""}
+                          onChange={(event) =>
+                            setForm((current) => ({
+                              ...current,
+                              rows: current.rows.map((item, itemIndex) =>
+                                itemIndex === rowIndex
+                                  ? {
+                                      ...item,
+                                      values: {
+                                        ...item.values,
+                                        [column]: event.target.value,
+                                      },
+                                    }
+                                  : item
+                              ),
+                            }))
+                          }
+                          className={inputClassName}
+                        />
+                      </Field>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
-          <section style={styles.group}>
-            <div style={styles.groupHeader}>
-              <h3 style={styles.subheading}>Price List</h3>
-              <button type="button" onClick={addPrice} style={styles.secondaryButton}>
-                Add Price
+          <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, isActive: event.target.checked }))
+                }
+              />
+              Product is active on the public catalogue
+            </label>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="submit"
+                disabled={status.loading}
+                className="inline-flex items-center rounded-full bg-sky-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {status.loading ? "Saving..." : editingProductId ? "Update Product" : "Create Product"}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700"
+              >
+                Clear Form
               </button>
             </div>
-
-            {form.priceList.map((item, index) => (
-              <div key={`${index}-${item.model}`} style={styles.priceRow}>
-                <input
-                  value={item.model}
-                  onChange={(event) => updatePrice(index, "model", event.target.value)}
-                  placeholder="Model"
-                  style={styles.input}
-                />
-                <input
-                  value={item.price}
-                  onChange={(event) => updatePrice(index, "price", event.target.value)}
-                  placeholder="Price"
-                  style={styles.input}
-                />
-                <button type="button" onClick={() => removePrice(index)} style={styles.ghostButton}>
-                  Remove
-                </button>
-              </div>
-            ))}
           </section>
-
-          <ArraySection
-            title="Accessories"
-            buttonLabel="Add Accessory"
-            items={form.accessories}
-            onAdd={() => addTextItem("accessories")}
-            onChange={(index, value) => updateTextItem("accessories", index, value)}
-            onRemove={(index) => removeTextItem("accessories", index)}
-            placeholder="Accessory"
-          />
-
-          <ArraySection
-            title="Spare Parts"
-            buttonLabel="Add Spare Part"
-            items={form.spareParts}
-            onAdd={() => addTextItem("spareParts")}
-            onChange={(index, value) => updateTextItem("spareParts", index, value)}
-            onRemove={(index) => removeTextItem("spareParts", index)}
-            placeholder="Spare Part"
-          />
-
-          <ArraySection
-            title="Advantages"
-            buttonLabel="Add Advantage"
-            items={form.advantages}
-            onAdd={() => addTextItem("advantages")}
-            onChange={(index, value) => updateTextItem("advantages", index, value)}
-            onRemove={(index) => removeTextItem("advantages", index)}
-            placeholder="Advantage"
-          />
-
-          <ArraySection
-            title="Chart Images"
-            buttonLabel="Add Chart Image"
-            items={form.chartImages}
-            onAdd={() => addTextItem("chartImages")}
-            onChange={(index, value) => updateTextItem("chartImages", index, value)}
-            onRemove={(index) => removeTextItem("chartImages", index)}
-            placeholder="Chart Image URL"
-          />
-
-          <ArraySection
-            title="Videos"
-            buttonLabel="Add Video"
-            items={form.videos}
-            onAdd={() => addTextItem("videos")}
-            onChange={(index, value) => updateTextItem("videos", index, value)}
-            onRemove={(index) => removeTextItem("videos", index)}
-            placeholder="YouTube Video URL"
-          />
-
-          <section style={styles.group}>
-            <div style={styles.groupHeader}>
-              <h3 style={styles.subheading}>Customer Reviews</h3>
-              <button type="button" onClick={addReview} style={styles.secondaryButton}>
-                Add Review
-              </button>
-            </div>
-
-            {form.reviews.map((review, index) => (
-              <div key={`${index}-${review.name}`} style={styles.nestedCard}>
-                <Input
-                  value={review.name}
-                  onChange={(event) => updateReview(index, "name", event.target.value)}
-                  placeholder="Customer Name"
-                />
-                <Input
-                  type="number"
-                  value={review.rating}
-                  onChange={(event) => updateReview(index, "rating", Number(event.target.value))}
-                  placeholder="Rating"
-                />
-                <TextArea
-                  value={review.comment}
-                  onChange={(event) => updateReview(index, "comment", event.target.value)}
-                  placeholder="Review Comment"
-                />
-                <button type="button" onClick={() => removeReview(index)} style={styles.ghostButton}>
-                  Remove Review
-                </button>
-              </div>
-            ))}
-          </section>
-
-          {status.error ? <p style={styles.error}>{status.error}</p> : null}
-          {status.notice ? <p style={styles.notice}>{status.notice}</p> : null}
-
-          <div style={styles.inlineActions}>
-            <button type="submit" style={styles.primaryButton} disabled={status.loading}>
-              {status.loading ? "Saving..." : editingId ? "Update Product" : "Add Product"}
-            </button>
-            {editingId ? (
-              <button type="button" onClick={() => { setForm(emptyForm); setEditingId(null); }} style={styles.ghostButton}>
-                Cancel
-              </button>
-            ) : null}
-          </div>
         </form>
-      </section>
 
+      </section>
     </div>
   );
 }
 
-function ArraySection({
-  title,
-  buttonLabel,
-  items,
-  onAdd,
-  onChange,
-  onRemove,
-  placeholder,
-}) {
+function DynamicArraySection({ title, description, items, addLabel, onAdd, onChange, onRemove }) {
   return (
-    <section style={styles.group}>
-      <div style={styles.groupHeader}>
-        <h3 style={styles.subheading}>{title}</h3>
-        <button type="button" onClick={onAdd} style={styles.secondaryButton}>
-          {buttonLabel}
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">{title}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>
+        </div>
+        <button type="button" onClick={onAdd} className={secondaryButtonClassName}>
+          {addLabel}
         </button>
       </div>
-      {items.map((item, index) => (
-        <div key={`${title}-${index}`} style={styles.arrayRow}>
-          <input
-            value={item}
-            onChange={(event) => onChange(index, event.target.value)}
-            placeholder={placeholder}
-            style={styles.input}
-          />
-          <button type="button" onClick={() => onRemove(index)} style={styles.ghostButton}>
-            Remove
-          </button>
-        </div>
-      ))}
+
+      <div className="mt-5 grid gap-3">
+        {items.map((item, index) => (
+          <div
+            key={`${title}-${index}`}
+            className="grid gap-3 rounded-[22px] border border-slate-200 bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_auto]"
+          >
+            <input
+              value={item}
+              onChange={(event) => onChange(index, event.target.value)}
+              className={inputClassName}
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
 
-function Input(props) {
-  return <input {...props} style={styles.input} />;
+function DynamicObjectArraySection({ title, description, items, onAdd, onChange, onRemove }) {
+  return (
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">{title}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>
+        </div>
+        <button type="button" onClick={onAdd} className={secondaryButtonClassName}>
+          Add Icon
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-3">
+        {items.map((item, index) => (
+          <div
+            key={`${item.label}-${index}`}
+            className="grid gap-3 rounded-[22px] border border-slate-200 bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
+          >
+            <input
+              value={item.label}
+              onChange={(event) => onChange(index, "label", event.target.value)}
+              placeholder="Label"
+              className={inputClassName}
+            />
+            <input
+              value={item.imageUrl}
+              onChange={(event) => onChange(index, "imageUrl", event.target.value)}
+              placeholder="Image URL"
+              className={inputClassName}
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-function TextArea(props) {
-  return <textarea {...props} style={styles.textarea} />;
+function Field({ label, children }) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-slate-700">
+      <span>{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function createEmptyForm(columns = []) {
+  return {
+    categoryId: "",
+    name: "",
+    slug: "",
+    description: "",
+    imageUrl: "",
+    bulletPoints: [""],
+    icons: [{ label: "", imageUrl: "" }],
+    technicalTags: [""],
+    rows: [{ values: createEmptyRowValues(columns) }],
+    isActive: true,
+  };
+}
+
+function createEmptyRowValues(columns, source = {}) {
+  return columns.reduce((accumulator, column) => {
+    accumulator[column] = source[column] || "";
+    return accumulator;
+  }, {});
+}
+
+function normalizeFormRows(rows, columns) {
+  return rows.map((row, index) => ({
+    values: createEmptyRowValues(columns, row.values || {}),
+    sortOrder: index + 1,
+    isActive: row.isActive !== false,
+  }));
+}
+
+function syncRowsToColumns(form, columns) {
+  const syncedRows = (form.rows?.length ? form.rows : [{ values: {} }]).map((row, index) => ({
+    values: createEmptyRowValues(columns, row.values || {}),
+    sortOrder: row.sortOrder || index + 1,
+    isActive: row.isActive !== false,
+  }));
+
+  return {
+    ...form,
+    rows: syncedRows,
+  };
+}
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function getCookieValue(name) {
@@ -730,148 +781,8 @@ function getCookieValue(name) {
     ?.split("=")[1] || "";
 }
 
-const styles = {
-  layout: {
-    display: "grid",
-    gap: "1.5rem",
-  },
-  panel: {
-    display: "grid",
-    gap: "1rem",
-    padding: "1.5rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #e5e7eb",
-    background: "#ffffff",
-  },
-  form: {
-    display: "grid",
-    gap: "1rem",
-  },
-  sectionTitle: {
-    margin: 0,
-    color: "#0f172a",
-  },
-  subheading: {
-    margin: 0,
-    color: "#0f172a",
-    fontSize: "1rem",
-  },
-  group: {
-    display: "grid",
-    gap: "0.75rem",
-  },
-  groupHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "1rem",
-    flexWrap: "wrap",
-  },
-  input: {
-    width: "100%",
-    padding: "0.8rem 0.9rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #cbd5e1",
-  },
-  textarea: {
-    width: "100%",
-    minHeight: "7rem",
-    padding: "0.8rem 0.9rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #cbd5e1",
-    resize: "vertical",
-  },
-  fileLabel: {
-    display: "grid",
-    gap: "0.4rem",
-    color: "#334155",
-  },
-  fileInput: {
-    width: "fit-content",
-  },
-  importTextarea: {
-    width: "100%",
-    minHeight: "16rem",
-    padding: "0.8rem 0.9rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #cbd5e1",
-    resize: "vertical",
-    fontFamily: "var(--font-mono), monospace",
-    fontSize: "0.9rem",
-  },
-  summaryCard: {
-    display: "grid",
-    gap: "0.5rem",
-    padding: "1rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #d1fae5",
-    background: "#ecfdf5",
-  },
-  summaryText: {
-    margin: 0,
-    color: "#166534",
-  },
-  summaryList: {
-    margin: 0,
-    paddingLeft: "1.2rem",
-    color: "#166534",
-  },
-  nestedCard: {
-    display: "grid",
-    gap: "0.75rem",
-    padding: "1rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #e2e8f0",
-    background: "#f8fafc",
-  },
-  arrayRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr auto",
-    gap: "0.75rem",
-    alignItems: "center",
-  },
-  priceRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr auto",
-    gap: "0.75rem",
-    alignItems: "center",
-  },
-  inlineActions: {
-    display: "flex",
-    gap: "0.75rem",
-    flexWrap: "wrap",
-  },
-  primaryButton: {
-    padding: "0.8rem 1rem",
-    borderRadius: "0.5rem",
-    border: "none",
-    background: "#0f172a",
-    color: "#ffffff",
-    cursor: "pointer",
-    fontWeight: 600,
-  },
-  secondaryButton: {
-    padding: "0.8rem 1rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #cbd5e1",
-    background: "#ffffff",
-    color: "#0f172a",
-    cursor: "pointer",
-  },
-  ghostButton: {
-    padding: "0.8rem 1rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #e2e8f0",
-    background: "#f8fafc",
-    color: "#334155",
-    cursor: "pointer",
-  },
-  error: {
-    margin: 0,
-    color: "#b91c1c",
-  },
-  notice: {
-    margin: 0,
-    color: "#166534",
-  },
-};
+const inputClassName =
+  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500";
+
+const secondaryButtonClassName =
+  "inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700";

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   categories,
   featuredBanners,
@@ -12,6 +13,7 @@ import {
   whyPillars,
   whyStats,
 } from "./landingData";
+import { appRoutes } from "@/lib/routes";
 import HomeNavbar from "./HomeNavbar";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
@@ -80,9 +82,9 @@ export default function LandingPage() {
             to SI units and built to last.
           </Reveal>
           <Reveal className={styles.heroActions} delay={3}>
-            <a href="#" className={styles.primaryButton}>
+            <Link href={appRoutes.products} className={styles.primaryButton}>
               Explore Products
-            </a>
+            </Link>
             <a href="#" className={styles.outlineButton}>
               View Promotions
             </a>
@@ -110,9 +112,9 @@ export default function LandingPage() {
                   <p className={styles.bannerCategory}>{banner.category}</p>
                   <h3>{banner.title}</h3>
                   <p className={styles.bannerTagline}>{banner.tagline}</p>
-                  <a href="#" className={styles.bannerButton}>
+                  <Link href={appRoutes.products} className={styles.bannerButton}>
                     View Products
-                  </a>
+                  </Link>
                 </div>
                 <img src={banner.image} alt={banner.title} />
               </Reveal>
@@ -139,9 +141,9 @@ export default function LandingPage() {
                   </div>
                   <p className={styles.productCategory}>{product.category}</p>
                   <p className={styles.productName}>{product.name}</p>
-                  <a href="#" className={styles.cardButton}>
+                  <Link href={appRoutes.products} className={styles.cardButton}>
                     View Product
-                  </a>
+                  </Link>
                 </Reveal>
               ))}
             </div>
@@ -175,7 +177,7 @@ export default function LandingPage() {
                 <img src={category.image} alt={category.title} />
                 <div className={styles.categoryBody}>
                   <h3>{category.title}</h3>
-                  <a href="#">View Products</a>
+                  <Link href={appRoutes.products}>View Products</Link>
                 </div>
               </Reveal>
             ))}

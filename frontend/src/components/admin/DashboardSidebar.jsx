@@ -388,5 +388,9 @@ function isActiveRoute(pathname, href) {
     return pathname === href;
   }
 
+  if (href === appRoutes.adminCategories) {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return pathname === href;
 }

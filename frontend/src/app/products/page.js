@@ -1,12 +1,20 @@
-import ProductCatalogClient from "@/components/store/ProductCatalogClient";
 import StorefrontChrome from "@/components/store/StorefrontChrome";
-import { fetchAllProducts, fetchCategories } from "@/lib/storefront";
+import ProductCatalogClient from "@/components/store/ProductCatalogClient";
+import { fetchCatalogueCategories } from "@/lib/storefront";
 
 export default async function ProductsPage() {
-  const [products, categories] = await Promise.all([
-    fetchAllProducts(),
-    fetchCategories(),
-  ]);
+  const categories = await fetchCatalogueCategories();
+  const products = categories.flatMap((category) =>
+    (category.products || []).map((product) => ({
+      ...product,
+      category: {
+        _id: category._id,
+        name: category.name,
+        slug: category.slug,
+        tableColumns: category.tableColumns || [],
+      },
+    }))
+  );
 
   return (
     <StorefrontChrome>
@@ -14,8 +22,7 @@ export default async function ProductsPage() {
         products={products}
         categories={categories}
         title="All Products"
-        description={`${products.length.toLocaleString()} products`}
-        activeCategorySlug="all"
+        description="Browse products by category from the backend catalogue."
       />
     </StorefrontChrome>
   );

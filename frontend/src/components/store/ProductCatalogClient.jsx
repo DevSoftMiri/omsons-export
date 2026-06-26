@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { appRoutes } from "@/lib/routes";
 import ProductCard from "./ProductCard";
@@ -16,38 +16,23 @@ export default function ProductCatalogClient({
   activeCategorySlug = "all",
 }) {
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState("default");
   const [selectedCategory, setSelectedCategory] = useState(activeCategorySlug || "all");
-  const [inStockOnly, setInStockOnly] = useState(false);
   const [page, setPage] = useState(1);
-
-  const resetPage = useCallback(() => setPage(1), []);
-
-  const handleQuery = (e) => { setQuery(e.target.value); resetPage(); };
-  const handleSort = (e) => { setSort(e.target.value); resetPage(); };
-  const handleCategory = (slug) => { setSelectedCategory(slug); resetPage(); };
-  const handleInStock = (e) => { setInStockOnly(e.target.checked); resetPage(); };
 
   const categoryOptions = useMemo(() => {
     const counts = products.reduce((map, product) => {
-      const slug = product.category || "uncategorized";
+      const slug = product.category?.slug || "uncategorized";
       map.set(slug, (map.get(slug) || 0) + 1);
       return map;
     }, new Map());
 
-    const normalized = categories.map((category) => ({
-      slug: category.slug,
-      label: category.name,
-      count: counts.get(category.slug) || 0,
-    }));
-
-    for (const [slug, count] of counts.entries()) {
-      if (!normalized.some((item) => item.slug === slug)) {
-        normalized.push({ slug, label: toTitleCase(slug), count });
-      }
-    }
-
-    normalized.sort((left, right) => left.label.localeCompare(right.label));
+    const normalized = categories
+      .map((category) => ({
+        slug: category.slug,
+        label: category.name,
+        count: counts.get(category.slug) || 0,
+      }))
+      .sort((left, right) => left.label.localeCompare(right.label));
 
     return [{ slug: "all", label: "All Products", count: products.length }, ...normalized];
   }, [categories, products]);
@@ -56,11 +41,7 @@ export default function ProductCatalogClient({
     let result = [...products];
 
     if (selectedCategory !== "all") {
-      result = result.filter((product) => (product.category || "uncategorized") === selectedCategory);
-    }
-
-    if (inStockOnly) {
-      result = result.filter((product) => hasInStockVariant(product));
+      result = result.filter((product) => product.category?.slug === selectedCategory);
     }
 
     if (query.trim()) {
@@ -68,45 +49,51 @@ export default function ProductCatalogClient({
       result = result.filter((product) => {
         const haystacks = [
           product.name,
-          product.sku,
-          product.category,
-          product.mainCategory,
-          product.shortDescription,
-          ...(product.variants || []).flatMap((variant) => [
-            variant.name,
-            variant.sku,
-            variant.specsText,
-            ...Object.values(variant.specs || {}),
-          ]),
+          product.slug,
+          product.description,
+          product.category?.name,
+          ...(product.bulletPoints || []),
+          ...(product.technicalTags || []),
+          ...(product.rows || []).flatMap((row) => Object.values(row.values || {})),
         ];
+
         return haystacks.some((value) =>
           String(value || "").toLowerCase().includes(normalizedQuery)
         );
       });
     }
 
-    if (sort === "name-asc") {
-      result.sort((left, right) => left.name.localeCompare(right.name));
-    } else if (sort === "variants-desc") {
-      result.sort((left, right) => (right.variants?.length || 0) - (left.variants?.length || 0));
-    }
-
     return result;
-  }, [inStockOnly, products, query, selectedCategory, sort]);
+  }, [products, query, selectedCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   const safePage = Math.min(page, totalPages);
-  const pagedProducts = filteredProducts.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+  const pagedProducts = filteredProducts.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE
+  );
+
+  function handleCategory(slug) {
+    setSelectedCategory(slug);
+    setPage(1);
+  }
+
+  function handleQuery(event) {
+    setQuery(event.target.value);
+    setPage(1);
+  }
 
   const activeCategoryLabel =
     categoryOptions.find((item) => item.slug === selectedCategory)?.label || title;
+  const startIndex = filteredProducts.length ? (safePage - 1) * ITEMS_PER_PAGE + 1 : 0;
+  const endIndex = filteredProducts.length
+    ? Math.min(safePage * ITEMS_PER_PAGE, filteredProducts.length)
+    : 0;
 
   return (
     <div className={styles.page}>
       <div className={styles.breadcrumbs}>
         <Link href={appRoutes.home}>Home</Link>
-        <span>/</span>
-        <Link href={appRoutes.products}>Categories</Link>
         <span>/</span>
         <span>{activeCategoryLabel}</span>
       </div>
@@ -125,17 +112,8 @@ export default function ProductCatalogClient({
             className={styles.search}
             value={query}
             onChange={handleQuery}
-            placeholder="Search by name, SKU, category..."
+            placeholder="Search by name, slug or category..."
           />
-          <select
-            className={styles.sort}
-            value={sort}
-            onChange={handleSort}
-          >
-            <option value="default">Default</option>
-            <option value="name-asc">Name A–Z</option>
-            <option value="variants-desc">Most Variants</option>
-          </select>
         </div>
       </section>
 
@@ -144,11 +122,7 @@ export default function ProductCatalogClient({
           <div className={styles.group}>
             <h2 className={styles.groupTitle}>Availability</h2>
             <label className={styles.checkbox}>
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={handleInStock}
-              />
+              <input type="checkbox" disabled />
               <span>In Stock Only</span>
             </label>
           </div>
@@ -158,6 +132,7 @@ export default function ProductCatalogClient({
             <div className={styles.categoryScroller}>
               {categoryOptions.map((category) => {
                 const isActive = category.slug === selectedCategory;
+
                 return (
                   <button
                     key={category.slug}
@@ -178,10 +153,9 @@ export default function ProductCatalogClient({
         <div className={styles.results}>
           <div className={styles.resultsBar}>
             <span>
-              {filteredProducts.length.toLocaleString()} product{filteredProducts.length !== 1 ? "s" : ""} found
-              {filteredProducts.length > ITEMS_PER_PAGE && ` · showing ${(safePage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(safePage * ITEMS_PER_PAGE, filteredProducts.length)}`}
+              {startIndex}-{endIndex} of{" "}
+              {filteredProducts.length.toLocaleString()} products
             </span>
-            <span>Data loaded from backend</span>
           </div>
 
           {pagedProducts.length ? (
@@ -191,12 +165,10 @@ export default function ProductCatalogClient({
               ))}
             </div>
           ) : (
-            <div className={styles.empty}>
-              No products match the selected filters.
-            </div>
+            <div className={styles.empty}>No products match the selected category.</div>
           )}
 
-          {totalPages > 1 && (
+          {totalPages > 1 ? (
             <div className={styles.pagination}>
               <button
                 className={styles.pageBtn}
@@ -205,7 +177,9 @@ export default function ProductCatalogClient({
               >
                 ← Prev
               </button>
-              <span className={styles.pageInfo}>Page {safePage} of {totalPages}</span>
+              <span className={styles.pageInfo}>
+                Page {safePage} of {totalPages}
+              </span>
               <button
                 className={styles.pageBtn}
                 disabled={safePage === totalPages}
@@ -214,22 +188,9 @@ export default function ProductCatalogClient({
                 Next →
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       </section>
     </div>
   );
-}
-
-function hasInStockVariant(product) {
-  if (!product.variants?.length) return false;
-  return product.variants.some((variant) => variant.inStock);
-}
-
-function toTitleCase(value) {
-  return String(value || "")
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
 }

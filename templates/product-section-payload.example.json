@@ -1,0 +1,66 @@
+{
+  "categoryId": "REPLACE_WITH_REAL_ADAPTERS_CATEGORY_ID",
+  "name": "Adapters, Reduction",
+  "slug": "adapters-reduction",
+  "description": "Reduction adaptors for socket-to-cone assemblies in laboratory glassware.",
+  "imageUrl": "",
+  "bulletPoints": [
+    "Complies as per DIN 12257.",
+    "Small size socket at top & big size cone at bottom."
+  ],
+  "icons": [
+    {
+      "label": "Glass Boro 3.3",
+      "imageUrl": ""
+    },
+    {
+      "label": "Chemical Resistant",
+      "imageUrl": ""
+    },
+    {
+      "label": "One Cone",
+      "imageUrl": ""
+    },
+    {
+      "label": "One Socket",
+      "imageUrl": ""
+    }
+  ],
+  "technicalTags": [],
+  "rows": [
+    {
+      "values": {
+        "Cat. No.": "1001.100.01",
+        "Range": "0 to 110",
+        "Pack Unit": "10",
+        "L.C. (°C)": "1",
+        "Length (mm)": "305"
+      },
+      "sortOrder": 1,
+      "isActive": true
+    },
+    {
+      "values": {
+        "Cat. No.": "1001.100.02",
+        "Range": "0 to 200",
+        "Pack Unit": "10",
+        "L.C. (°C)": "2",
+        "Length (mm)": "405"
+      },
+      "sortOrder": 2,
+      "isActive": true
+    },
+    {
+      "values": {
+        "Cat. No.": "1001.100.03",
+        "Range": "0 to 360",
+        "Pack Unit": "10",
+        "L.C. (°C)": "5",
+        "Length (mm)": "455"
+      },
+      "sortOrder": 3,
+      "isActive": true
+    }
+  ],
+  "isActive": true
+}

@@ -1,0 +1,50 @@
+{
+  "categoryId": "PUT_YOUR_CATEGORY_ID_HERE",
+  "name": "Product Name From PDF",
+  "slug": "product-name-from-pdf",
+  "description": "Short description or overview from the PDF.",
+  "imageUrl": "https://your-image-url-or-empty-string",
+  "bulletPoints": [
+    "First bullet point from the PDF",
+    "Second bullet point from the PDF"
+  ],
+  "icons": [
+    {
+      "label": "Glass Boro 3.3",
+      "imageUrl": ""
+    },
+    {
+      "label": "Chemical Resistant",
+      "imageUrl": ""
+    }
+  ],
+  "technicalTags": [
+    "Optional Tag 1",
+    "Optional Tag 2"
+  ],
+  "rows": [
+    {
+      "values": {
+        "Cat. No.": "1000.100.01",
+        "Range": "0 to 110",
+        "Pack Unit": "10",
+        "L.C. (°C)": "1",
+        "Length (mm)": "305"
+      },
+      "sortOrder": 1,
+      "isActive": true
+    },
+    {
+      "values": {
+        "Cat. No.": "1000.100.02",
+        "Range": "0 to 200",
+        "Pack Unit": "10",
+        "L.C. (°C)": "2",
+        "Length (mm)": "405"
+      },
+      "sortOrder": 2,
+      "isActive": true
+    }
+  ],
+  "isActive": true
+}

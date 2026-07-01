@@ -3,42 +3,48 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:5000/api";
 
-async function request(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+async function request(path, fallbackValue = null) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
 
-  if (!response.ok) {
-    if (response.status === 404) {
-      return null;
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+
+      console.error(`Storefront request failed for ${path} with status ${response.status}`);
+      return fallbackValue;
     }
 
-    throw new Error(`Request failed: ${response.status}`);
+    return response.json();
+  } catch (error) {
+    console.error(`Storefront request crashed for ${path}:`, error);
+    return fallbackValue;
   }
-
-  return response.json();
 }
 
 export async function fetchNavbar() {
-  const data = await request("/navbar");
+  const data = await request("/navbar", { navbars: [] });
   return data?.navbars || [];
 }
 
 export async function fetchAllProducts() {
-  const data = await request("/products");
+  const data = await request("/products", { products: [] });
   return data?.products || [];
 }
 
 export async function fetchCategories() {
-  const data = await request("/category");
+  const data = await request("/category", { categories: [] });
   return data?.categories || [];
 }
 
 export async function fetchCatalogueCategories() {
-  const data = await request("/category/catalogue");
+  const data = await request("/category/catalogue", { categories: [] });
   return data?.categories || [];
 }
 
 export async function fetchCategoryProducts(categorySlug) {
-  const data = await request(`/products/category/${categorySlug}`);
+  const data = await request(`/products/category/${categorySlug}`, { products: [] });
   return data?.products || [];
 }
 

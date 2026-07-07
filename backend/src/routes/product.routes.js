@@ -5,6 +5,7 @@ const {
   updateProduct,
   deleteProduct,
   deleteProductRow,
+  getAdminProductList,
   getAllProducts,
   getProductForAdmin,
   getProductsByCategory,
@@ -18,6 +19,7 @@ const router = express.Router();
 
 router.get("/", getAllProducts);
 router.get("/get-all", getAllProducts);
+router.get("/admin/list", requireAdmin, getAdminProductList);
 router.get("/manage/:id", requireAdmin, getProductForAdmin);
 router.get("/category/:categorySlug", getProductsByCategory);
 router.get("/get-by-category/:categorySlug", getProductsByCategory);

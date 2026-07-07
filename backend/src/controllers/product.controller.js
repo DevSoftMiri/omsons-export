@@ -9,6 +9,70 @@ const getAllProducts = asyncHandler(async (_req, res) => {
   res.json({ success: true, products });
 });
 
+const getAdminProductList = asyncHandler(async (req, res) => {
+  const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+  const pageSize = Math.min(Math.max(Number.parseInt(req.query.pageSize, 10) || 24, 1), 100);
+  const search = String(req.query.search || "").trim();
+  const categorySlug = String(req.query.category || "").trim();
+
+  const filter = await buildAdminProductFilter({ search, categorySlug });
+  const total = await Product.countDocuments(filter);
+  const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+  const currentPage = Math.min(page, totalPages);
+  const skip = (currentPage - 1) * pageSize;
+
+  const products = await Product.find(filter)
+    .select("name slug description bulletPoints imageUrl categoryId sortOrder isActive createdAt")
+    .populate({ path: "categoryId", select: "name slug" })
+    .sort({ sortOrder: 1, createdAt: 1 })
+    .skip(skip)
+    .limit(pageSize)
+    .lean();
+
+  const productIds = products.map((product) => product._id);
+  const rowCounts = productIds.length
+    ? await ProductRow.aggregate([
+        { $match: { productId: { $in: productIds }, isActive: true } },
+        { $group: { _id: "$productId", count: { $sum: 1 } } },
+      ])
+    : [];
+
+  const rowCountMap = rowCounts.reduce((accumulator, item) => {
+    accumulator[String(item._id)] = item.count;
+    return accumulator;
+  }, {});
+
+  const categoryCounts = await Product.aggregate([
+    { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "_id",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    { $sort: { "category.name": 1 } },
+  ]);
+
+  res.json({
+    success: true,
+    products: products.map((product) => serializeAdminListProduct(product, rowCountMap[String(product._id)] || 0)),
+    filters: categoryCounts.map((item) => ({
+      slug: item.category.slug,
+      label: item.category.name,
+      count: item.count,
+    })),
+    pagination: {
+      page: currentPage,
+      pageSize,
+      total,
+      totalPages,
+    },
+  });
+});
+
 const getProductsByCategory = asyncHandler(async (req, res) => {
   const category = await Category.findOne({ slug: req.params.categorySlug }).lean();
 
@@ -183,6 +247,31 @@ async function fetchProducts(filter) {
   );
 }
 
+async function buildAdminProductFilter({ search, categorySlug }) {
+  const filter = {};
+
+  if (categorySlug) {
+    const category = await Category.findOne({ slug: categorySlug }).select("_id").lean();
+    filter.categoryId = category?._id || null;
+  }
+
+  if (!search) {
+    return filter;
+  }
+
+  const searchRegex = new RegExp(escapeRegex(search), "i");
+  const matchingCategories = await Category.find({ name: searchRegex }).select("_id").lean();
+  const categoryIds = matchingCategories.map((category) => category._id);
+
+  filter.$or = [
+    { name: searchRegex },
+    { slug: searchRegex },
+    ...(categoryIds.length ? [{ categoryId: { $in: categoryIds } }] : []),
+  ];
+
+  return filter;
+}
+
 async function fetchSingleProduct(filter) {
   const product = await Product.findOne(filter).populate("categoryId").lean();
 
@@ -322,6 +411,30 @@ function serializeProduct(product, rows = [], category = null) {
   };
 }
 
+function serializeAdminListProduct(product, rowCount = 0) {
+  const category = product.categoryId
+    ? {
+        _id: product.categoryId._id,
+        name: product.categoryId.name,
+        slug: product.categoryId.slug,
+      }
+    : null;
+
+  return {
+    _id: product._id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description || "",
+    bulletPoints: product.bulletPoints || [],
+    imageUrl: product.imageUrl || "",
+    isActive: Boolean(product.isActive),
+    sortOrder: product.sortOrder || 0,
+    categoryId: category?._id || null,
+    category,
+    rowCount,
+  };
+}
+
 function normalizeRows(rows, tableColumns) {
   if (!Array.isArray(rows)) {
     return [];
@@ -360,6 +473,10 @@ function normalizeStringArray(value) {
   return Array.isArray(value)
     ? [...new Set(value.map((item) => String(item || "").trim()).filter(Boolean))]
     : [];
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function normalizeOptionalNumber(value, fallback) {
@@ -408,6 +525,7 @@ module.exports = {
   addProductRow,
   createProduct,
   deleteProduct,
+  getAdminProductList,
   deleteProductRow,
   getAllProducts,
   getProductBySlug,

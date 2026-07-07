@@ -19,6 +19,15 @@ export default function AdminShell({ title, description, children }) {
           min-width: 0;
         }
 
+        .admin-shell-content {
+          width: 100%;
+          max-width: 1180px;
+          margin: 0 auto;
+          display: grid;
+          gap: 1.5rem;
+          min-width: 0;
+        }
+
         .admin-shell-header {
           display: grid;
           gap: 0.35rem;
@@ -51,11 +60,13 @@ export default function AdminShell({ title, description, children }) {
       <div className="admin-shell-layout">
       <DashboardSidebar />
       <main className="admin-shell-main">
-        <header className="admin-shell-header">
-          <h1 className="admin-shell-title">{title}</h1>
-          <p className="admin-shell-description">{description}</p>
-        </header>
-        {children}
+        <div className="admin-shell-content">
+          <header className="admin-shell-header">
+            <h1 className="admin-shell-title">{title}</h1>
+            <p className="admin-shell-description">{description}</p>
+          </header>
+          {children}
+        </div>
       </main>
       </div>
     </>

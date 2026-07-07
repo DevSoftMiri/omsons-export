@@ -11,7 +11,8 @@ export default function ProductListClient() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [status, setStatus] = useState({ loading: false, error: "" });
+  const [status, setStatus] = useState({ loading: false, error: "", notice: "" });
+  const token = useMemo(() => getCookieValue("admin_token"), []);
 
   const categoryOptions = useMemo(() => {
     const counts = products.reduce((map, product) => {
@@ -57,7 +58,7 @@ export default function ProductListClient() {
   }, []);
 
   async function loadProducts() {
-    setStatus({ loading: true, error: "" });
+    setStatus((current) => ({ ...current, loading: true, error: "" }));
 
     try {
       const response = await fetch(`${API_BASE_URL}/products`, { cache: "no-store" });
@@ -68,14 +69,51 @@ export default function ProductListClient() {
       }
 
       setProducts(data.products || []);
-      setStatus({ loading: false, error: "" });
+      setStatus((current) => ({ ...current, loading: false, error: "" }));
     } catch (error) {
-      setStatus({ loading: false, error: error.message || "Failed to load products" });
+      setStatus((current) => ({
+        ...current,
+        loading: false,
+        error: error.message || "Failed to load products",
+      }));
+    }
+  }
+
+  async function handleDelete(product) {
+    if (!window.confirm(`Delete "${product.name}" from the catalogue?`)) {
+      return;
+    }
+
+    setStatus({ loading: true, error: "", notice: "" });
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${product._id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete product");
+      }
+
+      setProducts((current) => current.filter((item) => item._id !== product._id));
+      setStatus({
+        loading: false,
+        error: "",
+        notice: `${product.name} deleted successfully.`,
+      });
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error.message || "Failed to delete product",
+        notice: "",
+      });
     }
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-[1120px] gap-6">
+    <div className="grid w-full gap-6">
       <style>{`
         .product-list-category-scroll {
           scrollbar-width: thin;
@@ -136,13 +174,35 @@ export default function ProductListClient() {
           </span>
         </div>
 
-        <div className="mt-5">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
-            Filter By Category
+        {status.error ? (
+          <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {status.error}
           </p>
-          <div className="-mx-6 overflow-x-hidden">
-            <div className="product-list-category-scroll w-full overflow-x-scroll overscroll-x-contain px-6 pb-3">
-              <div className="flex min-w-max gap-3 pr-2">
+        ) : null}
+        {status.notice ? (
+          <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {status.notice}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="min-w-0 rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#f1f6fd_100%)] p-5 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+              Filter By Category
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Scroll inside this strip to browse all catalogue groups.
+            </p>
+          </div>
+          <span className="inline-flex items-center rounded-full border border-sky-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-sky-700">
+            {categoryOptions.length} filters
+          </span>
+        </div>
+
+        <div className="product-list-category-scroll min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain pb-2">
+          <div className="flex min-w-max flex-nowrap gap-3 pr-2">
             {categoryOptions.map((category) => {
               const isActive = category.slug === selectedCategory;
 
@@ -151,65 +211,55 @@ export default function ProductListClient() {
                   key={category.slug}
                   type="button"
                   onClick={() => setSelectedCategory(category.slug)}
-                  className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                    isActive
+                  className={`inline-flex shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition ${isActive
                       ? "border-sky-700 bg-sky-700 text-white"
                       : "border-slate-300 bg-white text-slate-700"
-                  }`}
+                    }`}
                 >
                   <span>{category.label}</span>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
-                    }`}
+                    className={`rounded-full px-2 py-0.5 text-xs ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                      }`}
                   >
                     {category.count}
                   </span>
                 </button>
               );
             })}
-              </div>
-            </div>
           </div>
         </div>
-
-        {status.error ? (
-          <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {status.error}
-          </p>
-        ) : null}
       </section>
 
-      <section className="grid gap-4">
-        {status.loading ? (
-          <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
-            Loading products...
-          </div>
-        ) : null}
+      <section className="overflow-x-auto pb-2">
+        <div className="grid min-w-[880px] gap-4">
+          {status.loading ? (
+            <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+              Loading products...
+            </div>
+          ) : null}
 
-        {!status.loading && !filteredProducts.length ? (
-          <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
-            No products found.
-          </div>
-        ) : null}
+          {!status.loading && !filteredProducts.length ? (
+            <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+              No products found.
+            </div>
+          ) : null}
 
-        {filteredProducts.map((product) => (
-          <article
-            key={product._id}
-            className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm"
-          >
-            <div className="flex min-w-0 flex-col gap-5">
-              <div className="flex flex-col gap-5 md:flex-row md:items-start">
-                <div className="flex h-24 w-24 flex-none items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
-                  <img
-                    src={product.imageUrl || "/omsons-logo.jpg"}
-                    alt={product.name}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
+          {filteredProducts.map((product) => (
+            <article
+              key={product._id}
+              className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              <div className="flex min-w-0 flex-col gap-5">
+                <div className="flex gap-5">
+                  <div className="flex h-24 w-24 flex-none items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
+                    <img
+                      src={product.imageUrl || "/omsons-logo.jpg"}
+                      alt={product.name}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 flex-1">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-sky-700">
@@ -225,31 +275,49 @@ export default function ProductListClient() {
                       <p className="mt-2 break-all text-sm text-slate-500">{product.slug}</p>
                     </div>
 
-                    <div className="flex w-full flex-wrap gap-2 lg:w-auto lg:flex-none lg:justify-end">
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                      {product.description || product.bulletPoints?.[0] || "No description available."}
+                    </p>
+
+                    <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
                       <Link
                         href={`${appRoutes.adminProducts}?edit=${product._id}&categoryId=${product.categoryId}`}
-                        className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 lg:min-w-[120px] lg:flex-none"
+                        className="inline-flex min-w-[110px] items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
                       >
                         Edit
                       </Link>
                       <Link
                         href={appRoutes.product(product.slug)}
-                        className="inline-flex flex-1 items-center justify-center rounded-full bg-sky-700 px-4 py-2 text-sm font-semibold text-white lg:min-w-[140px] lg:flex-none"
+                        className="inline-flex min-w-[130px] items-center justify-center rounded-full bg-sky-700 px-4 py-2 text-sm font-semibold !text-white"
                       >
                         View Detail
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(product)}
+                        className="inline-flex min-w-[110px] items-center justify-center rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
-
-                  <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                    {product.description || product.bulletPoints?.[0] || "No description available."}
-                  </p>
                 </div>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );
+}
+
+function getCookieValue(name) {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  return document.cookie
+    .split("; ")
+    .find((part) => part.startsWith(`${name}=`))
+    ?.split("=")[1] || "";
 }

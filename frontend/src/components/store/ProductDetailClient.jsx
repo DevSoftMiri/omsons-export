@@ -1,10 +1,59 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { appRoutes } from "@/lib/routes";
 import ProductCard from "./ProductCard";
 import ProductGallery from "./ProductGallery";
 import styles from "./ProductDetailClient.module.css";
+
+const SECTION_DEFINITIONS = [
+  {
+    id: "variants",
+    chipLabel: "Variants & Specifications",
+    title: "Variants & Specifications",
+    badge: "VS",
+  },
+  {
+    id: "itemsSupplied",
+    chipLabel: "Items Supplied",
+    title: "Items Supplied",
+    badge: "IS",
+  },
+  {
+    id: "accessories",
+    chipLabel: "Accessories",
+    title: "Accessories & Spare Parts",
+    badge: "AS",
+  },
+  {
+    id: "charts",
+    chipLabel: "Selection Charts",
+    title: "Selection Charts",
+    badge: "SC",
+  },
+  {
+    id: "videos",
+    chipLabel: "Videos",
+    title: "Videos",
+    badge: "VD",
+  },
+  {
+    id: "downloads",
+    chipLabel: "Downloads",
+    title: "Downloads",
+    badge: "DL",
+  },
+];
+
+const DEFAULT_OPEN_SECTIONS = {
+  variants: true,
+  itemsSupplied: false,
+  accessories: false,
+  charts: false,
+  videos: false,
+  downloads: false,
+};
 
 export default function ProductDetailClient({ product, relatedProducts = [] }) {
   const tableColumns = product.tableColumns || product.category?.tableColumns || [];
@@ -18,11 +67,41 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
     .filter((item) => item.value);
 
   const hasVariants = visibleRows.length > 0;
-  const isInStock = product.variants?.some((v) => v.inStock) ?? true;
+  const isInStock = product.variants?.some((variant) => variant.inStock) ?? true;
+  const itemsSupplied = product.itemsSupplied?.length
+    ? product.itemsSupplied
+    : product.bulletPoints || [];
+  const accessoriesSpareParts = product.accessoriesSpareParts || [];
+  const selectionCharts = product.selectionCharts || [];
+  const videos = product.videos || [];
+  const downloads = product.downloads || [];
+
+  const sections = useMemo(() => SECTION_DEFINITIONS, []);
+  const [openSections, setOpenSections] = useState(DEFAULT_OPEN_SECTIONS);
+
+  function toggleSection(sectionId) {
+    setOpenSections((current) => ({
+      ...current,
+      [sectionId]: !current[sectionId],
+    }));
+  }
+
+  function openAndScroll(sectionId) {
+    setOpenSections((current) => ({
+      ...current,
+      [sectionId]: true,
+    }));
+
+    if (typeof document !== "undefined") {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
 
   return (
     <div className={styles.page}>
-      {/* Breadcrumbs */}
       <div className={styles.breadcrumbs}>
         <Link href={appRoutes.home}>Home</Link>
         <span>/</span>
@@ -39,9 +118,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
         <span>{product.name}</span>
       </div>
 
-      {/* Hero: two-column layout */}
       <section className={styles.hero}>
-        {/* Left: gallery then icon strip */}
         <div className={styles.heroLeft}>
           <div className={styles.galleryCard}>
             <ProductGallery product={product} />
@@ -132,41 +209,162 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
           </p>
         </aside>
       </section>
-      {/* Specs table */}
-      {hasVariants ? (
-        <section className={styles.specsCard}>
-          <h2 className={styles.blockTitle}>Variants &amp; Specifications</h2>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  {tableColumns.map((header) => (
-                    <th key={header}>{header}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {visibleRows.map((row) => (
-                  <tr key={row._id}>
-                    {tableColumns.map((header) => (
-                      <td key={header}>{row.values?.[header] || "—"}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ) : null}
 
-      {/* Related products */}
+      <section className={styles.detailSections}>
+        <div className={styles.sectionPillRow}>
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => openAndScroll(section.id)}
+              className={`${styles.sectionPill} ${
+                openSections[section.id] ? styles.sectionPillActive : ""
+              }`}
+            >
+              <span className={styles.sectionPillBadge}>{section.badge}</span>
+              <span>{section.chipLabel}</span>
+            </button>
+          ))}
+        </div>
+
+        {sections.map((section) => (
+          <section key={section.id} id={section.id} className={styles.accordionCard}>
+            <button
+              type="button"
+              onClick={() => toggleSection(section.id)}
+              className={styles.accordionHeader}
+            >
+              <span className={styles.accordionTitle}>{section.title}</span>
+              <span className={styles.accordionToggle}>
+                {openSections[section.id] ? "-" : "+"}
+              </span>
+            </button>
+
+            {openSections[section.id] ? (
+              <div className={styles.accordionBody}>
+                {section.id === "variants" ? (
+                  hasVariants ? (
+                    <div className={styles.tableWrap}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            {tableColumns.map((header) => (
+                              <th key={header}>{header}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {visibleRows.map((row) => (
+                            <tr key={row._id}>
+                              {tableColumns.map((header) => (
+                                <td key={header}>{row.values?.[header] || "-"}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className={styles.emptySection}>No variant specifications available yet.</p>
+                  )
+                ) : null}
+
+                {section.id === "itemsSupplied" ? (
+                  itemsSupplied.length ? (
+                    <ul className={styles.sectionList}>
+                      {itemsSupplied.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.emptySection}>Items supplied information will be added soon.</p>
+                  )
+                ) : null}
+
+                {section.id === "accessories" ? (
+                  accessoriesSpareParts.length ? (
+                    <ul className={styles.sectionList}>
+                      {accessoriesSpareParts.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.emptySection}>No accessories or spare parts listed for this product.</p>
+                  )
+                ) : null}
+
+                {section.id === "charts" ? (
+                  selectionCharts.length ? (
+                    <div className={styles.linkGrid}>
+                      {selectionCharts.map((item) => (
+                        <a
+                          key={item}
+                          href={item}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.resourceLink}
+                        >
+                          {getResourceLabel(item)}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.emptySection}>Selection charts are not available for this product yet.</p>
+                  )
+                ) : null}
+
+                {section.id === "videos" ? (
+                  videos.length ? (
+                    <div className={styles.linkGrid}>
+                      {videos.map((item) => (
+                        <a
+                          key={item}
+                          href={item}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.resourceLink}
+                        >
+                          {getResourceLabel(item)}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.emptySection}>Videos are not available for this product yet.</p>
+                  )
+                ) : null}
+
+                {section.id === "downloads" ? (
+                  downloads.length ? (
+                    <div className={styles.linkGrid}>
+                      {downloads.map((item) => (
+                        <a
+                          key={item}
+                          href={item}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.resourceLink}
+                        >
+                          {getResourceLabel(item)}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.emptySection}>Downloads are not available for this product yet.</p>
+                  )
+                ) : null}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </section>
+
       {relatedProducts.length ? (
         <section className={styles.relatedCard}>
           <div className={styles.relatedHeader}>
             <h2 className={styles.blockTitle}>Related Products</h2>
             {product.category?.slug ? (
               <Link href={appRoutes.category(product.category.slug)}>
-                View all in {product.category.name} →
+                View all in {product.category.name}
               </Link>
             ) : null}
           </div>
@@ -179,4 +377,20 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
       ) : null}
     </div>
   );
+}
+
+function getResourceLabel(value) {
+  const normalized = String(value || "").trim();
+
+  if (!normalized) {
+    return "Open resource";
+  }
+
+  try {
+    const { pathname } = new URL(normalized);
+    const lastSegment = pathname.split("/").filter(Boolean).pop();
+    return lastSegment || normalized;
+  } catch (_error) {
+    return normalized;
+  }
 }

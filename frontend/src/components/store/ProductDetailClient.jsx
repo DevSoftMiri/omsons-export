@@ -7,14 +7,17 @@ import ProductGallery from "./ProductGallery";
 import styles from "./ProductDetailClient.module.css";
 
 export default function ProductDetailClient({ product, relatedProducts = [] }) {
-  const tableColumns = product.category?.tableColumns || [];
-  const firstRow = product.rows?.[0]?.values || {};
+  const tableColumns = product.tableColumns || product.category?.tableColumns || [];
+  const visibleRows = (product.rows || []).filter((row) =>
+    tableColumns.some((column) => String(row.values?.[column] || "").trim())
+  );
+  const firstRow = visibleRows[0]?.values || {};
   const summaryItems = tableColumns
     .filter((column) => column !== "Cat. No.")
     .map((column) => ({ label: column, value: firstRow[column] || "" }))
     .filter((item) => item.value);
 
-  const hasVariants = product.rows?.length > 0;
+  const hasVariants = visibleRows.length > 0;
   const isInStock = product.variants?.some((v) => v.inStock) ?? true;
 
   return (
@@ -107,7 +110,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
             </div>
             <div className={styles.actionStat}>
               <p className={styles.actionTitle}>Variants</p>
-              <p className={styles.actionValue}>{product.rows?.length || 0}</p>
+              <p className={styles.actionValue}>{visibleRows.length}</p>
             </div>
             <div className={styles.actionStat}>
               <p className={styles.actionTitle}>Category</p>
@@ -143,7 +146,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
                 </tr>
               </thead>
               <tbody>
-                {product.rows.map((row) => (
+                {visibleRows.map((row) => (
                   <tr key={row._id}>
                     {tableColumns.map((header) => (
                       <td key={header}>{row.values?.[header] || "—"}</td>

@@ -1,5 +1,7 @@
 export default function ProductGallery({ product }) {
-  const images = [product.imageUrl].filter(Boolean);
+  const images = Array.isArray(product.galleryImages) && product.galleryImages.length
+    ? product.galleryImages
+    : [product.imageUrl].filter(Boolean);
   const normalizedImages = images.length ? images : ["/omsons-logo.jpg"];
 
   return (

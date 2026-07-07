@@ -209,9 +209,11 @@ function groupProductsByCategory(products, rows, categories) {
       _id: product._id,
       name: product.name,
       slug: product.slug,
+      tableColumns: product.tableColumns || category?.tableColumns || [],
       description: product.description || "",
       bulletPoints: product.bulletPoints || [],
       imageUrl: product.imageUrl || "",
+      galleryImages: product.galleryImages || [],
       icons: product.icons || [],
       technicalTags: product.technicalTags || [],
       isActive: Boolean(product.isActive),
@@ -229,7 +231,10 @@ function groupProductsByCategory(products, rows, categories) {
         _id: row._id,
         sortOrder: row.sortOrder || 0,
         isActive: Boolean(row.isActive),
-        values: normalizeRowValues(row.values, category?.tableColumns || []),
+        values: normalizeRowValues(
+          row.values,
+          product.tableColumns || category?.tableColumns || []
+        ),
       })),
     });
     return accumulator;

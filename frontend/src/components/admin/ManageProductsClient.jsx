@@ -28,6 +28,9 @@ export default function ManageProductsClient() {
     () => categories.find((item) => item._id === selectedCategoryId) || null,
     [categories, selectedCategoryId]
   );
+  const activeColumns = form.tableColumns?.length
+    ? form.tableColumns
+    : selectedCategory?.tableColumns || [];
 
   const filteredProducts = useMemo(() => {
     if (!selectedCategoryId) {
@@ -46,7 +49,11 @@ export default function ManageProductsClient() {
       return;
     }
 
-    setForm((current) => syncRowsToColumns(current, selectedCategory.tableColumns || []));
+    setForm((current) =>
+      current.tableColumns?.length
+        ? current
+        : syncRowsToColumns(current, selectedCategory.tableColumns || [])
+    );
   }, [selectedCategory]);
 
   useEffect(() => {
@@ -115,6 +122,9 @@ export default function ManageProductsClient() {
         categoryId: product.categoryId,
         name: product.name || "",
         slug: product.slug || "",
+        tableColumns: product.tableColumns?.length
+          ? product.tableColumns
+          : product.category?.tableColumns || [],
         description: product.description || "",
         imageUrl: product.imageUrl || "",
         bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
@@ -126,7 +136,7 @@ export default function ManageProductsClient() {
               sortOrder: row.sortOrder,
               isActive: row.isActive,
             }))
-          : [{ values: createEmptyRowValues(product.category?.tableColumns || []) }],
+          : [{ values: createEmptyRowValues(product.tableColumns || product.category?.tableColumns || []) }],
         isActive: Boolean(product.isActive),
       });
       setStatus((current) => ({ ...current, loading: false }));
@@ -153,7 +163,8 @@ export default function ManageProductsClient() {
       const payload = {
         ...form,
         categoryId: selectedCategoryId,
-        rows: normalizeFormRows(form.rows, selectedCategory?.tableColumns || []),
+        tableColumns: activeColumns,
+        rows: normalizeFormRows(form.rows, activeColumns),
       };
 
       const response = await fetch(
@@ -234,9 +245,11 @@ export default function ManageProductsClient() {
 
   function handleCategoryChange(categoryId) {
     setSelectedCategoryId(categoryId);
+    const nextColumns = categories.find((item) => item._id === categoryId)?.tableColumns || [];
     setForm((current) => ({
-      ...syncRowsToColumns(current, categories.find((item) => item._id === categoryId)?.tableColumns || []),
+      ...syncRowsToColumns(current, nextColumns),
       categoryId,
+      tableColumns: nextColumns,
     }));
   }
 
@@ -247,6 +260,9 @@ export default function ManageProductsClient() {
       categoryId: product.categoryId,
       name: product.name || "",
       slug: product.slug || "",
+      tableColumns: product.tableColumns?.length
+        ? product.tableColumns
+        : product.category?.tableColumns || [],
       description: product.description || "",
       imageUrl: product.imageUrl || "",
       bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
@@ -258,7 +274,7 @@ export default function ManageProductsClient() {
             sortOrder: row.sortOrder,
             isActive: row.isActive,
           }))
-        : [{ values: createEmptyRowValues(product.category?.tableColumns || []) }],
+        : [{ values: createEmptyRowValues(product.tableColumns || product.category?.tableColumns || []) }],
       isActive: Boolean(product.isActive),
     });
     router.replace(`${appRoutes.adminProducts}?edit=${product._id}&categoryId=${product.categoryId}`);
@@ -270,7 +286,7 @@ export default function ManageProductsClient() {
       rows: [
         ...current.rows,
         {
-          values: createEmptyRowValues(selectedCategory?.tableColumns || []),
+          values: createEmptyRowValues(activeColumns),
           sortOrder: current.rows.length + 1,
           isActive: true,
         },
@@ -283,7 +299,7 @@ export default function ManageProductsClient() {
       ...current,
       rows:
         current.rows.length === 1
-          ? [{ values: createEmptyRowValues(selectedCategory?.tableColumns || []) }]
+          ? [{ values: createEmptyRowValues(activeColumns) }]
           : current.rows.filter((_, rowIndex) => rowIndex !== index),
     }));
   }
@@ -513,7 +529,7 @@ export default function ManageProductsClient() {
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
                   {selectedCategory
-                    ? `These fields come from ${selectedCategory.name}: ${selectedCategory.tableColumns.join(", ")}.`
+                    ? `These fields come from ${selectedCategory.name}: ${activeColumns.join(", ")}.`
                     : "Select a category to generate the table row fields."}
                 </p>
               </div>
@@ -561,7 +577,7 @@ export default function ManageProductsClient() {
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    {(selectedCategory?.tableColumns || []).map((column) => (
+                    {activeColumns.map((column) => (
                       <Field key={`${column}-${rowIndex}`} label={column}>
                         <input
                           value={row.values?.[column] || ""}
@@ -724,6 +740,7 @@ function createEmptyForm(columns = []) {
     categoryId: "",
     name: "",
     slug: "",
+    tableColumns: columns,
     description: "",
     imageUrl: "",
     bulletPoints: [""],
@@ -758,6 +775,7 @@ function syncRowsToColumns(form, columns) {
 
   return {
     ...form,
+    tableColumns: columns,
     rows: syncedRows,
   };
 }

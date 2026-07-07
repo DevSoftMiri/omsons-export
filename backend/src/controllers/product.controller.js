@@ -96,8 +96,7 @@ const addProductRow = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Product not found" });
   }
 
-  const category = await Category.findById(product.categoryId).lean();
-  const values = normalizeRowValues(req.body.values, category?.tableColumns || []);
+  const values = normalizeRowValues(req.body.values, product.tableColumns || []);
   const row = await ProductRow.create({
     productId: product._id,
     values,
@@ -115,7 +114,6 @@ const updateProductRow = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Product not found" });
   }
 
-  const category = await Category.findById(product.categoryId).lean();
   const row = await ProductRow.findOne({ _id: req.params.rowId, productId: product._id });
 
   if (!row) {
@@ -123,7 +121,7 @@ const updateProductRow = asyncHandler(async (req, res) => {
   }
 
   row.set({
-    values: normalizeRowValues(req.body.values, category?.tableColumns || []),
+    values: normalizeRowValues(req.body.values, product.tableColumns || []),
     sortOrder: normalizeOptionalNumber(req.body.sortOrder, row.sortOrder),
     isActive: typeof req.body.isActive === "boolean" ? req.body.isActive : row.isActive,
   });
@@ -245,7 +243,15 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
     throw validationError("Product slug must be unique");
   }
 
-  const rows = normalizeRows(payload.rows, category.tableColumns);
+  const tableColumns = normalizeStringArray(payload.tableColumns).length
+    ? normalizeStringArray(payload.tableColumns)
+    : category.tableColumns;
+
+  if (!tableColumns.length) {
+    throw validationError("At least one table column is required");
+  }
+
+  const rows = normalizeRows(payload.rows, tableColumns);
 
   return {
     categoryId,
@@ -253,12 +259,16 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
     product: {
       name,
       slug,
+      tableColumns,
       description: String(payload.description || "").trim(),
       bulletPoints: normalizeStringArray(payload.bulletPoints),
       imageUrl: String(payload.imageUrl || "").trim(),
       icons: normalizeIcons(payload.icons),
       technicalTags: normalizeStringArray(payload.technicalTags),
       isActive: typeof payload.isActive === "boolean" ? payload.isActive : true,
+      ...(Array.isArray(payload.galleryImages)
+        ? { galleryImages: normalizeStringArray(payload.galleryImages) }
+        : {}),
     },
     rows,
   };
@@ -279,21 +289,26 @@ function serializeProduct(product, rows = [], category = null) {
     _id: product._id,
     name: product.name,
     slug: product.slug,
+    tableColumns: product.tableColumns || categoryRecord?.tableColumns || [],
     description: product.description || "",
     bulletPoints: product.bulletPoints || [],
     imageUrl: product.imageUrl || "",
+    galleryImages: product.galleryImages || [],
     icons: product.icons || [],
     technicalTags: product.technicalTags || [],
     isActive: Boolean(product.isActive),
     sortOrder: product.sortOrder || 0,
     categoryId: categoryRecord?._id || null,
     category: categoryRecord,
-    rows: rows.map((row) => ({
-      _id: row._id,
-      sortOrder: row.sortOrder || 0,
-      isActive: Boolean(row.isActive),
-      values: normalizeRowValues(row.values, categoryRecord?.tableColumns || []),
-    })),
+      rows: rows.map((row) => ({
+        _id: row._id,
+        sortOrder: row.sortOrder || 0,
+        isActive: Boolean(row.isActive),
+        values: normalizeRowValues(
+          row.values,
+          product.tableColumns || categoryRecord?.tableColumns || []
+        ),
+      })),
   };
 }
 

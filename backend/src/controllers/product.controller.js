@@ -3,6 +3,7 @@ const Category = require("../models/Category");
 const Product = require("../models/Product");
 const ProductRow = require("../models/ProductRow");
 const slugify = require("../utils/slugify");
+const cloudinary = require("../config/cloudinary");
 
 const getAllProducts = asyncHandler(async (_req, res) => {
   const products = await fetchProducts({});
@@ -22,7 +23,7 @@ const getAdminProductList = asyncHandler(async (req, res) => {
   const skip = (currentPage - 1) * pageSize;
 
   const products = await Product.find(filter)
-    .select("name slug description bulletPoints imageUrl categoryId sortOrder isActive createdAt")
+    .select("name slug description bulletPoints imageUrl galleryImages categoryId sortOrder isActive createdAt")
     .populate({ path: "categoryId", select: "name slug" })
     .sort({ sortOrder: 1, createdAt: 1 })
     .skip(skip)
@@ -102,6 +103,28 @@ const getProductForAdmin = asyncHandler(async (req, res) => {
   }
 
   res.json({ success: true, product });
+});
+
+const uploadProductImage = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw validationError("Product image is required");
+  }
+
+  const previousPublicId = String(req.body.previousPublicId || "").trim();
+  const uploaded = await uploadBufferToCloudinary(req.file.buffer, {
+    folder: "omsons/products",
+    resource_type: "image",
+  });
+
+  if (previousPublicId && previousPublicId !== uploaded.public_id) {
+    await destroyCloudinaryAsset(previousPublicId);
+  }
+
+  res.status(201).json({
+    success: true,
+    imageUrl: uploaded.secure_url,
+    imagePublicId: uploaded.public_id,
+  });
 });
 
 const createProduct = asyncHandler(async (req, res) => {
@@ -297,6 +320,29 @@ async function buildSerializedProduct(product, rows, category) {
   );
 }
 
+function uploadBufferToCloudinary(buffer, options = {}) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve(result);
+    });
+
+    stream.end(buffer);
+  });
+}
+
+async function destroyCloudinaryAsset(publicId) {
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+  } catch (_error) {
+    // If cleanup fails we still keep the new uploaded image and saved URL intact.
+  }
+}
+
 async function normalizeProductPayload(payload = {}, currentProductId = null) {
   const name = String(payload.name || "").trim();
 
@@ -352,6 +398,7 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
       description: String(payload.description || "").trim(),
       bulletPoints: normalizeStringArray(payload.bulletPoints),
       imageUrl: String(payload.imageUrl || "").trim(),
+      imagePublicId: String(payload.imagePublicId || "").trim(),
       itemsSupplied: normalizeStringArray(payload.itemsSupplied),
       accessoriesSpareParts: normalizeStringArray(payload.accessoriesSpareParts),
       selectionCharts: normalizeStringArray(payload.selectionCharts),
@@ -387,6 +434,7 @@ function serializeProduct(product, rows = [], category = null) {
     description: product.description || "",
     bulletPoints: product.bulletPoints || [],
     imageUrl: product.imageUrl || "",
+    imagePublicId: product.imagePublicId || "",
     galleryImages: product.galleryImages || [],
     itemsSupplied: product.itemsSupplied || [],
     accessoriesSpareParts: product.accessoriesSpareParts || [],
@@ -427,6 +475,8 @@ function serializeAdminListProduct(product, rowCount = 0) {
     description: product.description || "",
     bulletPoints: product.bulletPoints || [],
     imageUrl: product.imageUrl || "",
+    imagePublicId: product.imagePublicId || "",
+    galleryImages: product.galleryImages || [],
     isActive: Boolean(product.isActive),
     sortOrder: product.sortOrder || 0,
     categoryId: category?._id || null,
@@ -532,6 +582,7 @@ module.exports = {
   getProductForAdmin,
   getProductsByCategory,
   reorderProductRows,
+  uploadProductImage,
   updateProduct,
   updateProductRow,
 };

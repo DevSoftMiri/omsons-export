@@ -60,11 +60,9 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
   const visibleRows = (product.rows || []).filter((row) =>
     tableColumns.some((column) => String(row.values?.[column] || "").trim())
   );
-  const firstRow = visibleRows[0]?.values || {};
-  const summaryItems = tableColumns
-    .filter((column) => column !== "Cat. No.")
-    .map((column) => ({ label: column, value: firstRow[column] || "" }))
-    .filter((item) => item.value);
+  const visibleColumns = tableColumns.filter((column) =>
+    visibleRows.some((row) => hasDisplayValue(row.values?.[column]))
+  );
 
   const hasVariants = visibleRows.length > 0;
   const isInStock = product.variants?.some((variant) => variant.inStock) ?? true;
@@ -75,9 +73,28 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
   const selectionCharts = product.selectionCharts || [];
   const videos = product.videos || [];
   const downloads = product.downloads || [];
+  const categoryLabel = formatCategoryLabel(product.category?.name);
+  const heroHighlights = [
+    `${visibleRows.length || 0} Variant${visibleRows.length === 1 ? "" : "s"}`,
+    isInStock ? "Ready to Dispatch" : "Built on Request",
+    "Installation Support",
+    "ISO Manufactured",
+  ];
+  const supportItems = [
+    { label: "Delivery", value: "Worldwide dispatch support" },
+    { label: "Warranty", value: "Coverage on eligible units" },
+    { label: "Technical Support", value: "Expert assistance on setup" },
+  ];
+  const quoteBenefits = [
+    "Response within 2 Hours",
+    "Technical Assistance",
+    "Bulk Order Support",
+  ];
+  const primaryDownload = downloads[0] || null;
 
   const sections = useMemo(() => SECTION_DEFINITIONS, []);
   const [openSections, setOpenSections] = useState(DEFAULT_OPEN_SECTIONS);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
   function toggleSection(sectionId) {
     setOpenSections((current) => ({
@@ -100,7 +117,16 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
     }
   }
 
+  function openQuoteModal() {
+    setIsQuoteModalOpen(true);
+  }
+
+  function closeQuoteModal() {
+    setIsQuoteModalOpen(false);
+  }
+
   return (
+    <>
     <div className={styles.page}>
       <div className={styles.breadcrumbs}>
         <Link href={appRoutes.home}>Home</Link>
@@ -120,6 +146,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
 
       <section className={styles.hero}>
         <div className={styles.heroLeft}>
+          <div className={styles.panelLabel}>Large Product Gallery</div>
           <div className={styles.galleryCard}>
             <ProductGallery product={product} />
           </div>
@@ -141,8 +168,10 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
         </div>
 
         <div className={styles.summary}>
+          <div className={styles.panelLabel}>Product Details</div>
+
           <div className={styles.taxonomy}>
-            {product.category?.name ? <span>{product.category.name}</span> : null}
+            {categoryLabel ? <span>{categoryLabel}</span> : null}
             {(product.technicalTags || []).map((tag) => (
               <span key={tag}>{tag}</span>
             ))}
@@ -150,8 +179,56 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
 
           <h1 className={styles.title}>{product.name}</h1>
 
+          <p className={styles.heroBadge}>Industrial Grade Equipment</p>
+
+          <div className={styles.copyBlock}>
+            <p className={styles.sectionLabel}>Short Description</p>
+            <p className={styles.copy}>
+              {product.description || "Detailed product information available for this item."}
+            </p>
+          </div>
+
+          <ul className={styles.premiumChecklist}>
+            {heroHighlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+
+          <div className={styles.heroActions}>
+            <button type="button" className={styles.cta}>
+              Request Quote
+            </button>
+            {primaryDownload ? (
+              <a
+                href={primaryDownload}
+                target="_blank"
+                rel="noreferrer"
+                className={`${styles.cta} ${styles.ctaSecondary} ${styles.ctaLink}`}
+              >
+                Download Catalogue
+              </a>
+            ) : (
+              <button
+                type="button"
+                className={`${styles.cta} ${styles.ctaSecondary}`}
+                onClick={() => openAndScroll("downloads")}
+              >
+                Download Catalogue
+              </button>
+            )}
+          </div>
+
+          <div className={styles.supportStrip}>
+            {supportItems.map((item) => (
+              <div key={item.label} className={styles.supportCard}>
+                <p className={styles.supportLabel}>{item.label}</p>
+                <p className={styles.supportValue}>{item.value}</p>
+              </div>
+            ))}
+          </div>
+
           <p className={styles.copy}>
-            {product.description || "Detailed product information available for this item."}
+            Contact us for pricing, custom configuration, and bulk order timelines.
           </p>
 
           {product.bulletPoints?.length ? (
@@ -164,49 +241,41 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
               </ul>
             </div>
           ) : null}
-
-          {summaryItems.length ? (
-            <dl className={styles.statsGrid}>
-              {summaryItems.map((item) => (
-                <div key={item.label}>
-                  <dt>{item.label}</dt>
-                  <dd>{item.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
         </div>
 
-        <aside className={styles.actionCard}>
-          <div className={styles.actionStats}>
-            <div className={styles.actionStat}>
-              <p className={styles.actionTitle}>Availability</p>
-              <p className={`${styles.actionValue} ${isInStock ? styles.stock : styles.stockMuted}`}>
-                {isInStock ? "In Stock" : "On Request"}
-              </p>
-            </div>
-            <div className={styles.actionStat}>
-              <p className={styles.actionTitle}>Variants</p>
-              <p className={styles.actionValue}>{visibleRows.length}</p>
-            </div>
-            <div className={styles.actionStat}>
-              <p className={styles.actionTitle}>Category</p>
-              <p className={styles.actionValue}>{product.category?.name || "Catalogue"}</p>
-            </div>
+        <aside className={styles.stickyQuoteCard}>
+          <p className={styles.quoteEyebrow}>Need Pricing?</p>
+          <h2 className={styles.quoteTitle}>{product.name}</h2>
+
+          <ul className={styles.quoteBenefits}>
+            {quoteBenefits.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+
+          <div className={styles.quoteActions}>
+            <button type="button" className={styles.quoteBtn} onClick={openQuoteModal}>
+              Get Quote
+            </button>
+            {primaryDownload ? (
+              <a
+                href={primaryDownload}
+                target="_blank"
+                rel="noreferrer"
+                className={`${styles.quoteBtn} ${styles.quoteBtnSecondary}`}
+              >
+                Download Catalogue
+              </a>
+            ) : (
+              <button
+                type="button"
+                className={`${styles.quoteBtn} ${styles.quoteBtnSecondary}`}
+                onClick={() => openAndScroll("downloads")}
+              >
+                Download Catalogue
+              </button>
+            )}
           </div>
-
-          <div className={styles.divider} />
-
-          <button type="button" className={styles.cta}>
-            Enquire Now
-          </button>
-          <button type="button" className={`${styles.cta} ${styles.ctaSecondary}`}>
-            Request Catalogue
-          </button>
-
-          <p className={styles.actionNote}>
-            Contact us for pricing and bulk order details.
-          </p>
         </aside>
       </section>
 
@@ -243,22 +312,32 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
             {openSections[section.id] ? (
               <div className={styles.accordionBody}>
                 {section.id === "variants" ? (
-                  hasVariants ? (
+                  hasVariants && visibleColumns.length ? (
                     <div className={styles.tableWrap}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
-                            {tableColumns.map((header) => (
+                            {visibleColumns.map((header) => (
                               <th key={header}>{header}</th>
                             ))}
+                            <th>Enquiry</th>
                           </tr>
                         </thead>
                         <tbody>
                           {visibleRows.map((row) => (
                             <tr key={row._id}>
-                              {tableColumns.map((header) => (
-                                <td key={header}>{row.values?.[header] || "-"}</td>
+                              {visibleColumns.map((header) => (
+                                <td key={header}>{formatTableCellValue(row.values?.[header])}</td>
                               ))}
+                              <td>
+                                <button
+                                  type="button"
+                                  className={styles.tableEnquiryButton}
+                                  onClick={openQuoteModal}
+                                >
+                                  Enquiry
+                                </button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -376,7 +455,52 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
         </section>
       ) : null}
     </div>
+    <div
+      id="quoteModal"
+      className={`${styles.quoteModal} ${isQuoteModalOpen ? styles.quoteModalActive : ""}`}
+      onClick={closeQuoteModal}
+    >
+      <div className={styles.quoteBox} onClick={(event) => event.stopPropagation()}>
+        <button
+          type="button"
+          className={styles.quoteClose}
+          onClick={closeQuoteModal}
+          aria-label="Close quote form"
+        >
+          ×
+        </button>
+
+        <h2>Request a Quote</h2>
+        <p>{product.name}</p>
+
+        <form className={styles.quoteForm}>
+          <input type="text" placeholder="Your Name" />
+          <input type="tel" placeholder="Phone Number" />
+          <input type="email" placeholder="Email Address" />
+          <input type="text" placeholder="Company Name" />
+
+          <button type="submit" className={styles.quoteSubmit}>
+            Submit Enquiry
+          </button>
+        </form>
+      </div>
+    </div>
+    </>
   );
+}
+
+function formatCategoryLabel(value) {
+  const normalized = String(value || "").trim();
+
+  if (!normalized) {
+    return "Laboratory Instrument";
+  }
+
+  if (normalized.endsWith("s")) {
+    return normalized.slice(0, -1);
+  }
+
+  return normalized;
 }
 
 function getResourceLabel(value) {
@@ -393,4 +517,14 @@ function getResourceLabel(value) {
   } catch (_error) {
     return normalized;
   }
+}
+
+function hasDisplayValue(value) {
+  const normalized = String(value ?? "").trim();
+  return normalized !== "" && normalized !== "-";
+}
+
+function formatTableCellValue(value) {
+  const normalized = String(value ?? "").trim();
+  return normalized || "-";
 }

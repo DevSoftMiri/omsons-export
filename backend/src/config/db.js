@@ -7,11 +7,18 @@ async function connectDatabase() {
     return false;
   }
 
-  const connection = await mongoose.connect(env.mongoUri);
-  const { host, name } = connection.connection;
+  try {
+    const connection = await mongoose.connect(env.mongoUri);
+    const { host, name, readyState } = connection.connection;
 
-  console.log(`MongoDB connected: ${name} @ ${host}`);
-  return true;
+    console.log(
+      `MongoDB connected successfully. Database=${name}, Host=${host}, ReadyState=${readyState}`,
+    );
+    return true;
+  } catch (error) {
+    console.error("MongoDB connection failed.", error.message);
+    throw error;
+  }
 }
 
 module.exports = connectDatabase;

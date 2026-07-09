@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { navItems as homepageNavItems } from "@/components/landing/landingData";
+import { getNavbarPreviewData, omsonsNavbarPreset } from "@/lib/navbarPreset";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
@@ -25,7 +25,7 @@ export default function ManageNavbarClient() {
   const [filter, setFilter] = useState("All");
 
   const token = useMemo(() => getCookieValue("admin_token"), []);
-  const homepageNavbarPreview = useMemo(() => normalizeHomepageNavbar(homepageNavItems), []);
+  const navbarPresetPreview = useMemo(() => getNavbarPreviewData(omsonsNavbarPreset), []);
 
   useEffect(() => { fetchNavbars(); }, []);
 
@@ -149,23 +149,23 @@ export default function ManageNavbarClient() {
     }
   }
 
-  async function handleImportHomepageNavbar() {
+  async function handleImportPresetNavbar() {
     setStatus({ loading: true, error: "", notice: "" });
     try {
       const response = await fetch(`${API_BASE_URL}/navbar/import`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ navbars: homepageNavbarPreview }),
+        body: JSON.stringify({ navbars: navbarPresetPreview }),
       });
       const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.message || "Failed to import home page navbar");
+      if (!response.ok || !data.success) throw new Error(data.message || "Failed to import navbar preset");
       setNavbars(data.navbars || []);
       setStatus({
         loading: false, error: "",
-        notice: `Home page navbar imported. Created: ${data.summary.created}, Updated: ${data.summary.updated}`,
+        notice: `Navbar preset imported. Created: ${data.summary.created}, Updated: ${data.summary.updated}`,
       });
     } catch (error) {
-      setStatus({ loading: false, error: error.message || "Failed to import home page navbar", notice: "" });
+      setStatus({ loading: false, error: error.message || "Failed to import navbar preset", notice: "" });
     }
   }
 
@@ -783,7 +783,7 @@ export default function ManageNavbarClient() {
           <div className="nb-page-header-right">
             <button
               type="button"
-              onClick={handleImportHomepageNavbar}
+              onClick={handleImportPresetNavbar}
               className="nb-btn-white"
               disabled={status.loading}
             >
@@ -1069,18 +1069,18 @@ export default function ManageNavbarClient() {
         </section>
 
         {/* ── Homepage Preview ── */}
-        <section className="nb-card">
+        <section className="nb-card" hidden>
           <div className="nb-panel-header">
             <div>
-              <p className="nb-section-label" style={{ margin: "0 0 0.35rem" }}>Homepage Preview</p>
-              <h2 className="nb-panel-title">Home Page Navbar Structure</h2>
+              <p className="nb-section-label" style={{ margin: "0 0 0.35rem" }}>Preset Preview</p>
+              <h2 className="nb-panel-title">Omsons Navbar Structure</h2>
               <p className="nb-panel-sub">
-                Static navbar from your landing page component. Import to sync with the database.
+                Import this base structure now, then edit submenu groups and dropdown links here later.
               </p>
             </div>
             <button
               type="button"
-              onClick={handleImportHomepageNavbar}
+              onClick={handleImportPresetNavbar}
               className="nb-btn-primary"
               disabled={status.loading}
             >
@@ -1089,7 +1089,7 @@ export default function ManageNavbarClient() {
           </div>
 
           <div className="nb-preview-grid">
-            {homepageNavbarPreview.map((navbar) => (
+            {navbarPresetPreview.map((navbar) => (
               <div key={navbar.slug} className="nb-preview-card">
                 <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.75rem" }}>
                   <span style={{ fontSize: "1rem" }}>📁</span>
@@ -1162,24 +1162,4 @@ function hydrateSubmenus(submenus) {
 function getCookieValue(name) {
   if (typeof document === "undefined") return "";
   return document.cookie.split("; ").find((p) => p.startsWith(`${name}=`))?.split("=")[1] || "";
-}
-
-function normalizeHomepageNavbar(items = []) {
-  return items.map((item, index) => ({
-    title: item.label,
-    slug: createSlug(item.label),
-    order: index,
-    submenus: Array.isArray(item.groups)
-      ? item.groups.map((group) => ({
-        title: group.title,
-        items: Array.isArray(group.links)
-          ? group.links.map((link) => ({ name: link, slug: createSlug(link) }))
-          : [],
-      }))
-      : [],
-  }));
-}
-
-function createSlug(text) {
-  return String(text || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }

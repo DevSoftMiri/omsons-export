@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { appRoutes } from "@/lib/routes";
 
 const API_BASE_URL =
@@ -10,13 +11,19 @@ const API_BASE_URL =
 const PAGE_SIZE = 24;
 
 export default function ProductListClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const initialCategory = searchParams.get("category") || "all";
+  const initialPage = normalizePageParam(searchParams.get("page"));
+
   const [products, setProducts] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [categoryFilters, setCategoryFilters] = useState([]);
   const [pagination, setPagination] = useState({
-    page: 1,
+    page: initialPage,
     pageSize: PAGE_SIZE,
     total: 0,
     totalPages: 1,
@@ -41,6 +48,45 @@ export default function ProductListClient() {
 
     return () => window.clearTimeout(timer);
   }, [searchInput]);
+
+  useEffect(() => {
+    const nextSearch = searchParams.get("search") || "";
+    const nextCategory = searchParams.get("category") || "all";
+    const nextPage = normalizePageParam(searchParams.get("page"));
+
+    setSearchInput((current) => (current === nextSearch ? current : nextSearch));
+    setSearchQuery((current) => (current === nextSearch ? current : nextSearch));
+    setSelectedCategory((current) => (current === nextCategory ? current : nextCategory));
+    setPagination((current) =>
+      current.page === nextPage ? current : { ...current, page: nextPage }
+    );
+  }, [searchParams]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) {
+      params.set("search", searchQuery);
+    }
+
+    if (selectedCategory !== "all") {
+      params.set("category", selectedCategory);
+    }
+
+    if (pagination.page > 1) {
+      params.set("page", String(pagination.page));
+    }
+
+    const nextQuery = params.toString();
+    const currentQuery = searchParams.toString();
+
+    if (nextQuery !== currentQuery) {
+      router.replace(
+        `${appRoutes.adminProductList}${nextQuery ? `?${nextQuery}` : ""}`,
+        { scroll: false }
+      );
+    }
+  }, [router, searchParams, searchQuery, selectedCategory, pagination.page]);
 
   useEffect(() => {
     if (!token) {
@@ -296,7 +342,7 @@ export default function ProductListClient() {
                   <div className="flex gap-5">
                     <div className="flex h-24 w-24 flex-none items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
                       <img
-                        src={product.imageUrl || "/omsons-logo.jpg"}
+                        src={getAdminProductImage(product)}
                         alt={product.name}
                         className="h-full w-full object-contain"
                       />
@@ -393,4 +439,18 @@ function getCookieValue(name) {
     .split("; ")
     .find((part) => part.startsWith(`${name}=`))
     ?.split("=")[1] || "";
+}
+
+function getAdminProductImage(product) {
+  const galleryImages = Array.isArray(product.galleryImages)
+    ? product.galleryImages.filter((image) => String(image || "").trim())
+    : [];
+  const preferredImage = galleryImages[0] || "";
+
+  return product.imageUrl || preferredImage || "/omsons-logo.jpg";
+}
+
+function normalizePageParam(value) {
+  const parsed = Number.parseInt(String(value || ""), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }

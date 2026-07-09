@@ -22,6 +22,7 @@ const productSchema = new mongoose.Schema(
     description: { type: String, default: "", trim: true },
     bulletPoints: [{ type: String, trim: true }],
     imageUrl: { type: String, default: "", trim: true },
+    imagePublicId: { type: String, default: "", trim: true },
     galleryImages: [{ type: String, trim: true }],
     itemsSupplied: [{ type: String, trim: true }],
     accessoriesSpareParts: [{ type: String, trim: true }],

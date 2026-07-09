@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 const {
   addProductRow,
   createProduct,
@@ -11,16 +12,27 @@ const {
   getProductsByCategory,
   getProductBySlug,
   reorderProductRows,
+  uploadProductImage,
   updateProductRow,
 } = require("../controllers/product.controller");
 const { requireAdmin } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 router.get("/", getAllProducts);
 router.get("/get-all", getAllProducts);
 router.get("/admin/list", requireAdmin, getAdminProductList);
 router.get("/manage/:id", requireAdmin, getProductForAdmin);
+router.post(
+  "/upload-image",
+  requireAdmin,
+  upload.single("image"),
+  uploadProductImage
+);
 router.get("/category/:categorySlug", getProductsByCategory);
 router.get("/get-by-category/:categorySlug", getProductsByCategory);
 router.post("/:id/rows", requireAdmin, addProductRow);

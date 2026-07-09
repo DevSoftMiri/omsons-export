@@ -5,7 +5,7 @@ export default function AdminNavbarPage() {
   return (
     <AdminShell
       title="Manage Navbar"
-      description="Use this section for main items, submenu groups, and category links that drive the storefront mega menu."
+      description="Use this section for main items, submenu groups, and future dropdown links that drive the storefront mega menu."
     >
       <ManageNavbarClient />
     </AdminShell>

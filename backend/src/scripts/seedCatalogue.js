@@ -12,12 +12,17 @@ const slugify = require("../utils/slugify");
 
 const DEFAULT_JSON_PATH = path.resolve(
   __dirname,
-  "../../../frontend/public/Omsons_Catalogue_v5_with_image_links.json"
+  "../../../frontend/public/omsons_catalogue_fixed.json"
+);
+const PUBLIC_ROOT = path.resolve(
+  __dirname,
+  "../../../frontend/public"
 );
 const LOCAL_IMAGE_ROOT = path.resolve(
   __dirname,
   "../../../frontend/public/Export catalogue images"
 );
+const PUBLIC_IMAGE_ROOT = "/Export%20catalogue%20images";
 
 async function seed() {
   if (!process.env.MONGODB_URI) {
@@ -67,27 +72,35 @@ async function seed() {
         continue;
       }
 
+      const normalizedJsonImages = normalizeJsonImages(productData);
       const matchedLocalImages = findLocalProductImages(productData, localImageIndex);
       const fallbackImages = normalizeRemoteImages(productData);
-      const galleryImages = matchedLocalImages.length ? matchedLocalImages : fallbackImages;
+      const galleryImages = uniqueStrings([
+        ...matchedLocalImages,
+        ...normalizedJsonImages,
+        ...fallbackImages,
+      ]);
 
-      const product = await Product.create({
-        categoryId: category._id,
-        name: cleanText(productData.name),
-        slug: ensureUniqueSlug(
-          cleanText(productData.slug || productData.name),
-          usedProductSlugs
-        ),
-        tableColumns,
-        description: "",
-        bulletPoints: normalizeStringArray(productData.points),
-        imageUrl: galleryImages[0] || "",
-        galleryImages,
-        icons: [],
-        technicalTags: [],
-        isActive: true,
-        sortOrder: productIndex + 1,
-      });
+      const product = await createProductWithUniqueSlug(
+        {
+          categoryId: category._id,
+          name: cleanText(productData.name),
+          slug: ensureUniqueSlug(
+            cleanText(productData.slug || productData.name),
+            usedProductSlugs
+          ),
+          tableColumns,
+          description: "",
+          bulletPoints: normalizeStringArray(productData.points),
+          imageUrl: galleryImages[0] || "",
+          galleryImages,
+          icons: [],
+          technicalTags: [],
+          isActive: true,
+          sortOrder: productIndex + 1,
+        },
+        usedProductSlugs
+      );
 
       const rows = normalizeRows(productData.rows, tableColumns).map((row, rowIndex) => ({
         productId: product._id,
@@ -119,11 +132,15 @@ function readCatalogue(sourcePath) {
 
   const parsed = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
 
-  if (!Array.isArray(parsed.categories) || !parsed.categories.length) {
-    throw new Error("Catalogue JSON does not contain any categories");
+  if (Array.isArray(parsed.categories) && parsed.categories.length) {
+    return parsed;
   }
 
-  return parsed;
+  if (Array.isArray(parsed.products) && parsed.products.length) {
+    return convertProductsPayloadToCatalogue(parsed.products);
+  }
+
+  throw new Error("Catalogue JSON does not contain any categories or products");
 }
 
 function collectCategoryColumns(products = []) {
@@ -138,6 +155,140 @@ function buildCategoryDescription(categoryData) {
   ].filter(Boolean);
 
   return parts.join(" | ");
+}
+
+function convertProductsPayloadToCatalogue(products = []) {
+  const categories = new Map();
+
+  for (const product of products) {
+    const categoryName = cleanText(product.categoryName) || "Uncategorized";
+    const categorySlug = cleanText(product.categorySlug) || slugify(categoryName) || "uncategorized";
+    const categoryKey = `${categorySlug}::${categoryName}`;
+
+    if (!categories.has(categoryKey)) {
+      categories.set(categoryKey, {
+        categoryName,
+        categorySlug,
+        categoryId: categorySlug,
+        pageRange: "",
+        productCount: 0,
+        products: [],
+      });
+    }
+
+    const categoryRecord = categories.get(categoryKey);
+    const normalizedProduct = normalizeProductFromCatalogueFile(product);
+
+    if (!normalizedProduct.tableColumns.length) {
+      continue;
+    }
+
+    categoryRecord.products.push(normalizedProduct);
+    categoryRecord.productCount += 1;
+  }
+
+  return {
+    categories: [...categories.values()],
+  };
+}
+
+function normalizeProductFromCatalogueFile(product = {}) {
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const specKeys = collectVariantSpecKeys(variants);
+  const tableColumns = buildVariantTableColumns(specKeys, variants);
+
+  return {
+    name: cleanText(product.name),
+    slug: cleanText(product.slug || product.name),
+    points: normalizeStringArray(product.points),
+    imagePath: cleanText(product.imagePath),
+    imagePaths: normalizeStringArray(product.imagePaths),
+    tableColumns,
+    rows: variants.map((variant, index) => ({
+      values: buildVariantRowValues(variant, specKeys),
+      sortOrder: index + 1,
+      isActive: true,
+    })),
+  };
+}
+
+function collectVariantSpecKeys(variants = []) {
+  const keys = new Set();
+
+  for (const variant of variants) {
+    const specs = variant?.specs && typeof variant.specs === "object" ? variant.specs : {};
+
+    for (const key of Object.keys(specs)) {
+      const normalizedKey = cleanText(key);
+
+      if (normalizedKey) {
+        keys.add(normalizedKey);
+      }
+    }
+  }
+
+  return [...keys];
+}
+
+function buildVariantTableColumns(specKeys = [], variants = []) {
+  const columns = ["Cat. No.", ...specKeys.map(formatSpecColumnLabel)];
+
+  if (variants.some((variant) => cleanText(variant?.packUnit))) {
+    columns.push("Pack Unit");
+  }
+
+  return columns;
+}
+
+function buildVariantRowValues(variant = {}, specKeys = []) {
+  const values = {
+    "Cat. No.": cleanText(variant.catalogueId || variant.sku || variant.id),
+  };
+
+  const specs = variant?.specs && typeof variant.specs === "object" ? variant.specs : {};
+
+  for (const key of specKeys) {
+    values[formatSpecColumnLabel(key)] = cleanText(specs[key]);
+  }
+
+  if (cleanText(variant.packUnit)) {
+    values["Pack Unit"] = cleanText(variant.packUnit);
+  }
+
+  return values;
+}
+
+function formatSpecColumnLabel(value) {
+  const normalized = cleanText(value)
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized
+    .split(/\s+/)
+    .map((segment) => {
+      const lower = segment.toLowerCase();
+
+      if (lower === "mm") {
+        return "mm";
+      }
+
+      if (lower === "ml") {
+        return "mL";
+      }
+
+      if (lower === "micron") {
+        return "Micron";
+      }
+
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
 }
 
 function normalizeRows(rows, tableColumns) {
@@ -167,11 +318,22 @@ function normalizeStringArray(value) {
     : [];
 }
 
+function uniqueStrings(values) {
+  return [...new Set(values.map((value) => cleanText(value)).filter(Boolean))];
+}
+
+function normalizeJsonImages(productData = {}) {
+  return uniqueStrings([
+    toPublicImageUrl(productData.imagePath),
+    ...normalizeStringArray(productData.imagePaths).map(toPublicImageUrl),
+  ]);
+}
+
 function normalizeRemoteImages(productData = {}) {
-  return [
+  return uniqueStrings([
     cleanText(productData.image),
     ...normalizeStringArray(productData.images),
-  ].filter((value, index, source) => value && source.indexOf(value) === index);
+  ]);
 }
 
 function buildLocalImageIndex(rootDirectory) {
@@ -229,7 +391,44 @@ function buildPublicImageUrl(relativePath) {
     .map((segment) => encodeURIComponent(segment))
     .join("/");
 
-  return `/Export%20catalogue%20images/${encodedPath}`;
+  return `${PUBLIC_IMAGE_ROOT}/${encodedPath}`;
+}
+
+function buildPublicUrlFromRelativePath(relativePath) {
+  const encodedPath = relativePath
+    .split(path.sep)
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+  return `/${encodedPath}`;
+}
+
+function toPublicImageUrl(rawPath) {
+  const normalized = cleanText(rawPath);
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(normalized) || normalized.startsWith("/")) {
+    return normalized;
+  }
+
+  const relativePath = normalized
+    .replace(/^[.\\/]+/, "")
+    .replace(/[\\/]+/g, path.sep);
+  const fallbackRelativePath = relativePath.replace(
+    /^assets[\\/]+export catalogue images[\\/]+/i,
+    `Export catalogue images${path.sep}`
+  );
+
+  for (const candidate of [relativePath, fallbackRelativePath]) {
+    if (candidate && fs.existsSync(path.resolve(PUBLIC_ROOT, candidate))) {
+      return buildPublicUrlFromRelativePath(candidate);
+    }
+  }
+
+  return fallbackRelativePath ? buildPublicUrlFromRelativePath(fallbackRelativePath) : "";
 }
 
 function findLocalProductImages(productData = {}, localImageIndex = new Map()) {
@@ -314,6 +513,29 @@ function normalizeOptionalNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+async function createProductWithUniqueSlug(productPayload, usedProductSlugs) {
+  let nextPayload = { ...productPayload };
+  let attempt = 1;
+
+  while (attempt <= 25) {
+    try {
+      return await Product.create(nextPayload);
+    } catch (error) {
+      if (error?.code !== 11000 || !error?.keyPattern?.slug) {
+        throw error;
+      }
+
+      attempt += 1;
+      nextPayload = {
+        ...nextPayload,
+        slug: ensureUniqueSlug(nextPayload.slug, usedProductSlugs),
+      };
+    }
+  }
+
+  throw new Error(`Unable to create a unique slug for product "${productPayload.name}"`);
+}
+
 function ensureUniqueSlug(baseSlug, usedSlugs) {
   const normalizedBase = slugify(cleanText(baseSlug)) || "item";
   let candidate = normalizedBase;
@@ -341,6 +563,6 @@ seed().catch(async (error) => {
   console.error(error);
   try {
     await mongoose.disconnect();
-  } catch (_error) {}
+  } catch (_error) { }
   process.exit(1);
 });

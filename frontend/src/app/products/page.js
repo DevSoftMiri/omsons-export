@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import StorefrontChrome from "@/components/store/StorefrontChrome";
 import ProductCatalogClient from "@/components/store/ProductCatalogClient";
 import { fetchCatalogueCategories } from "@/lib/storefront";
@@ -18,12 +19,14 @@ export default async function ProductsPage() {
 
   return (
     <StorefrontChrome>
-      <ProductCatalogClient
-        products={products}
-        categories={categories}
-        title="All Products"
-        description="Browse products by category from the backend catalogue."
-      />
+      <Suspense fallback={null}>
+        <ProductCatalogClient
+          products={products}
+          categories={categories}
+          title="All Products"
+          description="Browse products by category from the backend catalogue."
+        />
+      </Suspense>
     </StorefrontChrome>
   );
 }

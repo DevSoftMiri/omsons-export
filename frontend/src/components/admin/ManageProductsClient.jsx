@@ -23,6 +23,7 @@ export default function ManageProductsClient() {
   const [editingProductId, setEditingProductId] = useState(editProductId);
   const [form, setForm] = useState(createEmptyForm());
   const [status, setStatus] = useState(defaultStatus);
+  const [imageUpload, setImageUpload] = useState({ loading: false, error: "", name: "" });
 
   const selectedCategory = useMemo(
     () => categories.find((item) => item._id === selectedCategoryId) || null,
@@ -127,6 +128,7 @@ export default function ManageProductsClient() {
           : product.category?.tableColumns || [],
         description: product.description || "",
         imageUrl: product.imageUrl || "",
+        imagePublicId: product.imagePublicId || "",
         bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
         icons: product.icons?.length ? product.icons : [{ label: "", imageUrl: "" }],
         technicalTags: product.technicalTags?.length ? product.technicalTags : [""],
@@ -139,6 +141,7 @@ export default function ManageProductsClient() {
           : [{ values: createEmptyRowValues(product.tableColumns || product.category?.tableColumns || []) }],
         isActive: Boolean(product.isActive),
       });
+      setImageUpload({ loading: false, error: "", name: "" });
       setStatus((current) => ({ ...current, loading: false }));
     } catch (error) {
       setStatus({
@@ -203,6 +206,50 @@ export default function ManageProductsClient() {
     }
   }
 
+  async function handleImageUpload(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setImageUpload({ loading: true, error: "", name: file.name });
+
+    try {
+      const payload = new FormData();
+      payload.append("image", file);
+      if (form.imagePublicId) {
+        payload.append("previousPublicId", form.imagePublicId);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/products/upload-image`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: payload,
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to upload image");
+      }
+
+      setForm((current) => ({
+        ...current,
+        imageUrl: data.imageUrl || "",
+        imagePublicId: data.imagePublicId || "",
+      }));
+      setImageUpload({ loading: false, error: "", name: file.name });
+    } catch (error) {
+      setImageUpload({
+        loading: false,
+        error: error.message || "Failed to upload image",
+        name: file.name,
+      });
+    } finally {
+      event.target.value = "";
+    }
+  }
+
   async function handleDelete(productId) {
     if (!window.confirm("Delete this product?")) {
       return;
@@ -239,6 +286,7 @@ export default function ManageProductsClient() {
   function resetForm() {
     setEditingProductId("");
     setForm(createEmptyForm(selectedCategory?.tableColumns || []));
+    setImageUpload({ loading: false, error: "", name: "" });
     const nextCategory = selectedCategoryId ? `?categoryId=${selectedCategoryId}` : "";
     router.replace(`${appRoutes.adminProducts}${nextCategory}`);
   }
@@ -265,6 +313,7 @@ export default function ManageProductsClient() {
         : product.category?.tableColumns || [],
       description: product.description || "",
       imageUrl: product.imageUrl || "",
+      imagePublicId: product.imagePublicId || "",
       bulletPoints: product.bulletPoints?.length ? product.bulletPoints : [""],
       icons: product.icons?.length ? product.icons : [{ label: "", imageUrl: "" }],
       technicalTags: product.technicalTags?.length ? product.technicalTags : [""],
@@ -277,6 +326,7 @@ export default function ManageProductsClient() {
         : [{ values: createEmptyRowValues(product.tableColumns || product.category?.tableColumns || []) }],
       isActive: Boolean(product.isActive),
     });
+    setImageUpload({ loading: false, error: "", name: "" });
     router.replace(`${appRoutes.adminProducts}?edit=${product._id}&categoryId=${product.categoryId}`);
   }
 
@@ -404,14 +454,40 @@ export default function ManageProductsClient() {
                   required
                 />
               </Field>
-              <Field label="Product Image URL">
-                <input
-                  value={form.imageUrl}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, imageUrl: event.target.value }))
-                  }
-                  className={inputClassName}
-                />
+              <Field label="Product Image">
+                <div className="grid gap-3">
+                  <label className="inline-flex w-fit cursor-pointer items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="sr-only"
+                      disabled={imageUpload.loading}
+                    />
+                    {imageUpload.loading ? "Uploading..." : "Upload Image"}
+                  </label>
+                  <p className="text-xs text-slate-500">
+                    Upload a product image to Cloudinary. The hosted URL will be saved in MongoDB.
+                  </p>
+                  {imageUpload.name ? (
+                    <p className="text-xs text-slate-500">Selected file: {imageUpload.name}</p>
+                  ) : null}
+                  {imageUpload.error ? (
+                    <p className="text-sm text-red-600">{imageUpload.error}</p>
+                  ) : null}
+                  {form.imageUrl ? (
+                    <div className="grid gap-2">
+                      <img
+                        src={form.imageUrl}
+                        alt={form.name || "Product preview"}
+                        className="h-28 w-28 rounded-2xl border border-slate-200 object-cover"
+                      />
+                      <p className="break-all text-xs text-slate-500">{form.imageUrl}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400">No image uploaded yet.</p>
+                  )}
+                </div>
               </Field>
             </div>
 
@@ -743,6 +819,7 @@ function createEmptyForm(columns = []) {
     tableColumns: columns,
     description: "",
     imageUrl: "",
+    imagePublicId: "",
     bulletPoints: [""],
     icons: [{ label: "", imageUrl: "" }],
     technicalTags: [""],

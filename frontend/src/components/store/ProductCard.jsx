@@ -3,7 +3,7 @@ import { appRoutes } from "@/lib/routes";
 import styles from "./ProductCard.module.css";
 
 export default function ProductCard({ product }) {
-  const image = product.imageUrl || "/omsons-logo.jpg";
+  const image = getProductCardImage(product);
   const rowCount = product.rows?.length || 0;
   const categoryLabel = product.category?.name || "Catalogue product";
   const catNo = product.rows?.[0]?.values?.["Cat. No."] || product.slug;
@@ -11,7 +11,13 @@ export default function ProductCard({ product }) {
   return (
     <article className={styles.card}>
       <div className={styles.imageWrap}>
-        <img src={image} alt={product.name} className={styles.image} />
+        <div className={styles.imageGlow} />
+        <div className={styles.imageStage}>
+          <div className={styles.imageStageBorder} />
+          <div className={styles.imagePlatform} />
+          <div className={styles.imageReflection} />
+          <img src={image} alt={product.name} className={styles.image} />
+        </div>
       </div>
       <div className={styles.body}>
         <div className={styles.badgeRow}>
@@ -29,4 +35,13 @@ export default function ProductCard({ product }) {
       </div>
     </article>
   );
+}
+
+function getProductCardImage(product) {
+  const galleryImages = Array.isArray(product.galleryImages)
+    ? product.galleryImages.filter((image) => String(image || "").trim())
+    : [];
+  const preferredImage = galleryImages[0] || "";
+
+  return product.imageUrl || preferredImage || "/omsons-logo.jpg";
 }

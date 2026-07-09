@@ -13,6 +13,7 @@
   --shadow-sm: 0 10px 26px rgba(17, 37, 79, 0.06);
   --shadow-md: 0 18px 40px rgba(17, 37, 79, 0.08);
   min-height: 100vh;
+  padding-top: 136px;
   background:
     radial-gradient(circle at top right, rgba(21, 49, 108, 0.06), transparent 22%),
     linear-gradient(180deg, #fbfcff 0%, #f2f6fc 100%);
@@ -29,8 +30,10 @@
 }
 
 .siteHeader {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 40;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(14px);
@@ -145,7 +148,7 @@
 }
 
 .main {
-  padding: 20px 0 60px;
+  padding: 8px 0 60px;
 }
 
 .footer {

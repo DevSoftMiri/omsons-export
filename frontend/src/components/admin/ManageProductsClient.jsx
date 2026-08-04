@@ -598,14 +598,14 @@ export default function ManageProductsClient() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">
-                  Product Table Rows
+                  Comparison Row Values
                 </p>
                 <h3 className="mt-2 text-2xl font-semibold text-slate-900">
                   Dynamic rows from category columns
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
                   {selectedCategory
-                    ? `These fields come from ${selectedCategory.name}: ${activeColumns.join(", ")}.`
+                    ? `These values feed the public filter comparison panel and product detail table for ${selectedCategory.name}: ${activeColumns.join(", ")}.`
                     : "Select a category to generate the table row fields."}
                 </p>
               </div>

@@ -8,6 +8,8 @@ import ProductCard from "./ProductCard";
 import styles from "./ProductCatalogClient.module.css";
 
 const PAGE_SIZE_OPTIONS = [16, 24, 32, 48, 64];
+const MAX_COMPARISON_PRODUCTS = 4;
+const COMPARISON_CATEGORY_SLUG = "filters-membrane";
 
 export default function ProductCatalogClient({
   products = [],
@@ -15,6 +17,8 @@ export default function ProductCatalogClient({
   title = "All Products",
   description = "",
   activeCategorySlug = "all",
+  showComparison = true,
+  comparisonCategorySlug = COMPARISON_CATEGORY_SLUG,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -31,6 +35,7 @@ export default function ProductCatalogClient({
   const [page, setPage] = useState(initialPage);
   const [itemsPerPage, setItemsPerPage] = useState(initialLimit);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [showDifferencesOnly, setShowDifferencesOnly] = useState(false);
 
   const categoryOptions = useMemo(() => {
     const counts = products.reduce((map, product) => {
@@ -85,18 +90,21 @@ export default function ProductCatalogClient({
     (safePage - 1) * itemsPerPage,
     safePage * itemsPerPage
   );
+  const showComparisonPanel =
+    showComparison && selectedCategory === comparisonCategorySlug;
+  const comparisonModel = useMemo(
+    () => (showComparisonPanel ? buildComparisonModel(filteredProducts) : null),
+    [filteredProducts, showComparisonPanel]
+  );
+  const comparisonRows = useMemo(() => {
+    if (!comparisonModel) {
+      return [];
+    }
 
-  useEffect(() => {
-    const nextQuery = searchParams.get("search") || "";
-    const nextCategory = searchParams.get("category") || defaultCategory;
-    const nextPage = normalizePageParam(searchParams.get("page"));
-    const nextLimit = normalizeLimitParam(searchParams.get("limit"));
-
-    setQuery((current) => (current === nextQuery ? current : nextQuery));
-    setSelectedCategory((current) => (current === nextCategory ? current : nextCategory));
-    setPage((current) => (current === nextPage ? current : nextPage));
-    setItemsPerPage((current) => (current === nextLimit ? current : nextLimit));
-  }, [searchParams, defaultCategory]);
+    return showDifferencesOnly
+      ? comparisonModel.rows.filter((row) => row.isDifferent)
+      : comparisonModel.rows;
+  }, [comparisonModel, showDifferencesOnly]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -168,6 +176,7 @@ export default function ProductCatalogClient({
       setSelectedCategory(defaultCategory);
       setPage(1);
       setItemsPerPage(PAGE_SIZE_OPTIONS[0]);
+      setShowDifferencesOnly(false);
       setIsFilterDrawerOpen(false);
     });
   }
@@ -284,6 +293,103 @@ export default function ProductCatalogClient({
         ) : null}
 
         <div className={styles.results}>
+          {showComparisonPanel ? (
+            <section className={styles.comparisonCard} aria-label="Product comparison">
+            <div className={styles.comparisonHeader}>
+              <div>
+                <p className={styles.comparisonEyebrow}>Comparison</p>
+                <h2 className={styles.comparisonTitle}>Similar Products</h2>
+                <p className={styles.comparisonDescription}>
+                  Compare the products in your current filter set. The Difference button hides
+                  matching rows so only the changes stay visible.
+                </p>
+              </div>
+
+              <div className={styles.comparisonActions}>
+                {comparisonModel ? (
+                  <span className={styles.comparisonBadge}>
+                    {comparisonModel.products.length} products
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  className={`${styles.differenceButton} ${
+                    showDifferencesOnly ? styles.differenceButtonActive : ""
+                  }`}
+                  onClick={() => setShowDifferencesOnly((current) => !current)}
+                  disabled={!comparisonModel || !comparisonModel.hasDifferences}
+                  aria-pressed={showDifferencesOnly}
+                >
+                  Difference
+                </button>
+              </div>
+            </div>
+
+            {comparisonModel ? (
+              comparisonRows.length ? (
+                <>
+                  <div className={styles.comparisonTableWrap}>
+                    <table className={styles.comparisonTable}>
+                      <thead>
+                        <tr>
+                          <th scope="col">Specification</th>
+                          {comparisonModel.products.map((product) => (
+                            <th key={product._id} scope="col" className={styles.comparisonProductHead}>
+                              <div className={styles.comparisonProductCard}>
+                                <img
+                                  src={getProductCardImage(product)}
+                                  alt={product.name}
+                                  className={styles.comparisonProductImage}
+                                />
+                                <div className={styles.comparisonProductText}>
+                                  <span className={styles.comparisonProductName}>{product.name}</span>
+                                  <span className={styles.comparisonProductMeta}>
+                                    {product.category?.name || "Product"}
+                                  </span>
+                                </div>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {comparisonRows.map((row) => (
+                          <tr
+                            key={row.label}
+                            className={row.isDifferent ? styles.comparisonRowDifferent : ""}
+                          >
+                            <th scope="row">{row.label}</th>
+                            {row.values.map((value, index) => (
+                              <td key={`${row.label}-${index}`}>{value || "—"}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {comparisonModel.truncated ? (
+                    <p className={styles.comparisonFootnote}>
+                      Showing the first {MAX_COMPARISON_PRODUCTS} comparable products from the
+                      current filter set.
+                    </p>
+                  ) : null}
+                </>
+              ) : (
+                <div className={styles.comparisonEmpty}>
+                  {showDifferencesOnly
+                    ? "No differing rows were found for this comparison set."
+                    : "No comparison rows are available yet."}
+                </div>
+              )
+            ) : (
+              <div className={styles.comparisonEmpty}>
+                Add at least two products with the same table structure to compare them here.
+              </div>
+            )}
+            </section>
+          ) : null}
+
           <div className={styles.resultsBar}>
             <div className={styles.resultsSummary}>
               <strong>{filteredProducts.length.toLocaleString()}</strong>
@@ -375,4 +481,99 @@ function normalizePageParam(value) {
 function normalizeLimitParam(value) {
   const parsed = Number.parseInt(String(value || ""), 10);
   return PAGE_SIZE_OPTIONS.includes(parsed) ? parsed : PAGE_SIZE_OPTIONS[0];
+}
+
+function buildComparisonModel(products) {
+  const groups = new Map();
+
+  products.forEach((product) => {
+    const columns = normalizeColumns(product.tableColumns || product.category?.tableColumns || []);
+    const primaryRow = getPrimaryComparisonRow(product.rows || [], columns);
+
+    if (!columns.length || !primaryRow) {
+      return;
+    }
+
+    const key = columns.join("||");
+    const group = groups.get(key) || {
+      key,
+      columns,
+      products: [],
+    };
+
+    group.products.push({
+      ...product,
+      primaryRow,
+    });
+    groups.set(key, group);
+  });
+
+  let bestGroup = null;
+
+  for (const group of groups.values()) {
+    if (!bestGroup || group.products.length > bestGroup.products.length) {
+      bestGroup = group;
+    }
+  }
+
+  if (!bestGroup || bestGroup.products.length < 2) {
+    return null;
+  }
+
+  const comparisonProducts = bestGroup.products.slice(0, MAX_COMPARISON_PRODUCTS);
+  const rows = bestGroup.columns.map((label) => {
+    const values = comparisonProducts.map((product) =>
+      normalizeComparisonValue(product.primaryRow?.values?.[label])
+    );
+
+    return {
+      label,
+      values,
+      isDifferent: hasComparisonDifference(values),
+    };
+  });
+
+  return {
+    key: bestGroup.key,
+    columns: bestGroup.columns,
+    products: comparisonProducts,
+    rows,
+    hasDifferences: rows.some((row) => row.isDifferent),
+    truncated: bestGroup.products.length > MAX_COMPARISON_PRODUCTS,
+  };
+}
+
+function getPrimaryComparisonRow(rows, columns) {
+  if (!Array.isArray(rows) || !rows.length) {
+    return null;
+  }
+
+  const filledRow = rows.find((row) =>
+    columns.some((column) => String(row?.values?.[column] || "").trim())
+  );
+
+  return filledRow || rows[0] || null;
+}
+
+function normalizeColumns(columns) {
+  return Array.isArray(columns)
+    ? [...new Set(columns.map((column) => String(column || "").trim()).filter(Boolean))]
+    : [];
+}
+
+function normalizeComparisonValue(value) {
+  return String(value || "").trim();
+}
+
+function hasComparisonDifference(values) {
+  const normalizedValues = values.map((value) => String(value || "").trim());
+  return new Set(normalizedValues).size > 1;
+}
+
+function getProductCardImage(product) {
+  const galleryImages = Array.isArray(product.galleryImages)
+    ? product.galleryImages.filter((image) => String(image || "").trim())
+    : [];
+
+  return product.imageUrl || galleryImages[0] || "/omsons-logo.jpg";
 }

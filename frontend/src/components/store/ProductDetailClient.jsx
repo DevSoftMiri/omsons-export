@@ -7,6 +7,9 @@ import ProductCard from "./ProductCard";
 import ProductGallery from "./ProductGallery";
 import styles from "./ProductDetailClient.module.css";
 
+const MAX_COMPARISON_PRODUCTS = 4;
+const COMPARISON_CATEGORY_SLUG = "filters-membrane";
+
 const SECTION_DEFINITIONS = [
   {
     id: "variants",
@@ -91,10 +94,20 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
     "Bulk Order Support",
   ];
   const primaryDownload = downloads[0] || null;
+  const showComparison = product.category?.slug === COMPARISON_CATEGORY_SLUG;
+  const comparisonProducts = useMemo(
+    () => [product, ...relatedProducts].slice(0, MAX_COMPARISON_PRODUCTS),
+    [product, relatedProducts]
+  );
+  const comparisonModel = useMemo(
+    () => (showComparison ? buildComparisonModel(comparisonProducts) : null),
+    [comparisonProducts, showComparison]
+  );
 
   const sections = useMemo(() => SECTION_DEFINITIONS, []);
   const [openSections, setOpenSections] = useState(DEFAULT_OPEN_SECTIONS);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [showDifferencesOnly, setShowDifferencesOnly] = useState(false);
 
   function toggleSection(sectionId) {
     setOpenSections((current) => ({
@@ -278,6 +291,112 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
           </div>
         </aside>
       </section>
+
+      {showComparison ? (
+        <section className={styles.comparisonCard} aria-label="Product comparison">
+        <div className={styles.comparisonHeader}>
+          <div>
+            <p className={styles.comparisonEyebrow}>Comparison</p>
+            <div className={styles.comparisonTitleRow}>
+              <h2 className={styles.comparisonTitle}>Compare Similar Items</h2>
+            </div>
+            <p className={styles.comparisonDescription}>
+              Compare this product against nearby products from the same filter group. The
+              Difference button only highlights the cells that change.
+            </p>
+          </div>
+
+          <div className={styles.comparisonActions}>
+            <Link href="#variants" className={styles.comparisonHeaderLink}>
+              View Full Comparison
+            </Link>
+            {comparisonModel ? (
+              <span className={styles.comparisonBadge}>
+                {comparisonModel.products.length} products
+              </span>
+            ) : null}
+            <button
+              type="button"
+              className={`${styles.differenceButton} ${
+                showDifferencesOnly ? styles.differenceButtonActive : ""
+              }`}
+              onClick={() => setShowDifferencesOnly((current) => !current)}
+              disabled={!comparisonModel || !comparisonModel.hasDifferences}
+              aria-pressed={showDifferencesOnly}
+            >
+              Difference
+            </button>
+          </div>
+        </div>
+
+        {comparisonModel ? (
+          <>
+            <div className={styles.comparisonTableWrap}>
+              <table className={styles.comparisonTable}>
+                <thead>
+                  <tr>
+                    <th scope="col">Specification</th>
+                    {comparisonModel.products.map((item) => (
+                      <th key={item._id} scope="col" className={styles.comparisonProductHead}>
+                        <Link
+                          href={appRoutes.product(item.slug)}
+                          className={styles.comparisonProductLink}
+                        >
+                          <div className={styles.comparisonProductCard}>
+                            <img
+                              src={getProductCardImage(item)}
+                              alt={item.name}
+                              className={styles.comparisonProductImage}
+                            />
+                            <div className={styles.comparisonProductText}>
+                              <span className={styles.comparisonProductName}>{item.name}</span>
+                              <span className={styles.comparisonProductMeta}>
+                                {item.category?.name || "Product"}
+                              </span>
+                              <span className={styles.comparisonQuickView}>Quick View</span>
+                            </div>
+                          </div>
+                        </Link>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonModel.rows.map((row) => (
+                    <tr key={row.label}>
+                      <th scope="row">{row.label}</th>
+                      {row.cells.map((cell, index) => (
+                        <td
+                          key={`${row.label}-${index}`}
+                          className={`${styles.comparisonCell} ${
+                            showDifferencesOnly && cell.isDifferent
+                              ? styles.comparisonCellDifferent
+                              : ""
+                          }`}
+                        >
+                          {cell.value || "-"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {comparisonModel.truncated ? (
+              <p className={styles.comparisonFootnote}>
+                Showing the first {MAX_COMPARISON_PRODUCTS} comparable products from this filter
+                group.
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <div className={styles.comparisonEmpty}>
+            Add at least two products with the same table structure to compare them here.
+          </div>
+        )}
+        </section>
+      ) : null}
 
       <section className={styles.detailSections}>
         <div className={styles.sectionPillRow}>
@@ -517,6 +636,105 @@ function getResourceLabel(value) {
   } catch (_error) {
     return normalized;
   }
+}
+
+function buildComparisonModel(products) {
+  const groups = new Map();
+
+  products.forEach((product) => {
+    const columns = normalizeColumns(product.tableColumns || product.category?.tableColumns || []);
+    const primaryRow = getPrimaryComparisonRow(product.rows || [], columns);
+
+    if (!columns.length || !primaryRow) {
+      return;
+    }
+
+    const key = columns.join("||");
+    const group = groups.get(key) || {
+      key,
+      columns,
+      products: [],
+    };
+
+    group.products.push({
+      ...product,
+      primaryRow,
+    });
+    groups.set(key, group);
+  });
+
+  let bestGroup = null;
+
+  for (const group of groups.values()) {
+    if (!bestGroup || group.products.length > bestGroup.products.length) {
+      bestGroup = group;
+    }
+  }
+
+  if (!bestGroup || bestGroup.products.length < 2) {
+    return null;
+  }
+
+  const comparisonProducts = bestGroup.products.slice(0, MAX_COMPARISON_PRODUCTS);
+  const rows = bestGroup.columns.map((label) => {
+    const values = comparisonProducts.map((item) =>
+      normalizeComparisonValue(item.primaryRow?.values?.[label])
+    );
+    const isDifferent = hasComparisonDifference(values);
+
+    return {
+      label,
+      cells: values.map((value) => ({
+        value,
+        isDifferent,
+      })),
+      isDifferent,
+    };
+  });
+
+  return {
+    key: bestGroup.key,
+    columns: bestGroup.columns,
+    products: comparisonProducts,
+    rows,
+    hasDifferences: rows.some((row) => row.isDifferent),
+    truncated: bestGroup.products.length > MAX_COMPARISON_PRODUCTS,
+  };
+}
+
+function getPrimaryComparisonRow(rows, columns) {
+  if (!Array.isArray(rows) || !rows.length) {
+    return null;
+  }
+
+  const filledRow = rows.find((row) =>
+    columns.some((column) => String(row?.values?.[column] || "").trim())
+  );
+
+  return filledRow || rows[0] || null;
+}
+
+function normalizeColumns(columns) {
+  return Array.isArray(columns)
+    ? [...new Set(columns.map((column) => String(column || "").trim()).filter(Boolean))]
+    : [];
+}
+
+function normalizeComparisonValue(value) {
+  return String(value || "").trim();
+}
+
+function hasComparisonDifference(values) {
+  const normalizedValues = values.map((value) => String(value || "").trim());
+  return new Set(normalizedValues).size > 1;
+}
+
+function getProductCardImage(product) {
+  const galleryImages = Array.isArray(product.galleryImages)
+    ? product.galleryImages.filter((image) => String(image || "").trim())
+    : [];
+
+  return product.imageUrl || galleryImages[0] || "/omsons-logo.jpg";
 }
 
 function hasDisplayValue(value) {

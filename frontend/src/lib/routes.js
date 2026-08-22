@@ -10,6 +10,7 @@ export const appRoutes = {
   adminCategoryCreate: "/admin/categories/new",
   adminCategoryEdit: (categoryId) => `/admin/categories/${categoryId}`,
   adminCategoryRows: (categoryId) => `/admin/categories/${categoryId}/rows`,
+  adminFeatureCards: "/admin/feature-cards",
   adminProducts: "/admin/products",
   adminProductList: "/admin/products/list",
 };

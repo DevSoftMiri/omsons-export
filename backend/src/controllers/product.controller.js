@@ -1,5 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
 const Category = require("../models/Category");
+const FeatureCard = require("../models/FeatureCard");
 const Product = require("../models/Product");
 const ProductRow = require("../models/ProductRow");
 const slugify = require("../utils/slugify");
@@ -23,7 +24,9 @@ const getAdminProductList = asyncHandler(async (req, res) => {
   const skip = (currentPage - 1) * pageSize;
 
   const products = await Product.find(filter)
-    .select("name slug description bulletPoints imageUrl galleryImages categoryId sortOrder isActive createdAt")
+    .select(
+      "name slug description bulletPoints imageUrl galleryImages categoryId brochureUrl coqUrl sortOrder isActive createdAt"
+    )
     .populate({ path: "categoryId", select: "name slug" })
     .sort({ sortOrder: 1, createdAt: 1 })
     .skip(skip)
@@ -137,8 +140,8 @@ const createProduct = asyncHandler(async (req, res) => {
     sortOrder: normalizeOptionalNumber(req.body.sortOrder, sortOrder),
   });
 
-  const rows = await replaceProductRows(product._id, payload.rows);
-  const responseProduct = await buildSerializedProduct(product.toObject(), rows, payload.category);
+  await replaceProductRows(product._id, payload.rows);
+  const responseProduct = await fetchSingleProduct({ _id: product._id });
 
   res.status(201).json({ success: true, product: responseProduct });
 });
@@ -159,8 +162,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   });
 
   await existing.save();
-  const rows = await replaceProductRows(existing._id, payload.rows);
-  const responseProduct = await buildSerializedProduct(existing.toObject(), rows, payload.category);
+  await replaceProductRows(existing._id, payload.rows);
+  const responseProduct = await fetchSingleProduct({ _id: existing._id });
 
   res.json({ success: true, product: responseProduct });
 });
@@ -248,6 +251,8 @@ const reorderProductRows = asyncHandler(async (req, res) => {
 async function fetchProducts(filter) {
   const products = await Product.find(filter)
     .populate("categoryId")
+    .populate({ path: "featureCardIds", select: "name imageUrl isActive sortOrder" })
+    .populate({ path: "highlightCards.featureCardId", select: "name imageUrl isActive sortOrder" })
     .sort({ sortOrder: 1, createdAt: 1 })
     .lean();
 
@@ -296,7 +301,11 @@ async function buildAdminProductFilter({ search, categorySlug }) {
 }
 
 async function fetchSingleProduct(filter) {
-  const product = await Product.findOne(filter).populate("categoryId").lean();
+  const product = await Product.findOne(filter)
+    .populate("categoryId")
+    .populate({ path: "featureCardIds", select: "name imageUrl isActive sortOrder" })
+    .populate({ path: "highlightCards.featureCardId", select: "name imageUrl isActive sortOrder" })
+    .lean();
 
   if (!product) {
     return null;
@@ -307,17 +316,6 @@ async function fetchSingleProduct(filter) {
     .lean();
 
   return serializeProduct(product, rows, product.categoryId);
-}
-
-async function buildSerializedProduct(product, rows, category) {
-  return serializeProduct(
-    {
-      ...product,
-      categoryId: category,
-    },
-    rows,
-    category
-  );
 }
 
 function uploadBufferToCloudinary(buffer, options = {}) {
@@ -387,6 +385,8 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
   }
 
   const rows = normalizeRows(payload.rows, tableColumns);
+  const featureCardIds = await normalizeFeatureCardIds(payload.featureCardIds);
+  const highlightCards = await normalizeHighlightCards(payload.highlightCards);
 
   return {
     categoryId,
@@ -399,12 +399,18 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
       bulletPoints: normalizeStringArray(payload.bulletPoints),
       imageUrl: String(payload.imageUrl || "").trim(),
       imagePublicId: String(payload.imagePublicId || "").trim(),
+      detailSections: normalizeDetailSections(payload.detailSections),
+      highlightCards,
+      specifications: normalizeStringArray(payload.specifications),
       itemsSupplied: normalizeStringArray(payload.itemsSupplied),
       accessoriesSpareParts: normalizeStringArray(payload.accessoriesSpareParts),
       selectionCharts: normalizeStringArray(payload.selectionCharts),
       videos: normalizeStringArray(payload.videos),
-      downloads: normalizeStringArray(payload.downloads),
+      downloads: normalizeDownloads(payload.downloads),
+      brochureUrl: String(payload.brochureUrl || "").trim(),
+      coqUrl: String(payload.coqUrl || "").trim(),
       icons: normalizeIcons(payload.icons),
+      featureCardIds,
       technicalTags: normalizeStringArray(payload.technicalTags),
       isActive: typeof payload.isActive === "boolean" ? payload.isActive : true,
       ...(Array.isArray(payload.galleryImages)
@@ -436,12 +442,19 @@ function serializeProduct(product, rows = [], category = null) {
     imageUrl: product.imageUrl || "",
     imagePublicId: product.imagePublicId || "",
     galleryImages: product.galleryImages || [],
+    detailSections: product.detailSections || [],
+    highlightCards: serializeHighlightCards(product.highlightCards || []),
+    specifications:
+      product.specifications?.length ? product.specifications : product.itemsSupplied || [],
     itemsSupplied: product.itemsSupplied || [],
     accessoriesSpareParts: product.accessoriesSpareParts || [],
     selectionCharts: product.selectionCharts || [],
     videos: product.videos || [],
-    downloads: product.downloads || [],
+    downloads: serializeDownloads(product.downloads || []),
+    brochureUrl: product.brochureUrl || "",
+    coqUrl: product.coqUrl || "",
     icons: product.icons || [],
+    featureCards: serializeFeatureCards(product.featureCardIds || []),
     technicalTags: product.technicalTags || [],
     isActive: Boolean(product.isActive),
     sortOrder: product.sortOrder || 0,
@@ -477,6 +490,8 @@ function serializeAdminListProduct(product, rowCount = 0) {
     imageUrl: product.imageUrl || "",
     imagePublicId: product.imagePublicId || "",
     galleryImages: product.galleryImages || [],
+    brochureUrl: product.brochureUrl || "",
+    coqUrl: product.coqUrl || "",
     isActive: Boolean(product.isActive),
     sortOrder: product.sortOrder || 0,
     categoryId: category?._id || null,
@@ -517,6 +532,186 @@ function normalizeIcons(icons) {
       imageUrl: String(icon?.imageUrl || "").trim(),
     }))
     .filter((icon) => icon.label);
+}
+
+function normalizeDownloads(downloads) {
+  if (!Array.isArray(downloads)) {
+    return [];
+  }
+
+  return downloads
+    .map((item) => {
+      if (typeof item === "string") {
+        const url = String(item || "").trim();
+        return url ? { name: url, url } : null;
+      }
+
+      const name = String(item?.name || "").trim();
+      const url = String(item?.url || "").trim();
+
+      if (!name || !url) {
+        return null;
+      }
+
+      return { name, url };
+    })
+    .filter(Boolean);
+}
+
+function serializeDownloads(downloads) {
+  if (!Array.isArray(downloads)) {
+    return [];
+  }
+
+  return downloads
+    .map((item) => {
+      if (typeof item === "string") {
+        const url = String(item || "").trim();
+        return url ? { name: getDownloadLabel(url), url } : null;
+      }
+
+      const name = String(item?.name || "").trim();
+      const url = String(item?.url || "").trim();
+
+      if (!url) {
+        return null;
+      }
+
+      return {
+        name: name || getDownloadLabel(url),
+        url,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getDownloadLabel(url) {
+  try {
+    const parsed = new URL(url);
+    const lastSegment = parsed.pathname.split("/").filter(Boolean).pop();
+    return lastSegment || url;
+  } catch (_error) {
+    return url;
+  }
+}
+
+function normalizeDetailSections(detailSections) {
+  if (!Array.isArray(detailSections)) {
+    return [];
+  }
+
+  return detailSections
+    .map((section, index) => {
+      const title = String(section?.title || "").trim();
+      const contentType = section?.contentType === "points" ? "points" : "paragraph";
+      const points = normalizeStringArray(section?.points);
+
+      if (!title) {
+        return null;
+      }
+
+      return {
+        title,
+        contentType,
+        paragraph: contentType === "paragraph" ? String(section?.paragraph || "").trim() : "",
+        points: contentType === "points" ? points : [],
+        sortOrder: normalizeOptionalNumber(section?.sortOrder, index + 1),
+      };
+    })
+    .filter(Boolean);
+}
+
+async function normalizeFeatureCardIds(featureCardIds) {
+  const ids = Array.isArray(featureCardIds)
+    ? [...new Set(featureCardIds.map((item) => String(item || "").trim()).filter(Boolean))]
+    : [];
+
+  if (!ids.length) {
+    return [];
+  }
+
+  const cards = await FeatureCard.find({ _id: { $in: ids } }).select("_id").lean();
+  return cards.map((card) => card._id);
+}
+
+async function normalizeHighlightCards(highlightCards) {
+  if (!Array.isArray(highlightCards)) {
+    return [];
+  }
+
+  const normalizedItems = highlightCards
+    .map((item, index) => ({
+      featureCardId: String(item?.featureCardId || "").trim(),
+      title: String(item?.title || "").trim(),
+      description: String(item?.description || "").trim(),
+      sortOrder: normalizeOptionalNumber(item?.sortOrder, index + 1),
+    }))
+    .filter((item) => item.featureCardId && item.title);
+
+  if (!normalizedItems.length) {
+    return [];
+  }
+
+  const existingCards = await FeatureCard.find({
+    _id: { $in: normalizedItems.map((item) => item.featureCardId) },
+  })
+    .select("_id")
+    .lean();
+
+  const validCardIdSet = new Set(existingCards.map((card) => String(card._id)));
+
+  return normalizedItems
+    .filter((item) => validCardIdSet.has(item.featureCardId))
+    .map((item, index) => ({
+      featureCardId: item.featureCardId,
+      title: item.title,
+      description: item.description,
+      sortOrder: normalizeOptionalNumber(item.sortOrder, index + 1),
+    }));
+}
+
+function serializeFeatureCards(featureCards) {
+  if (!Array.isArray(featureCards)) {
+    return [];
+  }
+
+  return featureCards.map((card) => ({
+    _id: card._id,
+    name: card.name || "",
+    imageUrl: card.imageUrl || "",
+    isActive: typeof card.isActive === "boolean" ? card.isActive : true,
+    sortOrder: card.sortOrder || 0,
+  }));
+}
+
+function serializeHighlightCards(highlightCards) {
+  if (!Array.isArray(highlightCards)) {
+    return [];
+  }
+
+  return highlightCards
+    .map((item) => {
+      const card = item?.featureCardId;
+
+      if (!card?._id) {
+        return null;
+      }
+
+      return {
+        featureCardId: card._id,
+        title: String(item?.title || "").trim(),
+        description: String(item?.description || "").trim(),
+        sortOrder: item?.sortOrder || 0,
+        featureCard: {
+          _id: card._id,
+          name: card.name || "",
+          imageUrl: card.imageUrl || "",
+          isActive: typeof card.isActive === "boolean" ? card.isActive : true,
+          sortOrder: card.sortOrder || 0,
+        },
+      };
+    })
+    .filter(Boolean);
 }
 
 function normalizeStringArray(value) {

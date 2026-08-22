@@ -5,6 +5,7 @@ const navbarRoutes = require("./navbar.routes");
 const categoryRoutes = require("./category.routes");
 const productRoutes = require("./product.routes");
 const reviewRoutes = require("./review.routes");
+const featureCardRoutes = require("./featureCard.routes");
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use("/navbar", navbarRoutes);
 router.use("/category", categoryRoutes);
 router.use("/product", productRoutes);
 router.use("/products", productRoutes);
+router.use("/feature-cards", featureCardRoutes);
 router.use("/review", reviewRoutes);
 
 module.exports = router;

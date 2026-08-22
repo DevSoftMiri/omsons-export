@@ -214,12 +214,18 @@ function groupProductsByCategory(products, rows, categories) {
       bulletPoints: product.bulletPoints || [],
       imageUrl: product.imageUrl || "",
       galleryImages: product.galleryImages || [],
+      detailSections: product.detailSections || [],
+      specifications:
+        product.specifications?.length ? product.specifications : product.itemsSupplied || [],
       itemsSupplied: product.itemsSupplied || [],
       accessoriesSpareParts: product.accessoriesSpareParts || [],
       selectionCharts: product.selectionCharts || [],
       videos: product.videos || [],
-      downloads: product.downloads || [],
+      downloads: serializeCategoryDownloads(product.downloads || []),
+      brochureUrl: product.brochureUrl || "",
+      coqUrl: product.coqUrl || "",
       icons: product.icons || [],
+      featureCards: [],
       technicalTags: product.technicalTags || [],
       isActive: Boolean(product.isActive),
       sortOrder: product.sortOrder || 0,
@@ -272,6 +278,25 @@ function normalizeStringArray(value) {
   return Array.isArray(value)
     ? [...new Set(value.map((item) => String(item || "").trim()).filter(Boolean))]
     : [];
+}
+
+function serializeCategoryDownloads(downloads) {
+  if (!Array.isArray(downloads)) {
+    return [];
+  }
+
+  return downloads
+    .map((item) => {
+      if (typeof item === "string") {
+        const url = String(item || "").trim();
+        return url ? { name: url, url } : null;
+      }
+
+      const name = String(item?.name || "").trim();
+      const url = String(item?.url || "").trim();
+      return url ? { name: name || url, url } : null;
+    })
+    .filter(Boolean);
 }
 
 function normalizeOptionalNumber(value, fallback) {

@@ -246,7 +246,13 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
             <div className={styles.supportList}>
               {SUPPORT_ITEMS.map((item) => (
                 <div key={item.title} className={styles.supportItem}>
-                  <span className={styles.supportIcon}>{item.icon}</span>
+                  <span className={styles.supportIcon}>
+                    <img
+                      src={getSupportIcon(item.title)}
+                      alt=""
+                      className={styles.supportIconImage}
+                    />
+                  </span>
                   <div>
                   <h3>{item.title}</h3>
                   <p>{item.copy}</p>
@@ -273,33 +279,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
                     <p className={styles.sectionParagraph}>{section.paragraph}</p>
                   )}
                 </section>
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {highlightCards.length ? (
-          <section className={styles.highlightStrip}>
-            <div className={styles.highlightGrid}>
-              {highlightCards.map((item, index) => (
-                <article
-                  key={`${item.featureCardId || item.featureCard?._id || index}-${item.title}`}
-                  className={styles.highlightCard}
-                >
-                  <div className={styles.highlightMedia}>
-                    <img
-                      src={item.featureCard.imageUrl}
-                      alt={item.featureCard.name || item.title}
-                      className={styles.highlightImage}
-                    />
-                  </div>
-                  <div className={styles.highlightContent}>
-                    <h3 className={styles.highlightTitle}>{item.title}</h3>
-                    {item.description ? (
-                      <p className={styles.highlightDescription}>{item.description}</p>
-                    ) : null}
-                  </div>
-                </article>
               ))}
             </div>
           </section>
@@ -378,13 +357,25 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
 
                   {section.id === "specifications" ? (
                     product.specifications?.length ? (
-                      <ul className={styles.pointList}>
-                        {product.specifications.map((item) => (
-                          <li key={item}>{item}</li>
+                      <div className={styles.specificationImageGrid}>
+                        {product.specifications.map((item, index) => (
+                          <a
+                            key={`${item}-${index}`}
+                            href={item}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={styles.specificationImageCard}
+                          >
+                            <img
+                              src={item}
+                              alt={`${product.name} specification ${index + 1}`}
+                              className={styles.specificationImage}
+                            />
+                          </a>
                         ))}
-                      </ul>
+                      </div>
                     ) : (
-                      <p className={styles.emptySection}>Specifications will be added soon.</p>
+                      <p className={styles.emptySection}>Specification images will be added soon.</p>
                     )
                   ) : null}
 
@@ -478,6 +469,33 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
           ))}
         </section>
 
+        {highlightCards.length ? (
+          <section className={styles.highlightStrip}>
+            <div className={styles.highlightGrid}>
+              {highlightCards.map((item, index) => (
+                <article
+                  key={`${item.featureCardId || item.featureCard?._id || index}-${item.title}`}
+                  className={styles.highlightCard}
+                >
+                  <div className={styles.highlightMedia}>
+                    <img
+                      src={item.featureCard.imageUrl}
+                      alt={item.featureCard.name || item.title}
+                      className={styles.highlightImage}
+                    />
+                  </div>
+                  <div className={styles.highlightContent}>
+                    <h3 className={styles.highlightTitle}>{item.title}</h3>
+                    {item.description ? (
+                      <p className={styles.highlightDescription}>{item.description}</p>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         {relatedProducts.length ? (
           <section className={styles.relatedCard}>
             <div className={styles.blockHeader}>
@@ -553,6 +571,21 @@ const SUPPORT_ITEMS = [
     icon: "◎",
   },
 ];
+
+function getSupportIcon(title) {
+  const supportIconMap = {
+    "Quick Technical Support":
+      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787391139/ChatGPT_Image_Aug_22_2026_03_01_55_PM_pgifex.png",
+    "Bulk Order Support":
+      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787391284/ChatGPT_Image_Aug_22_2026_03_04_37_PM_ezamks.png",
+    "Quality Assured":
+      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1784366243/4_lxprkj.png",
+    "Worldwide Delivery":
+      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787391361/ChatGPT_Image_Aug_22_2026_03_05_44_PM_hnqiye.png",
+  };
+
+  return supportIconMap[title] || "";
+}
 
 function normalizeDetailSections(detailSections, fallbackBullets) {
   if (Array.isArray(detailSections) && detailSections.length) {

@@ -10,14 +10,15 @@
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.95), rgba(239, 246, 255, 0.9)),
     linear-gradient(180deg, #fcfdff 0%, #f1f6fd 100%);
-  min-height: 19rem;
+  min-height: 17.5rem;
+  padding: 0.6rem;
 }
 
 .mainImage {
   width: 100%;
-  height: 19rem;
+  height: 16.75rem;
   object-fit: contain;
-  padding: 0.65rem 0.85rem;
+  padding: 1rem 1.15rem;
 }
 
 .thumbnailRow {
@@ -61,5 +62,13 @@
   .mainImage {
     min-height: 17rem;
     height: 17rem;
+  }
+
+  .imageFrame {
+    padding: 0.35rem;
+  }
+
+  .mainImage {
+    padding: 0.8rem 0.9rem;
   }
 }

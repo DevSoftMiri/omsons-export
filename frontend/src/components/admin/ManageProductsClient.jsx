@@ -26,6 +26,11 @@ export default function ManageProductsClient() {
   const [status, setStatus] = useState(defaultStatus);
   const [imageUpload, setImageUpload] = useState({ loading: false, error: "", name: "" });
   const [galleryUpload, setGalleryUpload] = useState({ loading: false, error: "", name: "" });
+  const [specificationUpload, setSpecificationUpload] = useState({
+    loading: false,
+    error: "",
+    name: "",
+  });
 
   const selectedCategory = useMemo(
     () => categories.find((item) => item._id === selectedCategoryId) || null,
@@ -112,6 +117,7 @@ export default function ManageProductsClient() {
       setForm(createFormFromProduct(product));
       setImageUpload({ loading: false, error: "", name: "" });
       setGalleryUpload({ loading: false, error: "", name: "" });
+      setSpecificationUpload({ loading: false, error: "", name: "" });
       setStatus((current) => ({ ...current, loading: false }));
     } catch (error) {
       setStatus({
@@ -200,7 +206,12 @@ export default function ManageProductsClient() {
       return;
     }
 
-    const setUploadState = type === "gallery" ? setGalleryUpload : setImageUpload;
+    const setUploadState =
+      type === "gallery"
+        ? setGalleryUpload
+        : type === "specification"
+          ? setSpecificationUpload
+          : setImageUpload;
     setUploadState({ loading: true, error: "", name: file.name });
 
     try {
@@ -225,6 +236,11 @@ export default function ManageProductsClient() {
         setForm((current) => ({
           ...current,
           galleryImages: [...current.galleryImages, data.imageUrl || ""].filter(Boolean),
+        }));
+      } else if (type === "specification") {
+        setForm((current) => ({
+          ...current,
+          specifications: [...current.specifications, data.imageUrl || ""].filter(Boolean),
         }));
       } else {
         setForm((current) => ({
@@ -284,6 +300,7 @@ export default function ManageProductsClient() {
     setForm(createEmptyForm(selectedCategory?.tableColumns || []));
     setImageUpload({ loading: false, error: "", name: "" });
     setGalleryUpload({ loading: false, error: "", name: "" });
+    setSpecificationUpload({ loading: false, error: "", name: "" });
     const nextCategory = selectedCategoryId ? `?categoryId=${selectedCategoryId}` : "";
     router.replace(`${appRoutes.adminProducts}${nextCategory}`);
   }
@@ -304,6 +321,7 @@ export default function ManageProductsClient() {
     setForm(createFormFromProduct(product));
     setImageUpload({ loading: false, error: "", name: "" });
     setGalleryUpload({ loading: false, error: "", name: "" });
+    setSpecificationUpload({ loading: false, error: "", name: "" });
     router.replace(`${appRoutes.adminProducts}?edit=${product._id}&categoryId=${product.categoryId}`);
   }
 
@@ -812,11 +830,10 @@ export default function ManageProductsClient() {
           onRemove={(index) => removeArrayField(setForm, "bulletPoints", index, [""])}
         />
 
-        <DynamicArraySection
-          title="Specifications"
-          description="Shown in the product page specifications section below the variants table."
+        <DynamicSpecificationSection
           items={form.specifications}
-          addLabel="Add specification"
+          uploadState={specificationUpload}
+          onUpload={(event) => handleImageUpload(event, "specification")}
           onAdd={() => appendArrayItem(setForm, "specifications")}
           onChange={(index, value) => updateArrayField(setForm, "specifications", index, value)}
           onRemove={(index) => removeArrayField(setForm, "specifications", index, [""])}
@@ -1261,6 +1278,75 @@ function DynamicArraySection({ title, description, items, addLabel, onAdd, onCha
             <input
               value={item}
               onChange={(event) => onChange(index, event.target.value)}
+              className={inputClassName}
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DynamicSpecificationSection({ items, uploadState, onUpload, onAdd, onChange, onRemove }) {
+  return (
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-700">
+            Specifications
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            Add specification images that will appear in the product page specifications section
+            below the variants table.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <label className={`${secondaryButtonClassName} cursor-pointer`}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onUpload}
+              className="sr-only"
+              disabled={uploadState.loading}
+            />
+            {uploadState.loading ? "Uploading..." : "Upload Image"}
+          </label>
+          <button type="button" onClick={onAdd} className={secondaryButtonClassName}>
+            Add Image URL
+          </button>
+        </div>
+      </div>
+
+      {uploadState.error ? <p className="mt-4 text-sm text-red-600">{uploadState.error}</p> : null}
+
+      <div className="mt-5 grid gap-3">
+        {items.map((item, index) => (
+          <div
+            key={`specification-image-${index}`}
+            className="grid gap-3 rounded-[22px] border border-slate-200 bg-slate-50 p-4 md:grid-cols-[96px_minmax(0,1fr)_auto]"
+          >
+            {item ? (
+              <img
+                src={item}
+                alt={`Specification ${index + 1}`}
+                className="h-24 w-24 rounded-2xl border border-slate-200 object-cover"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-center text-xs text-slate-400">
+                No image
+              </div>
+            )}
+            <input
+              value={item}
+              onChange={(event) => onChange(index, event.target.value)}
+              placeholder="https://.../specification-image.jpg"
               className={inputClassName}
             />
             <button

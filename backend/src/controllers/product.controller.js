@@ -407,8 +407,8 @@ async function normalizeProductPayload(payload = {}, currentProductId = null) {
       selectionCharts: normalizeStringArray(payload.selectionCharts),
       videos: normalizeStringArray(payload.videos),
       downloads: normalizeDownloads(payload.downloads),
-      brochureUrl: String(payload.brochureUrl || "").trim(),
-      coqUrl: String(payload.coqUrl || "").trim(),
+      brochureUrl: normalizeExternalUrl(payload.brochureUrl),
+      coqUrl: normalizeExternalUrl(payload.coqUrl),
       icons: normalizeIcons(payload.icons),
       featureCardIds,
       technicalTags: normalizeStringArray(payload.technicalTags),
@@ -542,12 +542,12 @@ function normalizeDownloads(downloads) {
   return downloads
     .map((item) => {
       if (typeof item === "string") {
-        const url = String(item || "").trim();
+        const url = normalizeExternalUrl(item);
         return url ? { name: url, url } : null;
       }
 
       const name = String(item?.name || "").trim();
-      const url = String(item?.url || "").trim();
+      const url = normalizeExternalUrl(item?.url);
 
       if (!name || !url) {
         return null;
@@ -587,12 +587,33 @@ function serializeDownloads(downloads) {
 
 function getDownloadLabel(url) {
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(normalizeExternalUrl(url));
     const lastSegment = parsed.pathname.split("/").filter(Boolean).pop();
     return lastSegment || url;
   } catch (_error) {
     return url;
   }
+}
+
+function normalizeExternalUrl(value) {
+  const normalized = String(value || "").trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (
+    normalized.startsWith("/") ||
+    normalized.startsWith("./") ||
+    normalized.startsWith("../") ||
+    normalized.startsWith("#") ||
+    normalized.startsWith("//") ||
+    /^[a-z][a-z0-9+.-]*:/i.test(normalized)
+  ) {
+    return normalized;
+  }
+
+  return `https://${normalized}`;
 }
 
 function normalizeDetailSections(detailSections) {

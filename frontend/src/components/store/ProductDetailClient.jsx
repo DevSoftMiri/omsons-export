@@ -77,6 +77,10 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
     [product.highlightCards]
   );
   const hasDownloads = Boolean(product.brochureUrl || product.coqUrl || product.downloads?.length);
+  const downloadItems = useMemo(
+    () => buildDownloadItems(product),
+    [product]
+  );
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [openSections, setOpenSections] = useState(DEFAULT_OPEN_SECTIONS);
   const sections = useMemo(() => SECTION_DEFINITIONS, []);
@@ -223,7 +227,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
               </button>
               {product.brochureUrl ? (
                 <a
-                  href={product.brochureUrl}
+                  href={normalizeResourceUrl(product.brochureUrl)}
                   target="_blank"
                   rel="noreferrer"
                   className={`${styles.sideButton} ${styles.sideButtonSecondary}`}
@@ -233,7 +237,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
               ) : null}
               {product.coqUrl ? (
                 <a
-                  href={product.coqUrl}
+                  href={normalizeResourceUrl(product.coqUrl)}
                   target="_blank"
                   rel="noreferrer"
                   className={`${styles.sideButton} ${styles.sideButtonSecondary}`}
@@ -441,21 +445,27 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
                   ) : null}
 
                   {section.id === "downloads" ? (
-                    hasDownloads ? (
+                    downloadItems.length ? (
                       <div className={styles.downloadList}>
-                        {product.brochureUrl ? (
-                          <a href={product.brochureUrl} target="_blank" rel="noreferrer">
-                            Product Brochure
-                          </a>
-                        ) : null}
-                        {product.coqUrl ? (
-                          <a href={product.coqUrl} target="_blank" rel="noreferrer">
-                            COQ
-                          </a>
-                        ) : null}
-                        {(product.downloads || []).map((item) => (
-                          <a key={`${item.name}-${item.url}`} href={item.url} target="_blank" rel="noreferrer">
-                            {item.name || getResourceLabel(item.url)}
+                        {downloadItems.map((item) => (
+                          <a
+                            key={`${item.name}-${item.url}-${item.kind}`}
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={styles.downloadCard}
+                          >
+                            <span className={styles.downloadThumb}>
+                              <img
+                                src={item.previewImage}
+                                alt=""
+                                className={styles.downloadThumbImage}
+                              />
+                            </span>
+                            <span className={styles.downloadMeta}>
+                              <span className={styles.downloadName}>{item.name}</span>
+                              <span className={styles.downloadType}>{item.typeLabel}</span>
+                            </span>
                           </a>
                         ))}
                       </div>
@@ -620,7 +630,7 @@ function normalizeDetailSections(detailSections, fallbackBullets) {
 }
 
 function getResourceLabel(value) {
-  const normalized = String(value || "").trim();
+  const normalized = normalizeResourceUrl(value);
 
   if (!normalized) {
     return "Open resource";
@@ -633,6 +643,132 @@ function getResourceLabel(value) {
   } catch (_error) {
     return normalized;
   }
+}
+
+function normalizeResourceUrl(value) {
+  const normalized = String(value || "").trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (
+    normalized.startsWith("/") ||
+    normalized.startsWith("./") ||
+    normalized.startsWith("../") ||
+    normalized.startsWith("#") ||
+    normalized.startsWith("//") ||
+    /^[a-z][a-z0-9+.-]*:/i.test(normalized)
+  ) {
+    return normalized;
+  }
+
+  return `https://${normalized}`;
+}
+
+function buildDownloadItems(product) {
+  const items = [];
+
+  if (product?.brochureUrl) {
+    items.push(createDownloadItem("Product Brochure", product.brochureUrl, "brochure"));
+  }
+
+  if (product?.coqUrl) {
+    items.push(createDownloadItem("COQ", product.coqUrl, "certificate"));
+  }
+
+  for (const item of product?.downloads || []) {
+    const name = String(item?.name || "").trim() || getResourceLabel(item?.url);
+    items.push(createDownloadItem(name, item?.url, "download"));
+  }
+
+  return items.filter((item) => item.url);
+}
+
+function createDownloadItem(name, url, kind) {
+  const normalizedUrl = normalizeResourceUrl(url);
+  const extension = getResourceExtension(normalizedUrl);
+  const fileType = getFileTypeMeta(extension, kind);
+
+  return {
+    kind,
+    name: String(name || "").trim() || "Download file",
+    url: normalizedUrl,
+    typeLabel: fileType.label,
+    previewImage: createFilePreviewImage(fileType),
+  };
+}
+
+function getResourceExtension(value) {
+  try {
+    const normalized = normalizeResourceUrl(value);
+    const { pathname } = new URL(normalized);
+    const lastSegment = pathname.split("/").filter(Boolean).pop() || "";
+    const parts = lastSegment.split(".");
+    return parts.length > 1 ? parts.pop().toLowerCase() : "";
+  } catch (_error) {
+    return "";
+  }
+}
+
+function getFileTypeMeta(extension, kind) {
+  const normalizedExtension = String(extension || "").toLowerCase();
+
+  if (kind === "certificate") {
+    return { label: normalizedExtension ? normalizedExtension.toUpperCase() : "Certificate", accent: "#1d4ed8", icon: "CERT" };
+  }
+
+  if (kind === "brochure") {
+    return { label: normalizedExtension ? normalizedExtension.toUpperCase() : "Brochure", accent: "#0f766e", icon: "PDF" };
+  }
+
+  if (["pdf"].includes(normalizedExtension)) {
+    return { label: "PDF", accent: "#b91c1c", icon: "PDF" };
+  }
+
+  if (["doc", "docx"].includes(normalizedExtension)) {
+    return { label: normalizedExtension.toUpperCase(), accent: "#1d4ed8", icon: "DOC" };
+  }
+
+  if (["xls", "xlsx", "csv"].includes(normalizedExtension)) {
+    return { label: normalizedExtension.toUpperCase(), accent: "#15803d", icon: "XLS" };
+  }
+
+  if (["jpg", "jpeg", "png", "webp", "gif", "svg"].includes(normalizedExtension)) {
+    return { label: normalizedExtension.toUpperCase(), accent: "#7c3aed", icon: "IMG" };
+  }
+
+  return {
+    label: normalizedExtension ? normalizedExtension.toUpperCase() : "File",
+    accent: "#475569",
+    icon: normalizedExtension ? normalizedExtension.slice(0, 3).toUpperCase() : "FILE",
+  };
+}
+
+function createFilePreviewImage(fileType) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88" fill="none">
+      <rect x="8" y="8" width="72" height="72" rx="18" fill="#F8FBFF"/>
+      <rect x="16" y="14" width="40" height="52" rx="10" fill="white" stroke="#D8E3F2" stroke-width="2"/>
+      <path d="M48 14V28C48 31.3137 50.6863 34 54 34H68" fill="white"/>
+      <path d="M48 14V28C48 31.3137 50.6863 34 54 34H68" stroke="#D8E3F2" stroke-width="2"/>
+      <rect x="22" y="45" width="44" height="20" rx="10" fill="${fileType.accent}"/>
+      <text x="44" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="white">${escapeXml(
+        fileType.icon
+      )}</text>
+    </svg>
+  `.trim();
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function escapeXml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
 function getYouTubePreview(value) {

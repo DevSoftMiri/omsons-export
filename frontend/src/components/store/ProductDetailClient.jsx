@@ -7,6 +7,12 @@ import ProductCard from "./ProductCard";
 import ProductGallery from "./ProductGallery";
 import styles from "./ProductDetailClient.module.css";
 
+const QUALITY_ASSURANCE_IMAGE_URL =
+  "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787634488/ChatGPT_Image_Aug_25_2026_10_37_59_AM_sf5kt3.png";
+const QUALITY_ASSURANCE_TITLE = "Quality Assured";
+const QUALITY_ASSURANCE_DESCRIPTION =
+  "Detailed documentation and dependable product information";
+
 const SECTION_DEFINITIONS = [
   {
     id: "variants",
@@ -71,7 +77,10 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
     () =>
       Array.isArray(product.highlightCards)
         ? [...product.highlightCards]
-            .filter((item) => item?.featureCard?.imageUrl && String(item?.title || "").trim())
+            .filter(
+              (item) =>
+                getFeatureCardImageUrl(item?.featureCard) && String(item?.title || "").trim()
+            )
             .sort((first, second) => (first.sortOrder || 0) - (second.sortOrder || 0))
         : [],
     [product.highlightCards]
@@ -133,14 +142,19 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
               <div
                 className={styles.featureCardRow}
                 style={{
-                  gridTemplateColumns: `repeat(${featureCards.length}, minmax(0, 1fr))`,
+                  "--feature-card-columns": featureCards.length,
                 }}
               >
                 {featureCards.map((card) => (
                   <div key={card._id || card.name} className={styles.featureCard}>
-                    {card.imageUrl ? (
-                      <img src={card.imageUrl} alt={card.name} className={styles.featureCardImage} />
+                    {getFeatureCardImageUrl(card) ? (
+                      <img
+                        src={getFeatureCardImageUrl(card)}
+                        alt={card.name}
+                        className={styles.featureCardImage}
+                      />
                     ) : null}
+                    <span className={styles.featureCardLabel}>{card.name}</span>
                   </div>
                 ))}
               </div>
@@ -489,15 +503,15 @@ export default function ProductDetailClient({ product, relatedProducts = [] }) {
                 >
                   <div className={styles.highlightMedia}>
                     <img
-                      src={item.featureCard.imageUrl}
-                      alt={item.featureCard.name || item.title}
+                      src={getFeatureCardImageUrl(item.featureCard)}
+                      alt={getHighlightTitle(item)}
                       className={styles.highlightImage}
                     />
                   </div>
                   <div className={styles.highlightContent}>
-                    <h3 className={styles.highlightTitle}>{item.title}</h3>
-                    {item.description ? (
-                      <p className={styles.highlightDescription}>{item.description}</p>
+                    <h3 className={styles.highlightTitle}>{getHighlightTitle(item)}</h3>
+                    {getHighlightDescription(item) ? (
+                      <p className={styles.highlightDescription}>{getHighlightDescription(item)}</p>
                     ) : null}
                   </div>
                 </article>
@@ -589,7 +603,7 @@ function getSupportIcon(title) {
     "Bulk Order Support":
       "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787391284/ChatGPT_Image_Aug_22_2026_03_04_37_PM_ezamks.png",
     "Quality Assured":
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1784366243/4_lxprkj.png",
+      QUALITY_ASSURANCE_IMAGE_URL,
     "Worldwide Delivery":
       "https://res.cloudinary.com/dzrg0utcm/image/upload/v1787391361/ChatGPT_Image_Aug_22_2026_03_05_44_PM_hnqiye.png",
   };
@@ -683,6 +697,40 @@ function buildDownloadItems(product) {
   }
 
   return items.filter((item) => item.url);
+}
+
+function getFeatureCardImageUrl(card) {
+  if (!card) {
+    return "";
+  }
+
+  const normalizedName = String(card.name || "").trim().toLowerCase();
+
+  if (normalizedName === "quality assurance" || normalizedName === "quality assured") {
+    return QUALITY_ASSURANCE_IMAGE_URL;
+  }
+
+  return String(card.imageUrl || "").trim();
+}
+
+function isQualityAssuranceCard(card) {
+  return String(card?.name || "").trim().toLowerCase() === "quality assurance";
+}
+
+function getHighlightTitle(item) {
+  if (isQualityAssuranceCard(item?.featureCard)) {
+    return QUALITY_ASSURANCE_TITLE;
+  }
+
+  return String(item?.title || "").trim();
+}
+
+function getHighlightDescription(item) {
+  if (isQualityAssuranceCard(item?.featureCard)) {
+    return QUALITY_ASSURANCE_DESCRIPTION;
+  }
+
+  return String(item?.description || "").trim();
 }
 
 function createDownloadItem(name, url, kind) {

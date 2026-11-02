@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { appRoutes } from "@/lib/routes";
 import ProductCard from "./ProductCard";
+import { getOptimizedImageUrl } from "@/lib/image-url";
 import styles from "./ProductCatalogClient.module.css";
 
 const PAGE_SIZE_OPTIONS = [16, 24, 32, 48, 64];
@@ -161,6 +162,8 @@ export default function ProductCatalogClient({
   ]);
 
   function handleCategory(slug) {
+    resetPageScroll();
+
     if (isCategoryPage) {
       const destination = slug === "all" ? appRoutes.products : appRoutes.category(slug);
       const params = new URLSearchParams();
@@ -174,7 +177,9 @@ export default function ProductCatalogClient({
       }
 
       const queryString = params.toString();
-      router.push(`${destination}${queryString ? `?${queryString}` : ""}`);
+      router.push(`${destination}${queryString ? `?${queryString}` : ""}`, {
+        scroll: true,
+      });
       return;
     }
 
@@ -183,6 +188,15 @@ export default function ProductCatalogClient({
       setPage(1);
       setIsFilterDrawerOpen(false);
     });
+  }
+
+  function resetPageScroll() {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
+  function prefetchCategory(slug) {
+    if (!isCategoryPage || slug === "all") return;
+    router.prefetch(appRoutes.category(slug));
   }
 
   function handleQuery(event) {
@@ -301,6 +315,7 @@ export default function ProductCatalogClient({
                         isActive ? styles.categoryButtonActive : ""
                       }`}
                       onClick={() => handleCategory(category.slug)}
+                      onMouseEnter={() => prefetchCategory(category.slug)}
                     >
                       <span className={styles.indicator} />
                       <span className={styles.categoryLabel}>{category.label}</span>
@@ -371,7 +386,7 @@ export default function ProductCatalogClient({
                             <th key={product._id} scope="col" className={styles.comparisonProductHead}>
                               <div className={styles.comparisonProductCard}>
                                 <img
-                                  src={getProductCardImage(product)}
+                                  src={getOptimizedImageUrl(getProductCardImage(product), 240)}
                                   alt={product.name}
                                   className={styles.comparisonProductImage}
                                 />
@@ -461,8 +476,8 @@ export default function ProductCatalogClient({
 
           {pagedProducts.length ? (
             <div className={styles.grid}>
-              {pagedProducts.map((product) => (
-                <ProductCard key={product.slug} product={product} />
+              {pagedProducts.map((product, index) => (
+                <ProductCard key={product.slug} product={product} priority={index < 8} />
               ))}
             </div>
           ) : (

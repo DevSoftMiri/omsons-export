@@ -18,6 +18,7 @@ import HomeNavbar from "./HomeNavbar";
 import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
+import { useEffect, useState } from "react";
 
 function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) {
   const classes = [styles.reveal, delay ? styles[`delay${delay}`] : "", className]
@@ -32,12 +33,21 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 }
 
 export default function LandingPage() {
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    const updateHeader = () => setIsCompact(window.scrollY > 40);
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeader);
+  }, []);
+
   useLandingEffects();
   return (
     <main className={styles.pageShell}>
       <StorefrontHeader />
 
-      <HomeNavbar />
+      <HomeNavbar compact={isCompact} />
 
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />

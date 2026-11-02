@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { footerColumns } from "@/components/landing/landingData";
 import HomeNavbar from "@/components/landing/HomeNavbar";
 import SearchAutocomplete from "./SearchAutocomplete";
@@ -6,6 +9,15 @@ import { appRoutes } from "@/lib/routes";
 import styles from "./StorefrontChrome.module.css";
 
 export default function StorefrontChrome({ children }) {
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    const updateHeader = () => setIsCompact(window.scrollY > 40);
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeader);
+  }, []);
+
   const headerActions = [
     { href: "#", icon: "/wishlist.png", label: "Wishlist" },
     { href: appRoutes.adminLogin, icon: "/account.png", label: "Account" },
@@ -14,7 +26,7 @@ export default function StorefrontChrome({ children }) {
 
   return (
     <div className={styles.shell}>
-      <header className={styles.siteHeader}>
+      <header className={`${styles.siteHeader} ${isCompact ? styles.compactHeader : ""}`}>
         <div className={styles.headerInner}>
           <Link href={appRoutes.home} className={styles.logo}>
             <img src="/omsons-logo.jpg" alt="OMSONS" />
@@ -72,7 +84,7 @@ export default function StorefrontChrome({ children }) {
         </div>
       </header>
 
-      <HomeNavbar />
+      <HomeNavbar compact={isCompact} />
 
       <main className={styles.main}>
         <div className={styles.container}>{children}</div>

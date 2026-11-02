@@ -73,7 +73,7 @@ const categoryVisuals = {
   },
 };
 
-export default function HomeNavbar() {
+export default function HomeNavbar({ compact = false }) {
   const router = useRouter();
   const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
@@ -166,7 +166,7 @@ export default function HomeNavbar() {
   }
 
   return (
-    <nav className={`${styles.siteNav} ${isStaticOnThisPage ? styles.siteNavStatic : ""}`}>
+    <nav className={`${styles.siteNav} ${compact ? styles.compactNav : ""} ${isStaticOnThisPage ? styles.siteNavStatic : ""}`}>
       <div className={styles.navInner}>
         <div className={styles.navDesktop}>
           <ul className={styles.navList}>

@@ -33,6 +33,11 @@
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.compactHeader {
+  box-shadow: 0 5px 18px rgba(13, 47, 122, 0.12);
 }
 
 .headerInner,
@@ -57,6 +62,35 @@
   grid-template-columns: 132px minmax(0, 1fr) auto;
   align-items: center;
   gap: 24px;
+  transition: min-height 0.2s ease, gap 0.2s ease;
+}
+
+.compactHeader .headerInner {
+  min-height: 52px;
+  gap: 16px;
+}
+
+.compactHeader .logo img {
+  width: 62px;
+}
+
+.compactHeader .headerAction {
+  padding: 5px 8px;
+  gap: 2px;
+}
+
+.compactHeader .headerActionIconWrap {
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.compactHeader .headerActionIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.compactHeader .headerAction strong {
+  font-size: 11px;
 }
 
 .logo img {
@@ -157,6 +191,25 @@
   z-index: 35;
   background: linear-gradient(135deg, #0e2e71, #174ea6);
   box-shadow: 0 14px 28px rgba(14, 46, 113, 0.18);
+  transition: top 0.2s ease;
+}
+
+.compactNav {
+  top: 52px;
+}
+
+.compactNav .navList {
+  min-height: 50px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  box-sizing: border-box;
+  transition: min-height 0.2s ease;
+}
+
+.compactNav .navItem > a {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 13px;
 }
 
 .siteNavStatic {

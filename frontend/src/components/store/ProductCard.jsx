@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { appRoutes } from "@/lib/routes";
+import { getOptimizedImageUrl, getResponsiveImageSources } from "@/lib/image-url";
 import styles from "./ProductCard.module.css";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, priority = false }) {
   const image = getProductCardImage(product);
-  const rowCount = product.rows?.length || 0;
+  const rowCount = product.rowCount ?? product.rows?.length ?? 0;
   const categoryLabel = product.category?.name || "Catalogue product";
   const catNo = product.rows?.[0]?.values?.["Cat. No."] || product.slug;
 
@@ -16,7 +17,20 @@ export default function ProductCard({ product }) {
           <div className={styles.imageStageBorder} />
           <div className={styles.imagePlatform} />
           <div className={styles.imageReflection} />
-          <img src={image} alt={product.name} className={styles.image} />
+          <img
+            src={getOptimizedImageUrl(image, 480)}
+            srcSet={getResponsiveImageSources(image)}
+            sizes="(max-width: 720px) 92vw, (max-width: 1100px) 42vw, 300px"
+            alt={product.name}
+            className={styles.image}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
+            onError={(event) => {
+              event.currentTarget.src = "/omsons-logo.jpg";
+              event.currentTarget.srcSet = "";
+            }}
+          />
         </div>
       </div>
       <div className={styles.body}>

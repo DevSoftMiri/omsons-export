@@ -1,9 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import SearchAutocomplete from "./SearchAutocomplete";
 import { appRoutes } from "@/lib/routes";
 import styles from "./StorefrontChrome.module.css";
 
 export default function StorefrontHeader() {
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    const updateHeader = () => setIsCompact(window.scrollY > 40);
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeader);
+  }, []);
+
   const actions = [
     { href: "#", icon: "/wishlist.png", label: "Wishlist" },
     { href: appRoutes.adminLogin, icon: "/account.png", label: "Account" },
@@ -11,8 +23,8 @@ export default function StorefrontHeader() {
   ];
 
   return (
-    <header className={styles.siteHeader}>
-      <div className={styles.headerInner}>
+    <header className={`${styles.siteHeader} ${isCompact ? styles.compactHeader : ""}`}>
+        <div className={styles.headerInner}>
         <Link href={appRoutes.home} className={styles.logo}>
           <img src="/omsons-logo.jpg" alt="OMSONS" />
         </Link>

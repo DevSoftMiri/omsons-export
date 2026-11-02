@@ -3,6 +3,7 @@ const Category = require("../models/Category");
 const Product = require("../models/Product");
 const ProductRow = require("../models/ProductRow");
 const slugify = require("../utils/slugify");
+const { serializeCatalogueProduct } = require("../utils/catalogueProduct");
 
 const getCategories = asyncHandler(async (_req, res) => {
   const categories = await Category.find().sort({ sortOrder: 1, createdAt: 1 }).lean();
@@ -66,7 +67,7 @@ const getCategoryBySlug = asyncHandler(async (req, res) => {
     .sort({ sortOrder: 1, createdAt: 1 })
     .lean();
 
-  const grouped = groupProductsByCategory(products, rows, [category]);
+  const grouped = groupProductsByCategory(products, rows, [category], serializeCatalogueProduct);
   res.json({
     success: true,
     category: {
@@ -216,7 +217,7 @@ async function normalizeCategoryPayload(payload = {}, currentCategoryId = null) 
   };
 }
 
-function groupProductsByCategory(products, rows, categories) {
+function groupProductsByCategory(products, rows, categories, serializer = null) {
   const rowMap = rows.reduce((accumulator, row) => {
     const key = String(row.productId);
     accumulator[key] = accumulator[key] || [];
@@ -230,7 +231,8 @@ function groupProductsByCategory(products, rows, categories) {
     const category = categoryMap.get(String(product.categoryId));
     const key = String(product.categoryId);
     accumulator[key] = accumulator[key] || [];
-    accumulator[key].push({
+    const serialized = serializer?.(product, rowMap[String(product._id)] || [], category);
+    accumulator[key].push(serialized || {
       _id: product._id,
       name: product.name,
       slug: product.slug,

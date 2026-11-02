@@ -6,7 +6,19 @@ const slugify = require("../utils/slugify");
 
 const getCategories = asyncHandler(async (_req, res) => {
   const categories = await Category.find().sort({ sortOrder: 1, createdAt: 1 }).lean();
-  res.json({ success: true, categories });
+  const counts = await Product.aggregate([
+    { $match: { isActive: true } },
+    { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+  ]);
+  const countMap = new Map(counts.map((item) => [String(item._id), item.count]));
+
+  res.json({
+    success: true,
+    categories: categories.map((category) => ({
+      ...category,
+      productCount: countMap.get(String(category._id)) || 0,
+    })),
+  });
 });
 
 const getCatalogueCategories = asyncHandler(async (_req, res) => {
@@ -38,7 +50,7 @@ const getCatalogueCategories = asyncHandler(async (_req, res) => {
 });
 
 const getCategoryBySlug = asyncHandler(async (req, res) => {
-  const category = await Category.findOne({ slug: req.params.slug, isActive: true }).lean();
+  const category = await findActiveCategoryBySlug(req.params.slug);
 
   if (!category) {
     return res.status(404).json({ success: false, message: "Category not found" });
@@ -63,6 +75,19 @@ const getCategoryBySlug = asyncHandler(async (req, res) => {
     },
   });
 });
+
+async function findActiveCategoryBySlug(value) {
+  const requestedSlug = slugify(value);
+  const candidates = [requestedSlug];
+
+  if (requestedSlug.endsWith("ies")) {
+    candidates.push(`${requestedSlug.slice(0, -3)}y`);
+  } else if (requestedSlug.endsWith("s")) {
+    candidates.push(requestedSlug.slice(0, -1));
+  }
+
+  return Category.findOne({ slug: { $in: [...new Set(candidates)] }, isActive: true }).lean();
+}
 
 const getCategoryForAdmin = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id).lean();

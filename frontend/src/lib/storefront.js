@@ -5,7 +5,9 @@ const API_BASE_URL =
 
 async function request(path, fallbackValue = null) {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      next: { revalidate: 60 },
+    });
 
     if (!response.ok) {
       if (response.status === 404) {

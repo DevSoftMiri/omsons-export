@@ -15,6 +15,7 @@ import {
 } from "./landingData";
 import { appRoutes } from "@/lib/routes";
 import HomeNavbar from "./HomeNavbar";
+import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
 
@@ -32,38 +33,9 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 
 export default function LandingPage() {
   useLandingEffects();
-  const headerActions = [
-    { icon: "/wishlist.png", label: "Wishlist" },
-    { icon: "/account.png", label: "Account" },
-    { icon: "/cart.png", label: "Cart" },
-  ];
-
   return (
     <main className={styles.pageShell}>
-      <header className={styles.siteHeader}>
-        <div className={styles.headerInner}>
-          <a className={styles.logo} href="#">
-            <img
-              src="/omsons-logo.jpg"
-              alt="OMSONS"
-            />
-          </a>
-          <div className={styles.searchWrap}>
-            <input type="text" placeholder="Search products, categories..." />
-            <button type="button">Search</button>
-          </div>
-          <div className={styles.headerActions}>
-            {headerActions.map(({ icon, label }) => (
-              <a key={label} className={styles.headerAction} href="#">
-                <span className={styles.headerActionIconWrap}>
-                  <img src={icon} alt="" className={styles.headerActionIcon} />
-                </span>
-                {label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </header>
+      <StorefrontHeader />
 
       <HomeNavbar />
 

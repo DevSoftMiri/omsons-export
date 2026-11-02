@@ -11,6 +11,7 @@ const {
   getProductForAdmin,
   getProductsByCategory,
   getProductBySlug,
+  searchProducts,
   reorderProductRows,
   uploadProductImage,
   updateProductRow,
@@ -26,6 +27,7 @@ const upload = multer({
 router.get("/", getAllProducts);
 router.get("/get-all", getAllProducts);
 router.get("/admin/list", requireAdmin, getAdminProductList);
+router.get("/search", searchProducts);
 router.get("/manage/:id", requireAdmin, getProductForAdmin);
 router.post(
   "/upload-image",

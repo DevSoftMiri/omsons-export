@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { footerColumns } from "@/components/landing/landingData";
 import HomeNavbar from "@/components/landing/HomeNavbar";
+import SearchAutocomplete from "./SearchAutocomplete";
 import { appRoutes } from "@/lib/routes";
 import styles from "./StorefrontChrome.module.css";
 
@@ -19,20 +20,28 @@ export default function StorefrontChrome({ children }) {
             <img src="/omsons-logo.jpg" alt="OMSONS" />
           </Link>
 
-          <div className={styles.searchShell}>
-            <select className={styles.searchSelect} defaultValue="all">
+          <SearchAutocomplete
+            shellClassName={styles.searchShell}
+            selectClassName={styles.searchSelect}
+            inputClassName={styles.searchInput}
+            buttonClassName={styles.searchButton}
+          />
+          {/*
+            <select className={styles.searchSelect} name="searchType" defaultValue="all" aria-label="Search in">
               <option value="all">All</option>
               <option value="products">Products</option>
               <option value="categories">Categories</option>
             </select>
             <input
               className={styles.searchInput}
+              name="search"
               placeholder="Search by name, SKU, category, or specs..."
+              aria-label="Search products and categories"
             />
-            <button type="button" className={styles.searchButton} aria-label="Search">
+            <button type="submit" className={styles.searchButton} aria-label="Search">
               🔎
             </button>
-          </div>
+          </form>*/}
 
           <div className={styles.headerActions}>
             {headerActions.map(({ href, icon, label }) => {

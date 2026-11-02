@@ -18,4 +18,6 @@ const productRowSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+productRowSchema.index({ productId: 1, isActive: 1, sortOrder: 1, createdAt: 1 });
+
 module.exports = mongoose.models.ProductRow || mongoose.model("ProductRow", productRowSchema);

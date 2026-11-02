@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import NavigationLoadingIndicator from "@/components/navigation/NavigationLoadingIndicator";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-display",
@@ -29,7 +30,10 @@ export default function RootLayout({ children }) {
       className={`${plusJakartaSans.variable} ${inter.variable} ${jetBrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <NavigationLoadingIndicator />
+      </body>
     </html>
   );
 }

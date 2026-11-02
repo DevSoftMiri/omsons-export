@@ -11,6 +11,38 @@ const getAllProducts = asyncHandler(async (_req, res) => {
   res.json({ success: true, products });
 });
 
+const searchProducts = asyncHandler(async (req, res) => {
+  const query = String(req.query.q || "").trim();
+  const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 8, 1), 20);
+
+  if (query.length < 2) {
+    return res.json({ success: true, products: [] });
+  }
+
+  const pattern = new RegExp(escapeRegex(query), "i");
+  const products = await Product.find({
+    isActive: true,
+    $or: [{ name: pattern }, { slug: pattern }],
+  })
+    .select("name slug imageUrl galleryImages categoryId")
+    .populate({ path: "categoryId", select: "name slug" })
+    .sort({ name: 1 })
+    .limit(limit)
+    .lean();
+
+  res.json({
+    success: true,
+    products: products.map((product) => ({
+      name: product.name,
+      slug: product.slug,
+      imageUrl: product.imageUrl || product.galleryImages?.[0] || "",
+      category: product.categoryId
+        ? { name: product.categoryId.name, slug: product.categoryId.slug }
+        : null,
+    })),
+  });
+});
+
 const getAdminProductList = asyncHandler(async (req, res) => {
   const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
   const pageSize = Math.min(Math.max(Number.parseInt(req.query.pageSize, 10) || 24, 1), 100);
@@ -78,7 +110,7 @@ const getAdminProductList = asyncHandler(async (req, res) => {
 });
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
-  const category = await Category.findOne({ slug: req.params.categorySlug }).lean();
+  const category = await findCategoryBySlug(req.params.categorySlug);
 
   if (!category) {
     return res.status(404).json({ success: false, message: "Category not found" });
@@ -87,6 +119,19 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
   const products = await fetchProducts({ categoryId: category._id, isActive: true });
   res.json({ success: true, products });
 });
+
+async function findCategoryBySlug(value) {
+  const requestedSlug = slugify(value);
+  const candidates = [requestedSlug];
+
+  if (requestedSlug.endsWith("ies")) {
+    candidates.push(`${requestedSlug.slice(0, -3)}y`);
+  } else if (requestedSlug.endsWith("s")) {
+    candidates.push(requestedSlug.slice(0, -1));
+  }
+
+  return Category.findOne({ slug: { $in: [...new Set(candidates)] } }).lean();
+}
 
 const getProductBySlug = asyncHandler(async (req, res) => {
   const product = await fetchSingleProduct({ slug: req.params.productSlug, isActive: true });
@@ -797,6 +842,7 @@ module.exports = {
   getProductBySlug,
   getProductForAdmin,
   getProductsByCategory,
+  searchProducts,
   reorderProductRows,
   uploadProductImage,
   updateProduct,

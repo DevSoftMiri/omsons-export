@@ -78,6 +78,7 @@ export default function HomeNavbar() {
   const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
   const [items, setItems] = useState(() => getNavbarPreviewData(omsonsNavbarPreset));
+  const [categorySlugs, setCategorySlugs] = useState({});
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(() => omsonsNavbarPreset[0]?.slug || "");
   const [openDesktopMenu, setOpenDesktopMenu] = useState("");
@@ -96,8 +97,16 @@ export default function HomeNavbar() {
 
     async function loadNavbar() {
       try {
-        const response = await fetch(`${API_BASE_URL}/navbar`, { cache: "no-store" });
+        const [response, categoryResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/navbar`, { cache: "no-store" }),
+          fetch(`${API_BASE_URL}/category`, { cache: "no-store" }),
+        ]);
         const data = await response.json();
+        const categoryData = await categoryResponse.json();
+
+        if (active && Array.isArray(categoryData?.categories)) {
+          setCategorySlugs(buildCategorySlugMap(categoryData.categories));
+        }
 
         if (!response.ok || !data?.success || !Array.isArray(data.navbars) || !data.navbars.length) {
           return;
@@ -150,7 +159,10 @@ export default function HomeNavbar() {
   function navigateToSubmenu(submenuSlug) {
     setOpenDesktopMenu("");
     setMobileOpen(false);
-    router.push(buildProductsCategoryHref(submenuSlug));
+    const categorySlug = resolveCategorySlug(submenuSlug, categorySlugs);
+    if (categorySlug) {
+      router.push(appRoutes.category(categorySlug));
+    }
   }
 
   return (
@@ -160,6 +172,7 @@ export default function HomeNavbar() {
           <ul className={styles.navList}>
             {items.map((item) => {
               const hasDropdown = Array.isArray(item.submenus) && item.submenus.length > 0;
+              const topLevelSlug = resolveTopLevelSlug(item, categorySlugs);
               const visual = categoryVisuals[item.slug] || buildFallbackVisual(item);
               const submenuCount = item.submenus.length;
               const hideActionsPanel = item.slug === "glassware";
@@ -179,7 +192,7 @@ export default function HomeNavbar() {
                   onMouseEnter={() => openMenu(item.slug)}
                   onMouseLeave={scheduleCloseMenu}
                 >
-                  <Link href={appRoutes.products}>
+                  <Link href={topLevelSlug ? appRoutes.category(topLevelSlug) : appRoutes.products}>
                     {item.title}
                     {hasDropdown ? <span className={styles.navCaret}>v</span> : null}
                   </Link>
@@ -251,7 +264,10 @@ export default function HomeNavbar() {
                                   onKeyDown={(event) => event.stopPropagation()}
                                 >
                                   {submenu.items.map((link) => (
-                                    <Link key={link.slug} href={appRoutes.category(link.slug)}>
+                                    <Link
+                                      key={link.slug}
+                                      href={appRoutes.category(resolveCategorySlug(link.slug, categorySlugs))}
+                                    >
                                       {link.name}
                                     </Link>
                                   ))}
@@ -309,13 +325,16 @@ export default function HomeNavbar() {
                       <div className={styles.mobileMenuContent}>
                         {item.submenus.map((submenu) => (
                           <div key={`${item.slug}-${submenu.title}`} className={styles.mobileSubmenuCard}>
-                            <Link href={buildProductsCategoryHref(submenu.slug)}>
+                            <Link href={appRoutes.category(resolveCategorySlug(submenu.slug, categorySlugs))}>
                               <strong>{submenu.title}</strong>
                             </Link>
                             {submenu.items?.length ? (
                               <div className={styles.mobileSubmenuLinks}>
                                 {submenu.items.map((link) => (
-                                  <Link key={link.slug} href={appRoutes.category(link.slug)}>
+                                  <Link
+                                    key={link.slug}
+                                    href={appRoutes.category(resolveCategorySlug(link.slug, categorySlugs))}
+                                  >
                                     {link.name}
                                   </Link>
                                 ))}
@@ -345,7 +364,41 @@ function buildFallbackVisual(item) {
   };
 }
 
-function buildProductsCategoryHref(categorySlug) {
-  const params = new URLSearchParams({ category: categorySlug });
-  return `${appRoutes.products}?${params.toString()}`;
+function normalizeCategoryValue(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function buildCategorySlugMap(categories) {
+  return categories.reduce((map, category) => {
+    const slug = String(category?.slug || "").trim();
+    if (!slug) return map;
+
+    [category.name, category.slug, category.submenuTitle].forEach((value) => {
+      const key = normalizeCategoryValue(value);
+      if (key) map[key] = slug;
+    });
+
+    return map;
+  }, {});
+}
+
+function resolveCategorySlug(value, categorySlugs) {
+  const key = normalizeCategoryValue(value);
+  return categorySlugs[key] || (key ? value : "");
+}
+
+function resolveTopLevelSlug(item, categorySlugs) {
+  const directSlug =
+    categorySlugs[normalizeCategoryValue(item.title)] ||
+    categorySlugs[normalizeCategoryValue(item.slug)];
+
+  if (directSlug) return directSlug;
+
+  return (item.submenus || [])
+    .map((submenu) => resolveCategorySlug(submenu.slug, categorySlugs))
+    .find(Boolean) || "";
 }

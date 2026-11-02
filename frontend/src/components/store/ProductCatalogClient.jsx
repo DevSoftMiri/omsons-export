@@ -25,12 +25,17 @@ export default function ProductCatalogClient({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const defaultCategory = activeCategorySlug || "all";
+  const isCategoryPage = defaultCategory !== "all";
   const initialQuery = searchParams.get("search") || "";
-  const initialCategory = searchParams.get("category") || defaultCategory;
+  const initialSearchType = normalizeSearchType(searchParams.get("searchType"));
+  const initialCategory = isCategoryPage
+    ? defaultCategory
+    : searchParams.get("category") || defaultCategory;
   const initialPage = normalizePageParam(searchParams.get("page"));
   const initialLimit = normalizeLimitParam(searchParams.get("limit"));
 
   const [query, setQuery] = useState(initialQuery);
+  const [searchType, setSearchType] = useState(initialSearchType);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [page, setPage] = useState(initialPage);
   const [itemsPerPage, setItemsPerPage] = useState(initialLimit);
@@ -48,7 +53,9 @@ export default function ProductCatalogClient({
       .map((category) => ({
         slug: category.slug,
         label: category.name,
-        count: counts.get(category.slug) || 0,
+        count: counts.has(category.slug)
+          ? counts.get(category.slug)
+          : Number(category.productCount) || 0,
       }))
       .sort((left, right) => left.label.localeCompare(right.label));
 
@@ -65,15 +72,19 @@ export default function ProductCatalogClient({
     if (query.trim()) {
       const normalizedQuery = query.trim().toLowerCase();
       result = result.filter((product) => {
-        const haystacks = [
+        const productFields = [
           product.name,
           product.slug,
           product.description,
-          product.category?.name,
           ...(product.bulletPoints || []),
           ...(product.technicalTags || []),
           ...(product.rows || []).flatMap((row) => Object.values(row.values || {})),
         ];
+        const haystacks = searchType === "categories"
+          ? [product.category?.name]
+          : searchType === "products"
+            ? productFields
+            : [...productFields, product.category?.name];
 
         return haystacks.some((value) =>
           String(value || "").toLowerCase().includes(normalizedQuery)
@@ -82,7 +93,7 @@ export default function ProductCatalogClient({
     }
 
     return result;
-  }, [products, query, selectedCategory]);
+  }, [products, query, searchType, selectedCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage));
   const safePage = Math.min(page, totalPages);
@@ -113,6 +124,10 @@ export default function ProductCatalogClient({
       params.set("search", query.trim());
     }
 
+    if (searchType !== "all") {
+      params.set("searchType", searchType);
+    }
+
     if (selectedCategory !== defaultCategory) {
       params.set("category", selectedCategory);
     }
@@ -138,6 +153,7 @@ export default function ProductCatalogClient({
     pathname,
     searchParams,
     query,
+    searchType,
     selectedCategory,
     safePage,
     defaultCategory,
@@ -145,6 +161,23 @@ export default function ProductCatalogClient({
   ]);
 
   function handleCategory(slug) {
+    if (isCategoryPage) {
+      const destination = slug === "all" ? appRoutes.products : appRoutes.category(slug);
+      const params = new URLSearchParams();
+
+      if (query.trim()) {
+        params.set("search", query.trim());
+      }
+
+      if (searchType !== "all") {
+        params.set("searchType", searchType);
+      }
+
+      const queryString = params.toString();
+      router.push(`${destination}${queryString ? `?${queryString}` : ""}`);
+      return;
+    }
+
     startTransition(() => {
       setSelectedCategory(slug);
       setPage(1);
@@ -173,6 +206,7 @@ export default function ProductCatalogClient({
   function resetFilters() {
     startTransition(() => {
       setQuery("");
+      setSearchType("all");
       setSelectedCategory(defaultCategory);
       setPage(1);
       setItemsPerPage(PAGE_SIZE_OPTIONS[0]);
@@ -401,7 +435,12 @@ export default function ProductCatalogClient({
 
             <div className={styles.resultsControls}>
               <div className={styles.loadingState} aria-live="polite">
-                {isPending ? "Updating catalogue..." : ""}
+                {isPending ? (
+                  <>
+                    <span className={styles.loadingSpinner} aria-hidden="true" />
+                    <span>Updating catalogue...</span>
+                  </>
+                ) : null}
               </div>
               <label className={styles.limitControl}>
                 <span>Products per page</span>
@@ -471,6 +510,10 @@ export default function ProductCatalogClient({
       </section>
     </div>
   );
+}
+
+function normalizeSearchType(value) {
+  return ["all", "products", "categories"].includes(value) ? value : "all";
 }
 
 function normalizePageParam(value) {

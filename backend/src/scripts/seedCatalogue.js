@@ -38,10 +38,6 @@ async function seed() {
 
   await mongoose.connect(process.env.MONGODB_URI);
 
-  await ProductRow.deleteMany({});
-  await Product.deleteMany({});
-  await Category.deleteMany({});
-
   let productCount = 0;
   let rowCount = 0;
   const usedCategorySlugs = new Set();
@@ -53,7 +49,9 @@ async function seed() {
       cleanText(categoryData.categorySlug || categoryData.categoryId),
       usedCategorySlugs
     );
-    const category = await Category.create({
+    const category = await Category.findOneAndUpdate(
+      { slug: categorySlug },
+      {
       name: cleanText(categoryData.categoryName),
       slug: categorySlug,
       description: buildCategoryDescription(categoryData),
@@ -63,7 +61,9 @@ async function seed() {
       tableColumns: categoryColumns,
       isActive: true,
       sortOrder: categoryIndex + 1,
-    });
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     for (const [productIndex, productData] of (categoryData.products || []).entries()) {
       const tableColumns = normalizeStringArray(productData.tableColumns);
@@ -81,8 +81,7 @@ async function seed() {
         ...fallbackImages,
       ]);
 
-      const product = await createProductWithUniqueSlug(
-        {
+      const productPayload = {
           categoryId: category._id,
           name: cleanText(productData.name),
           slug: ensureUniqueSlug(
@@ -98,8 +97,11 @@ async function seed() {
           technicalTags: [],
           isActive: true,
           sortOrder: productIndex + 1,
-        },
-        usedProductSlugs
+      };
+      const product = await Product.findOneAndUpdate(
+        { slug: productPayload.slug },
+        productPayload,
+        { new: true, upsert: true, setDefaultsOnInsert: true }
       );
 
       const rows = normalizeRows(productData.rows, tableColumns).map((row, rowIndex) => ({
@@ -109,8 +111,12 @@ async function seed() {
         isActive: row.isActive !== false,
       }));
 
-      if (rows.length) {
-        await ProductRow.insertMany(rows);
+      for (const row of rows) {
+        await ProductRow.findOneAndUpdate(
+          { productId: row.productId, values: row.values },
+          row,
+          { new: true, upsert: true, setDefaultsOnInsert: true }
+        );
       }
 
       productCount += 1;

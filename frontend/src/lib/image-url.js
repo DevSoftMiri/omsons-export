@@ -1,6 +1,6 @@
 export function getOptimizedImageUrl(source, width = 480) {
   const value = String(source || "").trim();
-  if (!value) return "/omsons-logo.jpg";
+  if (!value) return "/omsons-germany-logo.png";
 
   const localPath = normalizeLocalImagePath(value);
   if (localPath) return localPath;

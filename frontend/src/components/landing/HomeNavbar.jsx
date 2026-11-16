@@ -17,11 +17,23 @@ const categoryVisuals = {
     title: "Explore Filtration",
     description: "High-clarity membrane filters and filtration essentials built for precise laboratory workflows.",
   },
+  "filters-membrane": {
+    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/filtration_k6seas.png",
+    eyebrow: "Filters & Membrane",
+    title: "Explore Filters & Membrane",
+    description: "Professional filtration solutions for laboratory and process applications.",
+  },
   "laboratory-instruments": {
     image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/lab_instrument_bn7hj2.png",
     eyebrow: "Lab Instruments",
     title: "Explore Instruments",
     description: "Reliable analytical instruments, accessories, and porcelain solutions for daily lab operations.",
+  },
+  "lab-instruments": {
+    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/lab_instrument_bn7hj2.png",
+    eyebrow: "Lab Instruments",
+    title: "Explore Lab Instruments",
+    description: "Reliable analytical instruments and accessories for daily laboratory operations.",
   },
   plasticware: {
     image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/plasticware_bmw8k0.png",
@@ -34,6 +46,12 @@ const categoryVisuals = {
     eyebrow: "Laboratory Glassware",
     title: "Explore Glassware",
     description: "Beakers, flasks, burettes, and precision borosilicate glassware for professional laboratories.",
+  },
+  "lab-glassware": {
+    image: "/assets/export%20catalogue%20images/1044.100.jpg",
+    eyebrow: "Omsons Catalogue",
+    title: "Explore Lab Glassware",
+    description: "Browse professional lab glassware solutions for laboratory and production environments.",
   },
   hydrometers: {
     image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/hydrometer_qdqm6r.png",
@@ -73,7 +91,7 @@ const categoryVisuals = {
   },
 };
 
-export default function HomeNavbar({ compact = false }) {
+export default function HomeNavbar({ compact = false, hideGlassUtility = false }) {
   const router = useRouter();
   const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
@@ -113,7 +131,16 @@ export default function HomeNavbar({ compact = false }) {
         }
 
         if (active) {
-          const nextItems = getNavbarPreviewData(data.navbars);
+          // Keep the workbook-driven header visible until the new preset is imported
+          // into the navbar collection from Header Management.
+          const requiredExcelHeaders = omsonsNavbarPreset.map((item) => item.slug);
+          const hasExcelHeaders = requiredExcelHeaders.every((slug) =>
+            data.navbars.some((item) => item.slug === slug)
+          );
+          const sourceNavbars = hasExcelHeaders
+            ? data.navbars
+            : omsonsNavbarPreset;
+          const nextItems = getNavbarPreviewData(sourceNavbars);
           setItems(nextItems);
           setMobileExpanded(nextItems[0]?.slug || "");
         }
@@ -169,6 +196,30 @@ export default function HomeNavbar({ compact = false }) {
     <nav className={`${styles.siteNav} ${compact ? styles.compactNav : ""} ${isStaticOnThisPage ? styles.siteNavStatic : ""}`}>
       <div className={styles.navInner}>
         <div className={styles.navDesktop}>
+          {!hideGlassUtility ? <div className={styles.glassUtilityNav}>
+            <div className={styles.glassPrimaryLinks}>
+              <Link href="#">Knowledge Hub</Link>
+              <Link href="#">About Us</Link>
+              <Link href="#">News &amp; Events</Link>
+              <Link href="#">Careers</Link>
+              <Link href="#">Contact Us</Link>
+            </div>
+            <div className={styles.glassUtilityLinks}>
+              <Link href="#" className={styles.glassUtilityAction}>
+                <span className={styles.glassActionIcon} aria-hidden="true">⇩</span>
+                <span>Download<br />Certificate</span>
+              </Link>
+              <Link href="#" className={styles.glassUtilityAction}>
+                <span className={styles.glassActionIcon} aria-hidden="true">♧</span>
+                <span>Distributors</span>
+              </Link>
+              <Link href="#" className={`${styles.glassUtilityAction} ${styles.dealerAction}`}>
+                <span className={styles.glassActionIcon} aria-hidden="true">♢</span>
+                <span>Join as Dealer</span>
+                <span aria-hidden="true">›</span>
+              </Link>
+            </div>
+          </div> : null}
           <ul className={styles.navList}>
             {items.map((item) => {
               const hasDropdown = Array.isArray(item.submenus) && item.submenus.length > 0;
@@ -246,13 +297,20 @@ export default function HomeNavbar({ compact = false }) {
                               }}
                             >
                               <div className={styles.megaCardHeader}>
+                                <div className={styles.megaCardTitleBlock}>
                                 <p
                                   className={`${styles.megaColTitle} ${
                                     submenu.items?.length ? "" : styles.megaColTitleCompact
                                   }`}
                                 >
-                                  {submenu.title}
+                                  {splitExcelCardTitle(submenu.title).title}
                                 </p>
+                                {splitExcelCardTitle(submenu.title).subtitle ? (
+                                  <span className={styles.megaCardSubtitle}>
+                                    {splitExcelCardTitle(submenu.title).subtitle}
+                                  </span>
+                                ) : null}
+                                </div>
                                 <span className={styles.megaArrow} aria-hidden="true">
                                   →
                                 </span>
@@ -263,12 +321,12 @@ export default function HomeNavbar({ compact = false }) {
                                   onClick={(event) => event.stopPropagation()}
                                   onKeyDown={(event) => event.stopPropagation()}
                                 >
-                                  {submenu.items.map((link) => (
+                                    {submenu.items.map((link) => (
                                     <Link
                                       key={link.slug}
                                       href={appRoutes.category(resolveCategorySlug(link.slug, categorySlugs))}
-                                    >
-                                      {link.name}
+                                      >
+                                        {splitExcelCardTitle(link.name).title}
                                     </Link>
                                   ))}
                                 </div>
@@ -355,9 +413,17 @@ export default function HomeNavbar({ compact = false }) {
   );
 }
 
+function splitExcelCardTitle(value) {
+  const parts = String(value || "").split(/\s*(?:—>|->)\s*/);
+  return {
+    title: parts[0] || value,
+    subtitle: parts.slice(1).join(" → "),
+  };
+}
+
 function buildFallbackVisual(item) {
   return {
-    image: "/omsons-logo.jpg",
+    image: "/omsons-germany-logo.png",
     eyebrow: "Omsons Catalogue",
     title: `Explore ${item.title}`,
     description: `Browse professional ${item.title.toLowerCase()} solutions for laboratory and production environments.`,

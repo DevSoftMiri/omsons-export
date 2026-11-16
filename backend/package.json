@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "seed:admin": "node src/scripts/seedAdmin.js",
     "seed:catalogue": "node src/scripts/seedCatalogue.js",
+    "normalize:taxonomy": "node src/scripts/normalizeExcelTaxonomy.js",
     "migrate:database": "node src/scripts/migrateDatabase.js"
   },
   "dependencies": {

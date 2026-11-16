@@ -12,6 +12,7 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
   const [searchType, setSearchType] = useState("all");
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
+  const [typeMenuOpen, setTypeMenuOpen] = useState(false);
   const requestRef = useRef(null);
 
   useEffect(() => {
@@ -42,14 +43,30 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
 
   return (
     <div className={styles.wrapper} onBlur={(event) => {
-      if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      if (!event.currentTarget.contains(event.relatedTarget)) {
+        setOpen(false);
+        setTypeMenuOpen(false);
+      }
     }}>
       <form className={shellClassName} action={appRoutes.products} method="get" onSubmit={() => setOpen(false)}>
-        <select className={selectClassName} name="searchType" value={searchType} onChange={(event) => { setSearchType(event.target.value); setResults([]); setOpen(false); }} aria-label="Search in">
-          <option value="all">All</option>
-          <option value="products">Products</option>
-          <option value="categories">Categories</option>
-        </select>
+        <div className={styles.typePicker}>
+          <button type="button" className={selectClassName} onClick={() => setTypeMenuOpen((value) => !value)} aria-expanded={typeMenuOpen}>
+            <span>{searchType === "products" ? "Products" : searchType === "categories" ? "Categories" : "All"}</span>
+            <img src="/omsons_header_icons/all-categories-chevron-blue.svg" alt="" />
+          </button>
+          {typeMenuOpen ? (
+            <div className={styles.typeMenu}>
+              {[{ value: "all", label: "All", icon: "/omsons_header_icons/all-categories-chevron-blue.svg" }, { value: "products", label: "Products", icon: "/file.svg" }, { value: "categories", label: "Categories", icon: "/globe.svg" }].map((option) => (
+                <button type="button" key={option.value} className={`${styles.typeOption} ${searchType === option.value ? styles.typeOptionActive : ""}`} onClick={() => { setSearchType(option.value); setResults([]); setOpen(false); setTypeMenuOpen(false); }}>
+                  <img src={option.icon} alt="" />
+                  <span>{option.label}</span>
+                  {searchType === option.value ? <span className={styles.typeCheck}>✓</span> : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <input type="hidden" name="searchType" value={searchType} />
+        </div>
         <input className={inputClassName} name="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpen(event.target.value.trim().length >= 2); }} onFocus={() => query.trim().length >= 2 && setOpen(true)} placeholder="Search by name, SKU, category, or specs..." aria-label="Search products and categories" autoComplete="off" />
         <button type="submit" className={buttonClassName} aria-label="Search">🔎</button>
       </form>
@@ -57,7 +74,7 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
         <div className={styles.dropdown} role="listbox">
           {results.length ? results.map((product) => (
             <Link key={product.slug} href={appRoutes.product(product.slug)} className={styles.result} onClick={() => setOpen(false)}>
-              <span className={styles.imageWrap}><img src={product.imageUrl || "/omsons-logo.jpg"} alt="" /></span>
+              <span className={styles.imageWrap}><img src={product.imageUrl || "/omsons-germany-logo.png"} alt="" /></span>
               <span className={styles.resultText}><strong>{product.name}</strong><small>{product.category?.name || "Product"}</small></span>
             </Link>
           )) : <div className={styles.empty}>No matching products found.</div>}

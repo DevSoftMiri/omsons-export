@@ -346,7 +346,7 @@ export default function AdminLoginForm() {
           <div className="al-brand-top">
             <div className="al-logo">
               <img
-                src="/omsons-logo.jpg"
+                src="/omsons-germany-logo.png"
                 alt="Omsons"
               />
             </div>
@@ -379,7 +379,7 @@ export default function AdminLoginForm() {
             <div className="al-mobile-logo">
               <div className="al-mobile-logo-frame">
                 <img
-                  src="/omsons-logo.jpg"
+                  src="/omsons-germany-logo.png"
                   alt="Omsons"
                 />
               </div>

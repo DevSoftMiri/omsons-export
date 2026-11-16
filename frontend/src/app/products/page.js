@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import StorefrontChrome from "@/components/store/StorefrontChrome";
 import ProductCatalogClient from "@/components/store/ProductCatalogClient";
-import { fetchCatalogueCategories } from "@/lib/storefront";
+import { fetchAllProducts, fetchCatalogueCategories } from "@/lib/storefront";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   const categories = await fetchCatalogueCategories();
-  const products = categories.flatMap((category) =>
+  let products = categories.flatMap((category) =>
     (category.products || []).map((product) => ({
       ...product,
       category: {
@@ -16,6 +18,10 @@ export default async function ProductsPage() {
       },
     }))
   );
+
+  if (!products.length) {
+    products = await fetchAllProducts();
+  }
 
   return (
     <StorefrontChrome>

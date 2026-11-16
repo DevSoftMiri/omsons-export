@@ -447,7 +447,7 @@ function getAdminProductImage(product) {
     : [];
   const preferredImage = galleryImages[0] || "";
 
-  return product.imageUrl || preferredImage || "/omsons-logo.jpg";
+  return product.imageUrl || preferredImage || "/omsons-germany-logo.png";
 }
 
 function normalizePageParam(value) {

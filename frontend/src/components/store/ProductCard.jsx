@@ -27,7 +27,7 @@ export default function ProductCard({ product, priority = false }) {
             fetchPriority={priority ? "high" : "auto"}
             decoding="async"
             onError={(event) => {
-              event.currentTarget.src = "/omsons-logo.jpg";
+              event.currentTarget.src = "/omsons-germany-logo.png";
               event.currentTarget.srcSet = "";
             }}
           />
@@ -57,5 +57,5 @@ function getProductCardImage(product) {
     : [];
   const preferredImage = galleryImages[0] || "";
 
-  return product.imageUrl || preferredImage || "/omsons-logo.jpg";
+  return product.imageUrl || preferredImage || "/omsons-germany-logo.png";
 }

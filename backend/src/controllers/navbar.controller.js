@@ -64,6 +64,13 @@ const importNavbarItems = asyncHandler(async (req, res) => {
     }
   }
 
+  const importedSlugs = rows
+    .map((row) => slugify(row.slug || row.title || ""))
+    .filter(Boolean);
+  if (importedSlugs.length) {
+    await Navbar.deleteMany({ slug: { $nin: importedSlugs } });
+  }
+
   const navbars = await Navbar.find().sort({ order: 1, createdAt: -1 });
   res.json({ success: true, summary, navbars });
 });

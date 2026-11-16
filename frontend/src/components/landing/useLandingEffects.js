@@ -23,17 +23,14 @@ export default function useLandingEffects() {
 
     revealElements.forEach((element) => revealObserver.observe(element));
 
-    const counterElements = document.querySelectorAll("[data-counter]");
-    let counterStarted = false;
     const counterObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting || counterStarted) {
+          if (!entry.isIntersecting) {
             return;
           }
 
-          counterStarted = true;
-          counterElements.forEach((element) => {
+          entry.target.querySelectorAll("[data-counter]").forEach((element) => {
             const target = Number(element.getAttribute("data-target") || 0);
             const suffix = element.getAttribute("data-suffix") || "";
             const start = performance.now();
@@ -58,19 +55,15 @@ export default function useLandingEffects() {
       { threshold: 0.3 }
     );
 
-    const counterSection = document.querySelector("[data-counter-section]");
-    if (counterSection) {
-      counterObserver.observe(counterSection);
-    }
+    document.querySelectorAll("[data-counter-section]").forEach((section) => counterObserver.observe(section));
 
-    const videoWrap = document.querySelector("[data-video-wrap]");
-    const videoElement = document.querySelector("[data-video]");
+    const videoWraps = document.querySelectorAll("[data-video-wrap]");
     const videoObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.setAttribute("data-visible", "true");
-            videoElement?.play().catch(() => {});
+            entry.target.querySelector("[data-video]")?.play().catch(() => {});
             videoObserver.unobserve(entry.target);
           }
         });
@@ -78,9 +71,7 @@ export default function useLandingEffects() {
       { threshold: 0.35 }
     );
 
-    if (videoWrap) {
-      videoObserver.observe(videoWrap);
-    }
+    videoWraps.forEach((videoWrap) => videoObserver.observe(videoWrap));
 
     return () => {
       revealObserver.disconnect();

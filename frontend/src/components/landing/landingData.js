@@ -198,16 +198,37 @@ export const helpItems = [
 ];
 
 export const categories = [
-  "Liquid Handling",
-  "Life Science Consumables",
-  "Pipetting Robots",
-  "Volumetric Instruments",
-  "General Lab Products",
-].map((title) => ({
-  title,
-  image:
-    "https://res.cloudinary.com/dzrg0utcm/image/upload/v1780480890/ChatGPT_Image_Jun_3_2026_03_31_17_PM_nifxs0.png",
-}));
+  {
+    title: "Volumetric Glassware",
+    slug: "volumetric-flasks",
+    image: "/Browse%20all%20products/volumetric%20glassware_2000x2000.webp",
+    eyebrow: "PRECISION MEASUREMENT",
+  },
+  {
+    title: "Cartridge Filters",
+    slug: "cartridge-filters",
+    image: "/Browse%20all%20products/Cartridge%20filter_2000x2000.webp",
+    eyebrow: "FILTRATION",
+  },
+  {
+    title: "Capsule Filters",
+    slug: "capsule-filter",
+    image: "/Browse%20all%20products/Capsule%20filter_2000x2000.webp",
+    eyebrow: "STERILE FILTRATION",
+  },
+  {
+    title: "Water Distillations",
+    slug: "distillation",
+    image: "/Browse%20all%20products/WATER%20DISTILLATIONS_2000x2000.webp",
+    eyebrow: "LABORATORY SYSTEMS",
+  },
+  {
+    title: "Petroleum Hydrometers",
+    slug: "petroleum-measurement",
+    image: "/Browse%20all%20products/Hydrometer_2000x2000.webp",
+    eyebrow: "DENSITY & TESTING",
+  },
+];
 
 export const stats = [
   {
@@ -215,109 +236,76 @@ export const stats = [
     value: 40,
     suffix: "+",
     label: "Years of Experience",
-    description: "Trusted by laboratories since 1984",
+    description: "Delivering trusted laboratory products and solutions since 1983.",
   },
   {
     icon: "GLB",
-    value: 40,
+    value: 80,
     suffix: "+",
     label: "Countries Served",
-    description: "A truly global distribution network",
+    description: "Connecting laboratories worldwide through an extensive international distribution network.",
   },
   {
     icon: "SKU",
-    value: 500,
+    value: 9000,
     suffix: "+",
     label: "Product SKUs",
-    description: "Comprehensive lab instrument catalog",
+    description: "A comprehensive portfolio of laboratory glassware, instruments, consumables, and scientific solutions.",
   },
   {
-    icon: "CUS",
-    value: 10000,
+    icon: "CP",
+    value: 300,
     suffix: "+",
-    label: "Customers Served",
-    description: "Research labs, hospitals, and industry",
+    label: "Channel Partners",
+    description: "A strong network of distribution partners supporting customers across international markets.",
   },
   {
-    icon: "ISO",
-    value: 15,
+    icon: "CERT",
+    value: 25,
     suffix: "",
-    label: "Awards & Certifications",
-    description: "ISO, DAkkS, and international standards",
-  },
-];
-
-export const services = [
-  {
-    icon: "DOC",
-    title: "MyProduct Documentation",
-    description:
-      "Certificates of performance and technical documentation for Transferpette and volumetric instruments.",
-  },
-  {
-    icon: "CAL",
-    title: "Calibration & Maintenance",
-    description:
-      "Maintenance, repair services, and accredited laboratory calibration support.",
-  },
-  {
-    icon: "SW",
-    title: "Software",
-    description:
-      "Free calibration software downloads and companion tools for OMSONS instruments.",
-  },
-  {
-    icon: "SOP",
-    title: "Application Information",
-    description:
-      "Application notes and testing instructions for consistent scientific workflows.",
+    label: "Certifications",
+    description: "Demonstrating our commitment to product quality, compliance, and recognized industry standards.",
   },
 ];
 
 export const whyPillars = [
   {
-    icon: "ISO",
-    title: "ISO-Certified Precision Manufacturing",
-    description:
-      "Every instrument leaves our facility after rigorous metrological validation and calibrated quality checks.",
+    icon: "/OMSONS_Icons/certified-manufacturing.svg",
+    title: "Certified Manufacturing",
+    description: "Manufactured under a robust quality system with rigorous checks.",
   },
   {
-    icon: "BIO",
-    title: "Purpose-Built for Life Sciences",
-    description:
-      "From glassware to liquid handling systems, the portfolio is shaped around biological and analytical workflows.",
+    icon: "/OMSONS_Icons/life-science-focus.svg",
+    title: "Life Science Focus",
+    description: "A comprehensive portfolio for research, clinical and industrial use.",
   },
   {
-    icon: "SI",
-    title: "Traceable to SI Units",
-    description:
-      "Volumetric instruments include traceability documentation linked to recognized measurement standards.",
+    icon: "/OMSONS_Icons/si-traceability.svg",
+    title: "SI Traceability",
+    description: "Volumetric products with traceable calibration and documentation.",
   },
   {
-    icon: "MAT",
-    title: "Uncompromising Material Quality",
-    description:
-      "Chemical-resistant polymers, borosilicate glass, and durable alloys support demanding reagent environments.",
+    icon: "/OMSONS_Icons/material-reliability.svg",
+    title: "Material Reliability",
+    description: "High-quality borosilicate glass, polymers and durable materials.",
   },
   {
-    icon: "NET",
-    title: "Global Reach, Local Support",
-    description:
-      "A broad distribution network helps OMSONS deliver technical guidance and spare parts quickly.",
+    icon: "/OMSONS_Icons/global-support.svg",
+    title: "Global Support",
+    description: "A growing international presence with responsive technical support.",
   },
   {
-    icon: "DATA",
-    title: "Data Integrity by Design",
-    description:
-      "Built-in reliability supports auditability, repeatability, and dependable scientific output.",
+    icon: "/OMSONS_Icons/data-integrity.svg",
+    title: "Data Integrity",
+    description: "Reliable performance for auditable and compliant laboratory workflows.",
   },
 ];
 
 export const whyStats = [
-  { value: "40+", label: "Years in Science" },
-  { value: "500+", label: "Product SKUs" },
-  { value: "40+", label: "Countries Served" },
-  { value: "ISO", label: "Certified Facility" },
+  { value: "40+", target: 40, suffix: "+", label: "Years in Science" },
+  { value: "500+", target: 500, suffix: "+", label: "Product SKUs" },
+  { value: "40+", target: 40, suffix: "+", label: "Countries Served" },
+  { value: "ISO", label: "ISO Certified Facility", detail: "(ISO 9001)", icon: "/OMSONS_Icons/iso-certified.svg" },
 ];
 
 export const testimonials = [

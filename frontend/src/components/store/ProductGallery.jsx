@@ -12,7 +12,7 @@ export default function ProductGallery({ product }) {
     return [...new Set(combined)];
   }, [product.galleryImages, product.imageUrl]);
 
-  const [activeImage, setActiveImage] = useState(images[0] || "/omsons-logo.jpg");
+  const [activeImage, setActiveImage] = useState(images[0] || "/omsons-germany-logo.png");
 
   return (
     <section className={styles.wrap}>

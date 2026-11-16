@@ -22,22 +22,29 @@ const getCategories = asyncHandler(async (_req, res) => {
   });
 });
 
-const getCatalogueCategories = asyncHandler(async (_req, res) => {
+const getCatalogueCategories = asyncHandler(async (req, res) => {
+  const summaryOnly = String(req.query.summary || "") === "1";
   const categories = await Category.find({ isActive: true })
     .sort({ sortOrder: 1, createdAt: 1 })
     .lean();
 
   const categoryIds = categories.map((category) => category._id);
-  const products = await Product.find({ categoryId: { $in: categoryIds }, isActive: true })
+  const productsQuery = Product.find({ categoryId: { $in: categoryIds }, isActive: true });
+  if (summaryOnly) {
+    productsQuery.select("name slug imageUrl galleryImages categoryId description bulletPoints technicalTags tableColumns isActive sortOrder");
+  }
+  const products = await productsQuery
     .sort({ sortOrder: 1, createdAt: 1 })
     .lean();
 
-  const rows = await ProductRow.find({
-    productId: { $in: products.map((product) => product._id) },
-    isActive: true,
-  })
-    .sort({ sortOrder: 1, createdAt: 1 })
-    .lean();
+  const rows = summaryOnly
+    ? []
+    : await ProductRow.find({
+        productId: { $in: products.map((product) => product._id) },
+        isActive: true,
+      })
+        .sort({ sortOrder: 1, createdAt: 1 })
+        .lean();
 
   const productMap = groupProductsByCategory(products, rows, categories);
 

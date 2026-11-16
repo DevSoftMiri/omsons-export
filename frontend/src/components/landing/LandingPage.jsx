@@ -7,18 +7,15 @@ import {
   featuredProducts,
   footerColumns,
   helpItems,
-  services,
   stats,
   testimonials,
   whyPillars,
   whyStats,
 } from "./landingData";
 import { appRoutes } from "@/lib/routes";
-import HomeNavbar from "./HomeNavbar";
 import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
-import { useEffect, useState } from "react";
 
 function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) {
   const classes = [styles.reveal, delay ? styles[`delay${delay}`] : "", className]
@@ -33,21 +30,10 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 }
 
 export default function LandingPage() {
-  const [isCompact, setIsCompact] = useState(false);
-
-  useEffect(() => {
-    const updateHeader = () => setIsCompact(window.scrollY > 40);
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
-    return () => window.removeEventListener("scroll", updateHeader);
-  }, []);
-
   useLandingEffects();
   return (
     <main className={styles.pageShell}>
       <StorefrontHeader />
-
-      <HomeNavbar compact={isCompact} />
 
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
@@ -77,10 +63,7 @@ export default function LandingPage() {
 
       <section className={styles.sectionBlock}>
         <div className={styles.sectionInner}>
-          <Reveal as="p" className={styles.sectionLabel}>
-            Featured Deals
-          </Reveal>
-          <Reveal as="h2" className={styles.sectionTitle} delay={1}>
+          <Reveal as="h2" className={styles.sectionTitle}>
             Top picks for your <span>laboratory</span>
           </Reveal>
           <div className={styles.bannerGrid}>
@@ -151,16 +134,26 @@ export default function LandingPage() {
             Browse
           </Reveal>
           <Reveal as="h2" className={styles.sectionTitle} delay={1}>
-            All products for <span>Life Science</span> and Liquid Handling
+            All products for <span>Life Science</span> and <span>Liquid Handling</span>
+          </Reveal>
+          <Reveal as="p" className={styles.sectionSubtitle} delay={2}>
+            From essential consumables to advanced instruments – everything you need for accurate,
+            reliable and efficient laboratory work.
           </Reveal>
           <div className={styles.categoryGrid}>
             {categories.map((category, index) => (
               <Reveal key={category.title} className={styles.categoryCard} delay={index + 1}>
-                <img src={category.image} alt={category.title} />
-                <div className={styles.categoryBody}>
-                  <h3>{category.title}</h3>
-                  <Link href={appRoutes.products}>View Products</Link>
-                </div>
+                <Link href={appRoutes.category(category.slug)} className={styles.categoryCardLink}>
+                  <div className={styles.categoryImageWrap}>
+                    <img src={category.image} alt={category.title} />
+                    <span className={styles.categoryMark}>{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div className={styles.categoryBody}>
+                    <span className={styles.categoryEyebrow}>{category.eyebrow}</span>
+                    <h3>{category.title}</h3>
+                    <span className={styles.categoryAction}>View Products <span aria-hidden="true">→</span></span>
+                  </div>
+                </Link>
               </Reveal>
             ))}
           </div>
@@ -198,44 +191,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className={styles.sectionBlock}>
-        <div className={styles.sectionInner}>
-          <Reveal as="p" className={styles.sectionLabel} style={{ textAlign: "center" }}>
-            Services
-          </Reveal>
-          <Reveal as="h2" className={styles.sectionTitle} delay={1} style={{ textAlign: "center" }}>
-            Our services make your <span>work more efficient</span>
-          </Reveal>
-          <div className={styles.servicesGrid}>
-            {services.map((service, index) => (
-              <Reveal key={service.title} className={styles.serviceCard} delay={index + 1}>
-                <span className={styles.serviceIcon}>{service.icon}</span>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-                <a href="#">More information</a>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.whySection}>
+      <section className={styles.whySection} data-counter-section>
         <div className={styles.sectionInner}>
           <Reveal as="p" className={styles.whyLabel}>
-            The OMSONS Difference
+            THE OMSONS DIFFERENCE
           </Reveal>
           <Reveal as="h2" className={styles.whyTitle} delay={1}>
             Why <em>OMSONS?</em>
           </Reveal>
           <Reveal as="p" className={styles.whyLead} delay={2}>
-            For over four decades, OMSONS has engineered precision tools that help
-            researchers, clinicians, and industry professionals achieve reliable
-            results.
+            Precision laboratory products and solutions, trusted globally for quality,
+            accuracy and long-term reliability.
+          </Reveal>
+          <Reveal className={styles.whyImageWrap} delay={2}>
+            <img src="/why_omsons.webp" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
           </Reveal>
           <div className={styles.whyGrid}>
             {whyPillars.map((pillar, index) => (
               <Reveal key={pillar.title} className={styles.whyCard} delay={(index % 3) + 1}>
-                <span className={styles.whyIcon}>{pillar.icon}</span>
+                <span className={styles.whyIcon}><img src={pillar.icon} alt="" /></span>
                 <h3>{pillar.title}</h3>
                 <p>{pillar.description}</p>
               </Reveal>
@@ -244,8 +218,9 @@ export default function LandingPage() {
           <div className={styles.whyStats}>
             {whyStats.map((item, index) => (
               <Reveal key={item.label} className={styles.whyStat} delay={index + 1}>
-                <strong>{item.value}</strong>
+                {item.icon ? <img src={item.icon} alt="" className={styles.whyStatIcon} /> : <strong data-counter data-target={item.target} data-suffix={item.suffix}>{item.value}</strong>}
                 <span>{item.label}</span>
+                {item.detail ? <small>{item.detail}</small> : null}
               </Reveal>
             ))}
           </div>
@@ -296,17 +271,18 @@ export default function LandingPage() {
           <Reveal as="p" className={styles.sectionSubtitle} delay={2}>
             We have a wide sales network and a number of partners around the world.
           </Reveal>
-          <Reveal className={styles.mapWrap} delay={2}>
-            <img
-              src="https://res.cloudinary.com/dzrg0utcm/image/upload/v1779267796/Screenshot_2026-05-20_143154_gunx3r.png"
-              alt="World sales network map"
-            />
-            <div className={styles.distCard}>
-              <img
-                src="/omsons-logo.jpg"
-                alt="OMSONS"
-              />
-            </div>
+          <Reveal className={styles.mapWrap} delay={2} data-video-wrap>
+            <video
+              className={styles.video}
+              data-video
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-label="OMSONS global presence animation"
+            >
+              <source src="/World%20Map%20Animation%20Omsons%20%20(1).mp4" type="video/mp4" />
+            </video>
           </Reveal>
         </div>
       </section>
@@ -323,7 +299,7 @@ export default function LandingPage() {
             <video
               className={styles.video}
               data-video
-              controls
+              loop
               muted
               playsInline
               preload="metadata"

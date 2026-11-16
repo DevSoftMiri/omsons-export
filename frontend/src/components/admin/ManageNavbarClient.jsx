@@ -787,7 +787,7 @@ export default function ManageNavbarClient() {
               className="nb-btn-white"
               disabled={status.loading}
             >
-              ⬇ {status.loading ? "Importing..." : "Import Existing Navigation"}
+              ⬇ {status.loading ? "Importing..." : "Replace With Excel Navigation"}
             </button>
           </div>
         </header>
@@ -1084,7 +1084,7 @@ export default function ManageNavbarClient() {
               className="nb-btn-primary"
               disabled={status.loading}
             >
-              {status.loading ? "Importing..." : "⬇ Import Existing Navigation"}
+              {status.loading ? "Importing..." : "⬇ Replace With Excel Navigation"}
             </button>
           </div>
 

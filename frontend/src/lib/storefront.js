@@ -3,10 +3,10 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:5000/api";
 
-async function request(path, fallbackValue = null) {
+async function request(path, fallbackValue = null, options = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: options.revalidate ?? 60 },
     });
 
     if (!response.ok) {
@@ -41,7 +41,7 @@ export async function fetchCategories() {
 }
 
 export async function fetchCatalogueCategories() {
-  const data = await request("/category/catalogue", { categories: [] });
+  const data = await request("/category/catalogue?summary=1", { categories: [] });
   return data?.categories || [];
 }
 

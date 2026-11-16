@@ -231,6 +231,7 @@ export default function ProductCatalogClient({
 
   const activeCategoryLabel =
     categoryOptions.find((item) => item.slug === selectedCategory)?.label || title;
+  const displayedTitle = selectedCategory === "all" ? title : activeCategoryLabel;
   const startIndex = filteredProducts.length ? (safePage - 1) * itemsPerPage + 1 : 0;
   const endIndex = filteredProducts.length
     ? Math.min(safePage * itemsPerPage, filteredProducts.length)
@@ -247,7 +248,7 @@ export default function ProductCatalogClient({
       <section className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>Product Catalogue</p>
-          <h1 className={styles.title}>{title}</h1>
+          <h1 className={styles.title}>{displayedTitle}</h1>
           <p className={styles.subtitle}>
             {description || `${filteredProducts.length.toLocaleString()} products available.`}
           </p>
@@ -633,5 +634,5 @@ function getProductCardImage(product) {
     ? product.galleryImages.filter((image) => String(image || "").trim())
     : [];
 
-  return product.imageUrl || galleryImages[0] || "/omsons-logo.jpg";
+  return product.imageUrl || galleryImages[0] || "/omsons-germany-logo.png";
 }

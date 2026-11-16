@@ -362,7 +362,7 @@ export default function DashboardSidebar() {
         <div className="sb-brand">
           <div className="sb-logo-wrap">
             <img
-              src="/omsons-logo.jpg"
+              src="/omsons-germany-logo.png"
               alt="Omsons"
             />
           </div>

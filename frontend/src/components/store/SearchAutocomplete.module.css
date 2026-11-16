@@ -9,3 +9,15 @@
 .resultText strong { font-size: 13px; }
 .resultText small { color: #71809d; font-size: 11px; }
 .empty { padding: 16px 12px; color: #71809d; font-size: 13px; }
+
+.typePicker { position: relative; min-width: 120px; }
+.typePicker > button { display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; }
+.typePicker > button img { width: 16px; height: 16px; }
+.typeMenu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 80; width: 150px; padding: 6px; border: 1px solid #b9dcf7; border-radius: 16px; background: rgba(255,255,255,.98); box-shadow: 0 14px 28px rgba(0,71,130,.18); }
+.typeOption { display: flex; align-items: center; width: 100%; gap: 10px; min-height: 48px; padding: 8px 10px; border: 0; border-bottom: 1px solid #eaf5ff; border-radius: 12px; background: transparent; color: #11254f; cursor: pointer; font: inherit; font-size: 15px; text-align: left; }
+.typeOption:last-child { border-bottom: 0; }
+.typeOption:hover { background: #eaf5ff; }
+.typeOptionActive { background: linear-gradient(135deg,#0066b0,#0088e8); color: #fff; }
+.typeOptionActive:hover { background: linear-gradient(135deg,#0066b0,#0088e8); }
+.typeOption img { width: 23px; height: 23px; object-fit: contain; }
+.typeCheck { margin-left: auto; font-size: 19px; }

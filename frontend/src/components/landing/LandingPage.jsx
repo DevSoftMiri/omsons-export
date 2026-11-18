@@ -7,13 +7,11 @@ import {
   featuredBanners,
   featuredProducts,
   footerColumns,
-  helpItems,
   stats,
   testimonials,
   whyPillars,
   whyStats,
 } from "./landingData";
-import { appRoutes } from "@/lib/routes";
 import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
 import useLandingEffects from "./useLandingEffects";
@@ -73,7 +71,7 @@ export default function LandingPage() {
       <StorefrontHeader />
 
       <section className={styles.hero} onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)}>
-        <Link href={appRoutes.category(slide.category)} className={styles.heroImageLink} aria-label={slide.title}>
+        <Link href="#" className={styles.heroImageLink} aria-label={slide.title}>
           <img src={slide.image} alt="" className={styles.heroImage} />
         </Link>
         <div className={styles.heroOverlay} />
@@ -85,11 +83,8 @@ export default function LandingPage() {
           </h1>
           <p>{slide.description}</p>
           <div className={styles.heroActions}>
-            <Link href={appRoutes.category(slide.category)} className={styles.primaryButton}>
+            <Link href="#" className={styles.primaryButton}>
               Explore Products
-            </Link>
-            <Link href={appRoutes.category(slide.category)} className={styles.outlineButton}>
-              View Promotions
             </Link>
           </div>
         </div>
@@ -118,7 +113,7 @@ export default function LandingPage() {
                   <p className={styles.bannerCategory}>{banner.category}</p>
                   <h3>{banner.title}</h3>
                   <p className={styles.bannerTagline}>{banner.description}</p>
-                  <Link href={appRoutes.products} className={styles.bannerButton}>
+                  <Link href="#" className={styles.bannerButton}>
                     View Products
                   </Link>
                 </div>
@@ -129,7 +124,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className={styles.sectionBlock}>
+      <section className={`${styles.sectionBlock} ${styles.featuredProductsSection}`}>
         <div className={styles.sectionInner}>
           <Reveal as="p" className={styles.sectionLabel}>
             Featured Products
@@ -138,38 +133,28 @@ export default function LandingPage() {
             Our product <span>recommendations</span> for you
           </Reveal>
           <div className={styles.recommendationLayout}>
-            <div className={styles.productsGrid}>
-              {featuredProducts.map((product, index) => (
-                <Reveal key={product.name} className={styles.productCard} delay={index + 1}>
+            <div className={styles.productsViewport}>
+              <div className={styles.productsGrid}>
+              {[...featuredProducts, ...featuredProducts].map((product, index) => (
+                <Reveal key={`${product.name}-${index}`} className={styles.productCard} delay={(index % featuredProducts.length) + 1}>
                   {product.promo ? <span className={styles.promoBadge}>Promo</span> : null}
                   <div className={styles.productImageWrap}>
                     <img src={product.image} alt={product.name} />
                   </div>
                   <p className={styles.productCategory}>{product.category}</p>
                   <p className={styles.productName}>{product.name}</p>
-                  <Link href={appRoutes.products} className={styles.cardButton}>
+                  <Link href="#" className={styles.cardButton}>
                     View Product
                   </Link>
                 </Reveal>
               ))}
+              </div>
             </div>
-            <Reveal className={styles.helpBox} delay={2}>
-              <h3>Help with your purchase</h3>
-              {helpItems.map((item) => (
-                <div key={item.title} className={styles.helpItem}>
-                  <span className={styles.helpIcon}>{item.icon}</span>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <a href="#">More information</a>
-                  </div>
-                </div>
-              ))}
-            </Reveal>
           </div>
         </div>
       </section>
 
-      <section className={styles.sectionBlock}>
+      <section className={`${styles.sectionBlock} ${styles.browseProductsSection}`}>
         <div className={styles.sectionInner}>
           <Reveal as="p" className={styles.sectionLabel}>
             Browse
@@ -184,10 +169,9 @@ export default function LandingPage() {
           <div className={styles.categoryGrid}>
             {categories.map((category, index) => (
               <Reveal key={category.title} className={styles.categoryCard} delay={index + 1}>
-                <Link href={appRoutes.category(category.slug)} className={styles.categoryCardLink}>
+                <Link href="#" className={styles.categoryCardLink}>
                   <div className={styles.categoryImageWrap}>
                     <img src={category.image} alt={category.title} />
-                    <span className={styles.categoryMark}>{String(index + 1).padStart(2, "0")}</span>
                   </div>
                   <div className={styles.categoryBody}>
                     <span className={styles.categoryEyebrow}>{category.eyebrow}</span>
@@ -245,7 +229,7 @@ export default function LandingPage() {
             accuracy and long-term reliability.
           </Reveal>
           <Reveal className={styles.whyImageWrap} delay={2}>
-            <img src="/why_omsons.webp" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
+            <img src="/why%20omsons%20.webp" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
           </Reveal>
           <div className={styles.whyGrid}>
             {whyPillars.map((pillar, index) => (

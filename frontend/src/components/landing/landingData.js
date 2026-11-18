@@ -164,30 +164,39 @@ export const featuredBanners = [
 
 export const featuredProducts = [
   {
-    category: "Bottle-top Dispensers",
-    name: "Dispensette S, analog-adjustable, DE-M",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1779262943/Screenshot_2026-05-20_131002_empckl.png",
-    promo: true,
+    category: "Volumetric Glassware",
+    name: "Volumetric Flask",
+    image: "/Browse%20all%20products/volumetric%20glassware_2000x2000.webp",
   },
   {
-    category: "Repetitive Pipettes",
-    name: "HandyStep touch, DE-M",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1779262943/Screenshot_2026-05-20_131002_empckl.png",
-    promo: true,
+    category: "Filtration Solutions",
+    name: "Syringe Filters",
+    image: "/assets/export%20catalogue%20images/CA-Syringe-Filters,-Sterile.jpg",
   },
   {
-    category: "Single-Channel Micropipette",
-    name: "Transferpette S, adjustable, DE-M",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1779262943/Screenshot_2026-05-20_131002_empckl.png",
+    category: "Temperature Measurement",
+    name: "ASTM Thermometer",
+    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/thermometer_ealqnx.png",
   },
   {
-    category: "Multi-Channel Micropipette",
-    name: "Transferpette S, multi-channel, DE-M",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1779262943/Screenshot_2026-05-20_131002_empckl.png",
+    category: "Laboratory Instruments",
+    name: "Hotplate",
+    image: "/assets/export%20catalogue%20images/TSE-AL-15L_Hotplate%20with%20Magnetic%20Stirrer%20thermostir%20Series.jpg",
+  },
+  {
+    category: "Lab Plasticware",
+    name: "Wash Bottle",
+    image: "/Top%20picks%20section/Glassware_742x1024.png",
+  },
+  {
+    category: "Density Testing",
+    name: "Hydrometer",
+    image: "/Browse%20all%20products/Hydrometer_2000x2000.webp",
+  },
+  {
+    category: "Analytical Instruments",
+    name: "Spectrum",
+    image: "/Top%20picks%20section/Lab%20instrument_742x1024.png",
   },
 ];
 
@@ -206,16 +215,16 @@ export const categories = [
     eyebrow: "PRECISION MEASUREMENT",
   },
   {
-    title: "Cartridge Filters",
-    slug: "cartridge-filters",
-    image: "/Browse%20all%20products/Cartridge%20filter_2000x2000.webp",
-    eyebrow: "FILTRATION",
-  },
-  {
-    title: "Capsule Filters",
+    title: "Capsule Filter",
     slug: "capsule-filter",
     image: "/Browse%20all%20products/Capsule%20filter_2000x2000.webp",
     eyebrow: "STERILE FILTRATION",
+  },
+  {
+    title: "Cartridge Filter",
+    slug: "cartridge-filters",
+    image: "/Browse%20all%20products/Cartridge%20filter_2000x2000.webp",
+    eyebrow: "FILTRATION",
   },
   {
     title: "Water Distillations",

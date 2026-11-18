@@ -198,7 +198,7 @@
 
 .siteNav {
   position: fixed;
-  top: 104px;
+  top: 126px;
   left: 0;
   right: 0;
   z-index: 35;
@@ -231,7 +231,7 @@
 
 .siteNavStatic {
   position: fixed;
-  top: 104px;
+  top: 126px;
   left: 0;
   right: 0;
   margin-top: 0;
@@ -1069,7 +1069,6 @@
 
 .primaryButton:hover,
 .searchWrap button:hover,
-.bannerButton:hover,
 .cardButton:hover,
 .megaPromoButton:hover {
   background: var(--cobalt-dk);
@@ -1116,7 +1115,15 @@
 .testimonialsSection,
 .networkSection,
 .videoSection {
-  padding: 88px 0;
+  padding: 48px 0;
+}
+
+.featuredProductsSection {
+  padding-bottom: 28px;
+}
+
+.browseProductsSection {
+  padding-top: 28px;
 }
 
 .sectionTitle,
@@ -1189,26 +1196,16 @@
   transition: opacity 0.35s ease;
 }
 
-.bannerCard:hover {
-  transform: translateY(-8px);
-  border-color: rgba(0, 102, 176, 0.24);
-  box-shadow: 0 24px 46px rgba(17, 37, 79, 0.16);
-}
-
-.bannerCard:hover::after {
-  opacity: 1;
-}
-
 .tonepeach {
-  background: linear-gradient(135deg, #fff0ea, #fff);
+  background: #f8fdfc;
 }
 
 .tonemint {
-  background: linear-gradient(135deg, #ebfaf5, #fff);
+  background: #f8fdfc;
 }
 
 .tonesky {
-  background: linear-gradient(135deg, #edf6ff, #fff);
+  background: #f8fdfc;
 }
 
 .bannerCategory,
@@ -1253,7 +1250,6 @@
   object-fit: contain;
   object-position: center bottom;
   justify-self: center;
-  transition: transform 0.45s cubic-bezier(.2,.8,.2,1), filter 0.45s ease;
 }
 
 @media (min-width: 700px) {
@@ -1269,22 +1265,31 @@
   }
 }
 
-.bannerCard:hover img {
-  transform: scale(1.06) translateY(-4px);
-  filter: drop-shadow(0 14px 14px rgba(17, 37, 79, 0.14));
+.recommendationLayout {
+  margin-top: 34px;
+  overflow: hidden;
 }
 
-.recommendationLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
-  margin-top: 34px;
+.productsViewport {
+  overflow: hidden;
+  padding: 4px 0 18px;
 }
 
 .productsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  width: max-content;
   gap: 20px;
+  animation: featuredProductsMarquee 52s linear infinite;
+}
+
+.productsViewport:hover .productsGrid,
+.productsViewport:focus-within .productsGrid {
+  animation-play-state: paused;
+}
+
+@keyframes featuredProductsMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 10px)); }
 }
 
 .productCard,
@@ -1299,6 +1304,7 @@
 
 .productCard {
   position: relative;
+  flex: 0 0 clamp(240px, 22vw, 310px);
   padding: 22px;
 }
 
@@ -1325,6 +1331,12 @@
   width: 100%;
   max-height: 170px;
   object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .productsGrid {
+    animation: none;
+  }
 }
 
 .productName {
@@ -2407,7 +2419,7 @@
   .networkSection,
   .videoSection,
   .whySection {
-    padding: 72px 0;
+    padding: 40px 0;
   }
 
   .networkSection {

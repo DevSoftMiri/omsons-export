@@ -3,13 +3,16 @@
 :root {
   --background: #ffffff;
   --foreground: #0d1117;
+  --font-heading: "D-DIN Pro";
+  --font-display: "Futura Book";
+  --font-body: "Open Sans";
+  --font-compact: "Swis721 CN BT";
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-body);
-  --font-mono: var(--font-mono);
 }
 
 *,
@@ -39,8 +42,48 @@ ol {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   overflow-x: clip;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading) !important;
+}
+
+/* Brand-kit enforcement: component-local styles cannot introduce another font. */
+body * {
+  font-family: var(--font-body) !important;
+}
+
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6 {
+  font-family: var(--font-heading) !important;
+}
+
+[data-font-display],
+[data-font-display] * {
+  font-family: var(--font-display) !important;
+}
+
+[data-font-compact],
+[data-font-compact] * {
+  font-family: var(--font-compact) !important;
 }
 
 a {

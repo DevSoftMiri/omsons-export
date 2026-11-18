@@ -47,8 +47,9 @@
 
 .headerInner {
   min-height: 68px;
+  height: 68px;
   display: grid;
-  grid-template-columns: 132px minmax(440px, 1fr) minmax(320px, 0.75fr);
+  grid-template-columns: 180px minmax(420px, 1fr) auto;
   align-items: center;
   gap: 16px;
   transition: min-height 0.2s ease, gap 0.2s ease;
@@ -56,11 +57,12 @@
 
 .compactHeader .headerInner {
   min-height: 52px;
+  height: 52px;
   gap: 16px;
 }
 
 .compactHeader .logo img {
-  width: 62px;
+  width: 78px;
 }
 
 .compactHeader .headerAction {
@@ -104,31 +106,37 @@
 .logo {
   display: inline-flex;
   align-items: center;
+  padding: 5px 0;
+  transform: translateX(-16px);
 }
 
 .logo img {
-  width: 96px;
+  width: 92px;
   height: auto;
   object-fit: contain;
 }
 
 .searchShell {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr) 48px;
+  grid-template-columns: 120px minmax(0, 1fr);
   align-items: center;
   border: 1.5px solid var(--line);
   border-radius: 14px;
   background: #fff;
   overflow: visible;
   box-shadow: var(--shadow-sm);
+  justify-self: center;
+  width: min(100%, 560px);
+}
+
+.searchShell:hover,
+.searchShell:focus-within {
+  border-color: #0066b0;
+  box-shadow: 0 0 0 1px #0066b0, var(--shadow-sm);
 }
 
 .searchShell > .typePicker > button {
   border-radius: 13px 0 0 13px;
-}
-
-.searchShell > .searchButton {
-  border-radius: 0 13px 13px 0;
 }
 
 .inlineGlassNav {
@@ -214,14 +222,6 @@
   pointer-events: none;
 }
 
-.topWave {
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 250px;
-  height: 36px;
-  pointer-events: none;
-}
-
 .topLinks {
   position: relative;
   z-index: 1;
@@ -293,39 +293,41 @@
 
 .logo > img {
   position: static;
-  width: 96px;
+  width: 92px;
   height: auto;
 }
 
 .compactHeader { top: 0; }
 
-.compactHeader .logo > img { width: 62px; }
+.compactHeader .logo > img { width: 72px; }
 
 .headerActionsNew {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
-  margin-left: 44px;
+  margin-left: auto;
+  justify-content: flex-end;
 }
 
 .headerActionsNew a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 43px;
-  padding: 0 18px;
+  min-height: 36px;
+  padding: 0 12px;
   border-radius: 14px;
   color: #0066b0;
+  font-size: 12px;
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .headerActionsNew a img {
-  width: 23px;
-  height: 23px;
-  margin-right: 9px;
+  width: 19px;
+  height: 19px;
+  margin-right: 6px;
   object-fit: contain;
 }
 
@@ -347,12 +349,32 @@
 }
 
 .distributorButton {
+  background: #fff;
+  border: 2px solid #0088e8;
+  color: #0066b0 !important;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.distributorButton:hover {
   background: #0066b0;
   color: #fff !important;
 }
 
 .certificateButton {
   border: 2px solid #0088e8;
+  color: #0066b0;
+  background: #fff;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.certificateButton:hover {
+  background: #0066b0;
+  color: #fff !important;
+}
+
+.distributorButton:hover img,
+.certificateButton:hover img {
+  filter: brightness(0) invert(1);
 }
 
 .inlineGlassNav {
@@ -361,11 +383,17 @@
 
 @media (max-width: 900px) {
   .topBar { padding: 0 12px; }
-  .topWave { width: 110px; }
   .topLinks { overflow-x: auto; }
   .topLinks a { padding: 0 8px; font-size: 11px; }
   .headerActionsNew { gap: 6px; }
   .headerActionsNew a { min-height: 38px; padding: 0 10px; font-size: 11px; }
+  .logo {
+    padding: 20px 0;
+  }
+  .logo > img,
+  .compactHeader .logo > img {
+    width: 72px !important;
+  }
 }
 
 .searchSelect {
@@ -379,7 +407,9 @@
   font: inherit;
   padding: 0 14px;
   outline: 0;
+  border-radius: 13px 0 0 13px;
 }
+
 
 .searchInput {
   width: 100%;
@@ -391,19 +421,44 @@
   font: inherit;
   padding: 0 16px;
   outline: 0;
+  border-radius: 0 13px 13px 0;
 }
 
 .searchButton {
   height: 42px;
   border: 0;
-  background: var(--nav);
-  color: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #111;
   cursor: pointer;
   transition: background 0.18s ease;
 }
 
 .searchButton:hover {
-  background: var(--nav-strong);
+  background: #f2f2f2;
+}
+
+.searchButton::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #111;
+  border-radius: 50%;
+  transform: translate(-2px, -2px);
+}
+
+.searchButton::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 2px;
+  background: #111;
+  border-radius: 2px;
+  transform: translate(7px, 7px) rotate(45deg);
 }
 
 .headerActions {
@@ -495,6 +550,11 @@
     padding: 14px 0;
   }
 
+  .headerActionsNew {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
   .inlineGlassNav {
     grid-column: 1 / -1;
   }
@@ -504,9 +564,7 @@
     flex-wrap: wrap;
   }
 
-  .searchShell {
-    grid-template-columns: 96px minmax(0, 1fr) 46px;
-  }
+  .searchShell { grid-template-columns: 96px minmax(0, 1fr); }
 
   .footerInner {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -514,6 +572,62 @@
 }
 
 @media (max-width: 640px) {
+  .shell {
+    padding-top: 230px;
+  }
+
+  .topBar {
+    display: none;
+  }
+
+  .siteHeader {
+    top: 0;
+  }
+
+  .headerInner {
+    width: calc(100% - 20px);
+    min-height: 0;
+    height: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px 0 10px;
+  }
+
+  .logo {
+    justify-self: center;
+    transform: none;
+    padding: 20px 0;
+  }
+
+  .logo > img {
+    width: 72px !important;
+  }
+
+  .searchShell {
+    width: 100%;
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .headerActionsNew {
+    width: 100%;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .headerActionsNew a {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .headerActionsNew a img {
+    width: 17px;
+    height: 17px;
+    margin-right: 4px;
+  }
+
   .container,
   .headerInner,
   .navInner,
@@ -522,9 +636,7 @@
     width: min(1380px, calc(100% - 20px));
   }
 
-  .searchShell {
-    grid-template-columns: 82px minmax(0, 1fr) 44px;
-  }
+  .searchShell { grid-template-columns: 82px minmax(0, 1fr); }
 
   .footerInner {
     grid-template-columns: 1fr;

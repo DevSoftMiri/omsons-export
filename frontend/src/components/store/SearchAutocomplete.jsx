@@ -14,6 +14,18 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
   const [open, setOpen] = useState(false);
   const [typeMenuOpen, setTypeMenuOpen] = useState(false);
   const requestRef = useRef(null);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const closeMenus = (event) => {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setOpen(false);
+        setTypeMenuOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", closeMenus);
+    return () => document.removeEventListener("pointerdown", closeMenus);
+  }, []);
 
   useEffect(() => {
     const value = query.trim();
@@ -42,7 +54,7 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
   }, [query, searchType]);
 
   return (
-    <div className={styles.wrapper} onBlur={(event) => {
+    <div ref={wrapperRef} className={styles.wrapper} onBlur={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget)) {
         setOpen(false);
         setTypeMenuOpen(false);
@@ -68,7 +80,6 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
           <input type="hidden" name="searchType" value={searchType} />
         </div>
         <input className={inputClassName} name="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpen(event.target.value.trim().length >= 2); }} onFocus={() => query.trim().length >= 2 && setOpen(true)} placeholder="Search by name, SKU, category, or specs..." aria-label="Search products and categories" autoComplete="off" />
-        <button type="submit" className={buttonClassName} aria-label="Search">🔎</button>
       </form>
       {open && searchType !== "categories" ? (
         <div className={styles.dropdown} role="listbox">

@@ -20,10 +20,6 @@ export default function StorefrontHeader() {
   return (
     <>
       <div className={`${styles.topBar} ${isCompact ? styles.topBarHidden : ""}`}>
-        <svg className={styles.topWave} viewBox="0 0 250 36" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 0 H250 C160 0 160 36 35 36 H0 Z" fill="#49A9F5" />
-          <path d="M0 0 H195 C125 0 120 36 0 36 Z" fill="#0088E8" />
-        </svg>
         <nav className={styles.topLinks} aria-label="Utility navigation">
           <Link href="#"><img className={styles.topLinkIcon} src="/omsons_header_icons/knowledge-hub-white.svg" alt="" />Knowledge Hub</Link>
           <Link href="#"><img className={styles.topLinkIcon} src="/omsons_header_icons/about-us-white.svg" alt="" />About Us</Link>
@@ -44,7 +40,7 @@ export default function StorefrontHeader() {
           buttonClassName={styles.searchButton}
         />
         <div className={styles.headerActionsNew}>
-          <Link href="#" className={styles.distributorButton}><img src="/omsons_header_icons/become-distributor-white.svg" alt="" />Become a Distributor</Link>
+          <Link href="#" className={styles.distributorButton}><img src="/omsons_header_icons/become-distributor-blue.svg" alt="" />Become a Distributor</Link>
           <Link href="#" className={styles.certificateButton}><img src="/omsons_header_icons/download-certificate-blue.svg" alt="" />Download Certificate</Link>
         </div>
       </div>

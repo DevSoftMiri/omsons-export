@@ -801,7 +801,7 @@ function createFilePreviewImage(fileType) {
       <path d="M48 14V28C48 31.3137 50.6863 34 54 34H68" fill="white"/>
       <path d="M48 14V28C48 31.3137 50.6863 34 54 34H68" stroke="#D8E3F2" stroke-width="2"/>
       <rect x="22" y="45" width="44" height="20" rx="10" fill="${fileType.accent}"/>
-      <text x="44" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="white">${escapeXml(
+      <text x="44" y="58" text-anchor="middle" font-family="Open Sans" font-size="13" font-weight="700" fill="white">${escapeXml(
         fileType.icon
       )}</text>
     </svg>

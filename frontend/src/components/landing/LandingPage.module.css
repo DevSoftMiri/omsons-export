@@ -52,8 +52,8 @@
 
 .navInner {
   position: relative;
-  width: min(1800px, calc(100% - 12px));
-  padding: 0 12px;
+  width: min(1800px, calc(100% - 64px));
+  padding: 0 32px;
 }
 
 .headerInner {
@@ -511,8 +511,8 @@
   letter-spacing: 0.18em;
   font-size: 11px;
   font-weight: 800;
-  color: #0066b0;
-  font-family: var(--font-mono), monospace;
+  color: #004f8a;
+  font-family: var(--font-compact);
 }
 
 .megaCard {
@@ -667,7 +667,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center;
+  object-position: 72% center;
   display: block;
   filter: drop-shadow(0 18px 28px rgba(14, 46, 113, 0.08));
 }
@@ -687,7 +687,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #0066b0;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .megaVisualActions {
@@ -829,7 +829,7 @@
 }
 
 .megaPromo h3 {
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--font-display);
   font-size: 20px;
   margin-bottom: 6px;
 }
@@ -844,7 +844,7 @@
 .megaPromoPrice {
   color: var(--cobalt);
   font-weight: 700;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .megaPromoPrice s {
@@ -899,24 +899,46 @@
 
 .hero {
   position: relative;
-  min-height: 620px;
+  min-height: 590px;
   display: flex;
   align-items: center;
-  background:
-    linear-gradient(115deg, rgba(12, 28, 70, 0.78), rgba(12, 28, 70, 0.14)),
-    url("https://res.cloudinary.com/dzrg0utcm/image/upload/v1780480890/ChatGPT_Image_Jun_3_2026_03_31_17_PM_nifxs0.png")
-      center/cover no-repeat;
+  background: #f5f6f8;
   overflow: hidden;
+}
+
+.heroImageLink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 36%;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.heroImage {
+  width: 105%;
+  height: 90%;
+  object-fit: contain;
+  object-position: right center;
+  margin-right: 8%;
+  background: #f5f6f8;
+  animation: heroImageIn 0.65s ease both;
+}
+
+@keyframes heroImageIn {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .heroOverlay {
   position: absolute;
-  inset: auto auto -110px -90px;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: rgba(200, 154, 42, 0.16);
-  filter: blur(10px);
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, #f5f6f8 0%, rgba(245, 246, 248, 0.98) 18%, rgba(245, 246, 248, 0.18) 44%, rgba(245, 246, 248, 0) 66%);
 }
 
 .heroContent {
@@ -925,7 +947,7 @@
   width: min(1360px, calc(100% - 32px));
   margin: 0 auto;
   padding: 96px 0 88px;
-  color: #fff;
+  color: #0d4a83;
 }
 
 .heroContent > * {
@@ -935,30 +957,69 @@
 .heroEyebrow {
   display: inline-block;
   margin-bottom: 18px;
-  color: #f3d58a;
+  color: #003b66 !important;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   font-size: 13px;
   font-weight: 700;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .heroContent h1,
 .sectionTitle,
 .whyTitle {
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--font-display);
 }
 
 .heroContent h1 {
+  max-width: 420px;
+  color: #0066b0;
   font-size: clamp(40px, 5vw, 62px);
   line-height: 1.04;
   letter-spacing: -0.04em;
 }
 
+.heroTitleAccent {
+  color: inherit;
+}
+
 .heroContent h1 em {
   font-style: normal;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.82);
+  color: #5f6872;
+}
+
+.heroControls {
+  position: absolute;
+  right: 32px;
+  bottom: 28px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heroControls button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  color: #0d4a83;
+  cursor: pointer;
+}
+
+.heroControls button:not(:first-child):not(:last-child) {
+  width: 9px;
+  height: 9px;
+  background: rgba(13, 74, 131, 0.35);
+}
+
+.heroControls .heroDotActive {
+  background: #0d4a83 !important;
 }
 
 .heroContent p,
@@ -968,6 +1029,10 @@
   max-width: 540px;
   font-size: 17px;
   color: rgba(255, 255, 255, 0.82);
+}
+
+.heroContent p {
+  color: #4f5965;
 }
 
 .heroActions {
@@ -995,6 +1060,15 @@
 
 .outlineButton:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.hero .outlineButton {
+  border-color: rgba(13, 74, 131, 0.45);
+  color: #0d4a83;
+}
+
+.hero .outlineButton:hover {
+  background: rgba(13, 74, 131, 0.08);
 }
 
 .heroBadge {
@@ -1092,7 +1166,7 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .bannerCard h3,
@@ -1103,7 +1177,7 @@
 .serviceCard h3,
 .whyCard h3,
 .footerInfoCard h3 {
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--font-display);
 }
 
 .bannerCard h3 {
@@ -1163,7 +1237,7 @@
   color: #7f5900;
   font-size: 11px;
   font-weight: 800;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .productImageWrap {
@@ -1322,7 +1396,7 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   justify-content: flex-start;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
 }
 
 .categoryBody a::after {
@@ -1918,7 +1992,7 @@
 
 .footerLinks h4 {
   margin-bottom: 16px;
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-body);
 }
 
 .footerLinks a {
@@ -1956,7 +2030,7 @@
   border-radius: 4px;
   background: #2e3440;
   color: #f1f4f8;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-compact);
   font-size: 12px;
   font-weight: 700;
 }
@@ -2172,6 +2246,16 @@
     min-height: 540px;
   }
 
+  .heroImageLink {
+    left: 0;
+    right: 0;
+  }
+
+  .heroImage {
+    width: 100%;
+    margin-right: 0;
+  }
+
   .heroBadge {
     right: 18px;
     top: 18px;
@@ -2191,6 +2275,22 @@
 }
 
 @media (max-width: 640px) {
+  .pageShell {
+    padding-top: 230px;
+  }
+
+  .siteNav,
+  .siteNavStatic,
+  .compactNav.siteNavStatic {
+    top: 180px;
+    position: fixed;
+  }
+
+  .navInner {
+    width: min(100%, calc(100% - 40px));
+    padding: 0 20px;
+  }
+
   .mobileMenuPanel {
     gap: 8px;
   }

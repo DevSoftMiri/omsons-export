@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   categories,
   featuredBanners,
@@ -30,35 +31,75 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 }
 
 export default function LandingPage() {
+  const [activeHero, setActiveHero] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
+  const heroSlides = [
+    {
+      image: "/heroimages/export1.jpg",
+      eyebrow: "Precision, Quality & Reliability In Every Piece.",
+      title: "Premium Laboratory Glassware",
+      description: "We provide reliable solutions for pharmaceutical, chemical, research and testing laboratories.",
+      category: "glassware",
+    },
+    {
+      image: "/heroimages/export2.jpg",
+      eyebrow: "Precision, Quality & Reliability In Every Piece.",
+      title: "Premium Laboratory Instruments",
+      description: "Our instruments are developed to meet the requirements of modern laboratories across pharmaceutical, chemical, research and testing industries.",
+      category: "lab-instruments",
+    },
+    {
+      image: "/heroimages/export3.jpg",
+      eyebrow: "Precision, Purity & Performance in Every Filter Product",
+      title: "Premium Filtration Products",
+      description: "Syringe filters and membrane filters to Capsule, Cartridge Filters and SS Filter Housings. We provide dependable filtration solutions for diverse laboratory and industrial applications.",
+      category: "filters-membrane",
+    },
+  ];
+
+  useEffect(() => {
+    if (heroPaused) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveHero((value) => (value + 1) % heroSlides.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [heroPaused, heroSlides.length]);
+
+  const slide = heroSlides[activeHero];
+
   useLandingEffects();
   return (
     <main className={styles.pageShell}>
       <StorefrontHeader />
 
-      <section className={styles.hero}>
+      <section className={styles.hero} onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)}>
+        <Link href={appRoutes.category(slide.category)} className={styles.heroImageLink} aria-label={slide.title}>
+          <img src={slide.image} alt="" className={styles.heroImage} />
+        </Link>
         <div className={styles.heroOverlay} />
-        <div className={styles.heroContent}>
-          <Reveal as="span" className={styles.heroEyebrow}>
-            Precision Instruments Since 1984
-          </Reveal>
-          <Reveal as="h1" delay={1}>
-            Life Science &<br />
-            <em>Liquid Handling</em>
-          </Reveal>
-          <Reveal as="p" delay={2}>
-            ISO-certified instruments engineered for the modern laboratory, traceable
-            to SI units and built to last.
-          </Reveal>
-          <Reveal className={styles.heroActions} delay={3}>
-            <Link href={appRoutes.products} className={styles.primaryButton}>
+        <div className={styles.heroContent} key={slide.category}>
+          <span className={styles.heroEyebrow}>{slide.eyebrow}</span>
+          <h1>
+            <span className={styles.heroTitleAccent}>{slide.title.split(" ")[0]}</span>{" "}
+            {slide.title.split(" ").slice(1).join(" ")}
+          </h1>
+          <p>{slide.description}</p>
+          <div className={styles.heroActions}>
+            <Link href={appRoutes.category(slide.category)} className={styles.primaryButton}>
               Explore Products
             </Link>
-            <a href="#" className={styles.outlineButton}>
+            <Link href={appRoutes.category(slide.category)} className={styles.outlineButton}>
               View Promotions
-            </a>
-          </Reveal>
+            </Link>
+          </div>
         </div>
-        <div className={styles.heroBadge}>SALE</div>
+        <div className={styles.heroControls} aria-label="Hero slides">
+          <button type="button" onClick={() => setActiveHero((activeHero + heroSlides.length - 1) % heroSlides.length)} aria-label="Previous slide">‹</button>
+          {heroSlides.map((item, index) => (
+            <button key={item.category} type="button" className={index === activeHero ? styles.heroDotActive : ""} onClick={() => setActiveHero(index)} aria-label={`Go to ${item.title}`} />
+          ))}
+          <button type="button" onClick={() => setActiveHero((activeHero + 1) % heroSlides.length)} aria-label="Next slide">›</button>
+        </div>
       </section>
 
       <section className={styles.sectionBlock}>

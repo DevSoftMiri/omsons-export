@@ -137,27 +137,28 @@ export const navItems = [
 
 export const featuredBanners = [
   {
-    tone: "peach",
-    category: "Precision & Accuracy",
-    title: "Thermometers",
-    tagline: "Durable. Accurate. Reliable.",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1780480469/1_equrf4.png",
-  },
-  {
     tone: "mint",
     category: "Filtration Solutions",
-    title: "Syringe Filters & Funnels",
+    description: "High-performance filters and systems for reliable, efficient and contamination-free sample preparation.",
+    title: "Filtration Products",
     tagline: "Pure results. Reliable filtration.",
-    image:
-      "https://res.cloudinary.com/dzrg0utcm/image/upload/v1780480470/ChatGPT_Image_Jun_3_2026_03_18_42_PM_kxysqd.png",
+    image: "/Top%20picks%20section/Filtration_742x1024.png",
   },
   {
     tone: "sky",
     category: "Laboratory Essentials",
+    description: "Precision-made borosilicate glassware (Glass 3.3) for accurate, safe and durable laboratory use.",
     title: "Glassware",
     tagline: "Borosilicate. High quality. Durable.",
-    image: "https://www.spectrumchemical.com/media/catalog/category/glassware.png",
+    image: "/Top%20picks%20section/Glassware_742x1024.png",
+  },
+  {
+    tone: "peach",
+    category: "Laboratory Instruments",
+    description: "Reliable, high-performance instruments for precise control, measurement and routine laboratory operations.",
+    title: "Lab Instruments",
+    tagline: "Precision tools for modern laboratories.",
+    image: "/Top%20picks%20section/Lab%20instrument_742x1024.png",
   },
 ];
 
@@ -303,7 +304,7 @@ export const whyPillars = [
 
 export const whyStats = [
   { value: "40+", target: 40, suffix: "+", label: "Years in Science" },
-  { value: "500+", target: 500, suffix: "+", label: "Product SKUs" },
+  { value: "9000+", target: 9000, suffix: "+", label: "Product SKUs" },
   { value: "40+", target: 40, suffix: "+", label: "Countries Served" },
   { value: "ISO", label: "ISO Certified Facility", detail: "(ISO 9001)", icon: "/OMSONS_Icons/iso-certified.svg" },
 ];

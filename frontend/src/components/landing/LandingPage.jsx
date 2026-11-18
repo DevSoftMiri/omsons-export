@@ -105,25 +105,25 @@ export default function LandingPage() {
       <section className={styles.sectionBlock}>
         <div className={styles.sectionInner}>
           <Reveal as="h2" className={styles.sectionTitle}>
+            <small className={styles.sectionEyebrow}>Featured Deals</small>
             Top picks for your <span>laboratory</span>
           </Reveal>
           <div className={styles.bannerGrid}>
-            {featuredBanners.map((banner, index) => (
-              <Reveal
+            {featuredBanners.map((banner) => (
+              <div
                 key={banner.title}
                 className={`${styles.bannerCard} ${styles[`tone${banner.tone}`]}`}
-                delay={index + 1}
               >
                 <div>
                   <p className={styles.bannerCategory}>{banner.category}</p>
                   <h3>{banner.title}</h3>
-                  <p className={styles.bannerTagline}>{banner.tagline}</p>
+                  <p className={styles.bannerTagline}>{banner.description}</p>
                   <Link href={appRoutes.products} className={styles.bannerButton}>
                     View Products
                   </Link>
                 </div>
                 <img src={banner.image} alt={banner.title} />
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>

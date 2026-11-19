@@ -174,6 +174,9 @@ export default function LandingPage() {
                     <img src={category.image} alt={category.title} />
                   </div>
                   <div className={styles.categoryBody}>
+                    <span className={`${styles.categoryIcon} ${!category.icon ? styles.categoryIconPlaceholder : ""}`}>
+                      {category.icon ? <img src={category.icon} alt="" /> : null}
+                    </span>
                     <span className={styles.categoryEyebrow}>{category.eyebrow}</span>
                     <h3>{category.title}</h3>
                     <span className={styles.categoryAction}>View Products <span aria-hidden="true">→</span></span>

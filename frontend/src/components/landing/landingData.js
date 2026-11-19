@@ -166,7 +166,7 @@ export const featuredProducts = [
   {
     category: "Volumetric Glassware",
     name: "Volumetric Flask",
-    image: "/Browse%20all%20products/volumetric%20glassware_2000x2000.webp",
+    image: "/All%20products%20images%20new/volumetric%20glassware_2000x2000.png",
   },
   {
     category: "Filtration Solutions",
@@ -211,31 +211,34 @@ export const categories = [
   {
     title: "Volumetric Glassware",
     slug: "volumetric-flasks",
-    image: "/Browse%20all%20products/volumetric%20glassware_2000x2000.webp",
+    image: "/All%20products%20images%20new/volumetric%20glassware_2000x2000.png",
     eyebrow: "PRECISION MEASUREMENT",
   },
   {
     title: "Capsule Filter",
     slug: "capsule-filter",
-    image: "/Browse%20all%20products/Capsule%20filter_2000x2000.webp",
+    image: "/All%20products%20images%20new/Capsule%20filter_2000x2000.png",
+    icon: "/All%20products%20images%20new/Capsule%20filter%20icon_100x100.png",
     eyebrow: "STERILE FILTRATION",
   },
   {
     title: "Cartridge Filter",
     slug: "cartridge-filters",
-    image: "/Browse%20all%20products/Cartridge%20filter_2000x2000.webp",
+    image: "/All%20products%20images%20new/Cartridge%20filter_2000x2000.png",
+    icon: "/All%20products%20images%20new/Cartridge%20filter%20icon_100x100.png",
     eyebrow: "FILTRATION",
   },
   {
     title: "Water Distillations",
     slug: "distillation",
-    image: "/Browse%20all%20products/WATER%20DISTILLATIONS_2000x2000.webp",
+    image: "/All%20products%20images%20new/WATER%20DISTILLATIONS_2000x2000.png",
     eyebrow: "LABORATORY SYSTEMS",
   },
   {
     title: "Petroleum Hydrometers",
     slug: "petroleum-measurement",
-    image: "/Browse%20all%20products/Hydrometer_2000x2000.webp",
+    image: "/All%20products%20images%20new/Hydrometer_2000x2000.png",
+    icon: "/All%20products%20images%20new/Hydrometer%20icon_100x100.png",
     eyebrow: "DENSITY & TESTING",
   },
 ];

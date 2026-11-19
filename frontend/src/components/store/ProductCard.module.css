@@ -204,8 +204,8 @@
   margin: 0;
   color: #13264d;
   min-height: 38px;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 1.0625rem;
+  font-weight: 600;
   line-height: 1.4;
 }
 
@@ -218,7 +218,8 @@
   padding-top: 8px;
   border-top: 1px solid #edf2fb;
   color: #7f8ead;
-  font-size: 11px;
+  font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1.4;
 }
 
@@ -231,8 +232,8 @@
   color: #fff;
   text-align: center;
   text-decoration: none;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 0.9375rem;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   transition: filter 0.15s ease;

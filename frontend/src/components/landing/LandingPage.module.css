@@ -938,11 +938,12 @@
   object-position: right center;
   margin-right: 8%;
   background: #f5f6f8;
-  animation: heroImageIn 0.65s ease both;
+  animation: heroImageIn 1.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 @keyframes heroImageIn {
-  from { opacity: 0; transform: scale(1.02); }
+  from { opacity: 0; transform: scale(1.045) translateX(12px); }
   to { opacity: 1; transform: scale(1); }
 }
 
@@ -965,6 +966,23 @@
 
 .heroContent > * {
   max-width: 620px;
+  animation: heroContentIn 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.heroContent > :nth-child(1) { animation-delay: 0.16s; }
+.heroContent > :nth-child(2) { animation-delay: 0.28s; }
+.heroContent > :nth-child(3) { animation-delay: 0.42s; }
+.heroContent > :nth-child(4) { animation-delay: 0.56s; }
+
+@keyframes heroContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .heroEyebrow {
@@ -997,11 +1015,12 @@
 }
 
 .heroContent h1 {
-  max-width: 420px;
+  max-width: 650px;
   color: #0066b0;
-  font-size: clamp(40px, 5vw, 62px);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
+  font-size: clamp(44px, 5vw, 60px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
 }
 
 .heroTitleAccent {
@@ -1021,7 +1040,13 @@
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 12px 30px rgba(13, 74, 131, 0.1);
+  backdrop-filter: blur(12px);
 }
 
 .heroControls button {
@@ -1032,19 +1057,39 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   color: #0d4a83;
   cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.heroControls button:first-child:hover,
+.heroControls button:last-child:hover {
+  background: #0d4a83;
+  color: #fff;
+  transform: scale(1.06);
 }
 
 .heroControls button:not(:first-child):not(:last-child) {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   background: rgba(13, 74, 131, 0.35);
+  transition: width 0.35s ease, background 0.35s ease, transform 0.35s ease;
 }
 
 .heroControls .heroDotActive {
   background: #0d4a83 !important;
+  width: 24px !important;
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroImage,
+  .heroContent > *,
+  .heroControls button {
+    animation: none;
+    transition: none;
+  }
 }
 
 .heroContent p,
@@ -2411,6 +2456,11 @@
 
   .heroContent {
     padding: 72px 0 64px;
+  }
+
+  .heroContent h1 {
+    max-width: 560px;
+    font-size: clamp(42px, 10vw, 56px);
   }
 
   .sectionBlock,

@@ -72,7 +72,7 @@ export default function LandingPage() {
 
       <section className={styles.hero} onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)}>
         <Link href="#" className={styles.heroImageLink} aria-label={slide.title}>
-          <img src={slide.image} alt="" className={styles.heroImage} />
+          <img key={slide.category} src={slide.image} alt="" className={styles.heroImage} />
         </Link>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent} key={slide.category}>

@@ -212,6 +212,7 @@ export const categories = [
     title: "Volumetric Glassware",
     slug: "volumetric-flasks",
     image: "/All%20products%20images%20new/volumetric%20glassware_2000x2000.png",
+    icon: "/All%20products%20images%20new/volumetric%20glassware%20icon_100x100.png",
     eyebrow: "PRECISION MEASUREMENT",
   },
   {
@@ -232,6 +233,7 @@ export const categories = [
     title: "Water Distillations",
     slug: "distillation",
     image: "/All%20products%20images%20new/WATER%20DISTILLATIONS_2000x2000.png",
+    icon: "/All%20products%20images%20new/WATER%20DISTILLATIONS%20icon_100x100.png",
     eyebrow: "LABORATORY SYSTEMS",
   },
   {

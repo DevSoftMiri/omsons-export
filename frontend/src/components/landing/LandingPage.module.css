@@ -1516,12 +1516,20 @@
   background: #d8f7f3;
 }
 
+.categoryCard:nth-child(1) .categoryIcon {
+  background: #dceeff;
+}
+
 .categoryCard:nth-child(3) .categoryIcon {
   background: #e3e4ff;
 }
 
 .categoryCard:nth-child(5) .categoryIcon {
   background: #fff0df;
+}
+
+.categoryCard:nth-child(4) .categoryIcon {
+  background: #d8f7f3;
 }
 
 .categoryEyebrow {

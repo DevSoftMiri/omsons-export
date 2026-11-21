@@ -40,6 +40,7 @@ export default function StorefrontHeader() {
           buttonClassName={styles.searchButton}
         />
         <div className={styles.headerActionsNew}>
+          <Link href="/oem" className={styles.oemButton}>OEM</Link>
           <Link href="#" className={styles.distributorButton}><img src="/omsons_header_icons/become-distributor-blue.svg" alt="" />Become a Distributor</Link>
           <Link href="#" className={styles.certificateButton}><img src="/omsons_header_icons/download-certificate-blue.svg" alt="" />Download Certificate</Link>
         </div>

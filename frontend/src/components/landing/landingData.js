@@ -166,37 +166,32 @@ export const featuredProducts = [
   {
     category: "Volumetric Glassware",
     name: "Volumetric Flask",
-    image: "/All%20products%20images%20new/volumetric%20glassware_2000x2000.png",
+    image: "/Featured%20product%20section/Volumetric%20Flask_2000x2000.png",
   },
   {
     category: "Filtration Solutions",
     name: "Syringe Filters",
-    image: "/assets/export%20catalogue%20images/CA-Syringe-Filters,-Sterile.jpg",
-  },
-  {
-    category: "Temperature Measurement",
-    name: "ASTM Thermometer",
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/thermometer_ealqnx.png",
+    image: "/Featured%20product%20section/Syringe%20filters_2000x2000.png",
   },
   {
     category: "Laboratory Instruments",
     name: "Hotplate",
-    image: "/assets/export%20catalogue%20images/TSE-AL-15L_Hotplate%20with%20Magnetic%20Stirrer%20thermostir%20Series.jpg",
+    image: "/Featured%20product%20section/Hot%20Plate_2000x2000.png",
   },
   {
     category: "Lab Plasticware",
     name: "Wash Bottle",
-    image: "/Top%20picks%20section/Glassware_742x1024.png",
+    image: "/Featured%20product%20section/Wash%20Bottle_2000x2000.png",
   },
   {
     category: "Density Testing",
     name: "Hydrometer",
-    image: "/Browse%20all%20products/Hydrometer_2000x2000.webp",
+    image: "/Featured%20product%20section/Hydrometer_2000x2000.png",
   },
   {
     category: "Analytical Instruments",
-    name: "Spectrum",
-    image: "/Top%20picks%20section/Lab%20instrument_742x1024.png",
+    name: "Spectrum Tube",
+    image: "/Featured%20product%20section/Spectrum%20Tube_2000x2000.png",
   },
 ];
 
@@ -214,6 +209,7 @@ export const categories = [
     image: "/All%20products%20images%20new/volumetric%20glassware_2000x2000.png",
     icon: "/All%20products%20images%20new/volumetric%20glassware%20icon_100x100.png",
     eyebrow: "PRECISION MEASUREMENT",
+    description: "Precision glassware manufactured by Omsons for accurate liquid measurement.",
   },
   {
     title: "Capsule Filter",
@@ -221,6 +217,7 @@ export const categories = [
     image: "/All%20products%20images%20new/Capsule%20filter_2000x2000.png",
     icon: "/All%20products%20images%20new/Capsule%20filter%20icon_100x100.png",
     eyebrow: "STERILE FILTRATION",
+    description: "Omsons-manufactured capsule filters for efficient and reliable filtration.",
   },
   {
     title: "Cartridge Filter",
@@ -228,6 +225,7 @@ export const categories = [
     image: "/All%20products%20images%20new/Cartridge%20filter_2000x2000.png",
     icon: "/All%20products%20images%20new/Cartridge%20filter%20icon_100x100.png",
     eyebrow: "FILTRATION",
+    description: "High-performance cartridge filters manufactured by Omsons for effective filtration.",
   },
   {
     title: "Water Distillations",
@@ -235,6 +233,7 @@ export const categories = [
     image: "/All%20products%20images%20new/WATER%20DISTILLATIONS_2000x2000.png",
     icon: "/All%20products%20images%20new/WATER%20DISTILLATIONS%20icon_100x100.png",
     eyebrow: "LABORATORY SYSTEMS",
+    description: "Laboratory water distillation systems manufactured by Omsons for purified water production.",
   },
   {
     title: "Petroleum Hydrometers",
@@ -242,6 +241,7 @@ export const categories = [
     image: "/All%20products%20images%20new/Hydrometer_2000x2000.png",
     icon: "/All%20products%20images%20new/Hydrometer%20icon_100x100.png",
     eyebrow: "DENSITY & TESTING",
+    description: "Precision hydrometers manufactured by Omsons for accurate petroleum density measurement.",
   },
 ];
 
@@ -314,13 +314,6 @@ export const whyPillars = [
     title: "Data Integrity",
     description: "Reliable performance for auditable and compliant laboratory workflows.",
   },
-];
-
-export const whyStats = [
-  { value: "40+", target: 40, suffix: "+", label: "Years in Science" },
-  { value: "9000+", target: 9000, suffix: "+", label: "Product SKUs" },
-  { value: "40+", target: 40, suffix: "+", label: "Countries Served" },
-  { value: "ISO", label: "ISO Certified Facility", detail: "(ISO 9001)", icon: "/OMSONS_Icons/iso-certified.svg" },
 ];
 
 export const testimonials = [

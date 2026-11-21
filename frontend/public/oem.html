@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OEM & Private Label Manufacturing | OMSONS Laboratory Products</title>
+<meta name="description" content="OEM and private-label manufacturing of laboratory glassware, borosilicate glass 3.3, hydrometers, thermometers, filtration products, plasticware and laboratory instruments by OMSONS, India.">
+<style>
+/* ===== BRAND TOKENS — change these to match your site ===== */
+:root{
+  --navy:#0B1F3A; --navy-2:#132C50; --blue:#0A63C9; --teal:#00A7B5;
+  --ink:#1B2433; --muted:#5B6678; --line:#E3E8EF; --bg:#F6F8FB; --white:#fff;
+  --radius:14px; --shadow:0 10px 30px rgba(11,31,58,.08);
+  --font:"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--ink);background:var(--white);line-height:1.6;font-size:16px}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+.eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+h1,h2,h3{color:var(--navy);line-height:1.2;font-weight:700}
+h2{font-size:clamp(28px,3.2vw,40px);margin-bottom:16px}
+.lead{font-size:18px;color:var(--muted);max-width:720px}
+.center{text-align:center}.center .lead{margin:0 auto}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:8px;font-weight:600;font-size:15px;transition:.2s;border:2px solid transparent;cursor:pointer}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#084f9f}
+.btn-ghost{border-color:rgba(255,255,255,.45);color:#fff}.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-outline{border-color:var(--blue);color:var(--blue)}.btn-outline:hover{background:var(--blue);color:#fff}
+
+/* ===== PHOTO SLOTS =====
+   Put your image at the path in src. If the file is missing,
+   the labelled placeholder shows instead. */
+.photo{position:relative;background:repeating-linear-gradient(45deg,#EEF2F7 0 12px,#E6ECF3 12px 24px);border:1.5px dashed #B9C4D3;border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;color:#7A879A;font-size:13px;font-weight:600;min-height:180px}
+.photo span{padding:12px;line-height:1.4}
+.photo span small{display:block;font-weight:400;font-size:11.5px;margin-top:4px}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo:has(img:not([data-missing])){border:none}
+
+/* ===== OEM SUB-NAV ===== */
+.subnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.subnav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:24px}
+.subnav .brand{font-weight:800;color:var(--navy);letter-spacing:.04em}
+.subnav .brand b{color:var(--blue)}
+.subnav nav{display:flex;gap:26px;font-size:14px;font-weight:500;color:var(--muted)}
+.subnav nav a:hover{color:var(--blue)}
+.subnav .btn{padding:10px 18px;font-size:14px}
+
+/* ===== HERO ===== */
+.hero{background:linear-gradient(120deg,var(--navy) 0%,var(--navy-2) 55%,#0E3A6B 100%);color:#fff;padding:110px 0 100px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-180px;top:-180px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(0,167,181,.25),transparent 70%)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative;z-index:1}
+.hero h1{color:#fff;font-size:clamp(34px,4.4vw,56px);margin-bottom:20px}
+.hero h1 em{font-style:normal;color:#5FD4DE}
+.hero p{font-size:18px;color:#C9D5E6;margin-bottom:32px;max-width:560px}
+.hero .actions{display:flex;gap:14px;flex-wrap:wrap}
+.hero .photo{min-height:440px;background:repeating-linear-gradient(45deg,#1A3A63 0 12px,#17345A 12px 24px);border-color:#3B5A84;color:#9FB3CF}
+.trust{display:flex;gap:28px;flex-wrap:wrap;margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.14)}
+.trust div{font-size:13px;color:#AFC0D8}
+.trust strong{display:block;color:#fff;font-size:15px}
+
+/* ===== VALUE STRIP ===== */
+.values{padding:0;margin-top:-48px;position:relative;z-index:2}
+.values .grid{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+.values .item{padding:30px 26px;border-right:1px solid var(--line)}
+.values .item:last-child{border-right:none}
+.values h3{font-size:16px;margin:10px 0 6px}
+.values p{font-size:14px;color:var(--muted)}
+.icon{width:44px;height:44px;border-radius:10px;background:#E8F3FF;color:var(--blue);display:flex;align-items:center;justify-content:center}
+.icon svg{width:22px;height:22px}
+
+/* ===== SERVICES ===== */
+.services .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;transition:.25s}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:#CFDCEB}
+.card h3{font-size:19px;margin:16px 0 10px}
+.card p{color:var(--muted);font-size:15px}
+
+/* ===== PRODUCT RANGE ===== */
+.range{background:var(--bg)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:36px 0 40px}
+.filters button{border:1px solid var(--line);background:#fff;padding:9px 18px;border-radius:30px;font:500 14px var(--font);color:var(--muted);cursor:pointer;transition:.2s}
+.filters button.active,.filters button:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.product{background:#fff;border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;transition:.25s}
+.product:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+.product .photo{border-radius:0;border:none;border-bottom:1px solid var(--line);min-height:220px}
+.product .body{padding:24px 26px 26px;display:flex;flex-direction:column;flex:1}
+.product .tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+.product h3{font-size:20px;margin:6px 0 10px}
+.product p{font-size:14.5px;color:var(--muted);margin-bottom:14px}
+.product ul{list-style:none;font-size:14px;margin-bottom:18px;display:grid;gap:6px}
+.product li{padding-left:20px;position:relative}
+.product li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:2px;background:var(--blue);opacity:.75}
+.product .oem{margin-top:auto;padding-top:16px;border-top:1px dashed var(--line);font-size:13px;color:var(--navy)}
+.product .oem b{color:var(--blue)}
+.product.hide{display:none}
+
+/* ===== CUSTOMISATION ===== */
+.custom .wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.custom .photos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.custom .photos .photo:first-child{grid-row:span 2;min-height:400px}
+table{width:100%;border-collapse:collapse;margin-top:28px;font-size:14.5px}
+th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--navy);color:#fff;font-weight:600;font-size:13px;letter-spacing:.04em}
+th:first-child{border-radius:8px 0 0 0}th:last-child{border-radius:0 8px 0 0}
+td:first-child{font-weight:600;color:var(--navy);width:34%}
+td{color:var(--muted)}
+
+/* ===== PROCESS ===== */
+.process{background:var(--navy);color:#fff}
+.process h2{color:#fff}.process .lead{color:#B7C6DC}
+.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-top:56px;counter-reset:s}
+.step{position:relative;padding-top:58px}
+.step::before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;top:0;left:0;width:44px;height:44px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700;color:#5FD4DE;font-size:14px}
+.step::after{content:"";position:absolute;top:22px;left:52px;right:-6px;height:2px;background:rgba(95,212,222,.3)}
+.step:last-child::after{display:none}
+.step h3{color:#fff;font-size:16px;margin-bottom:6px}
+.step p{font-size:13.5px;color:#A9BAD2}
+
+/* ===== FACILITY & QUALITY ===== */
+.facility .gallery{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:220px 220px;gap:16px;margin-top:44px}
+.facility .gallery .photo:first-child{grid-row:span 2}
+.quality{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px}
+.quality .card{padding:24px}
+.quality h3{font-size:16px;margin:12px 0 6px}
+.quality p{font-size:14px}
+.certs{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:40px}
+.certs .photo{width:150px;min-height:90px;font-size:11.5px}
+
+/* ===== INDUSTRIES ===== */
+.industries{background:var(--bg)}
+.ind-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:44px}
+.ind{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 16px;text-align:center;font-weight:600;color:var(--navy);font-size:14.5px}
+.ind .icon{margin:0 auto 12px}
+
+/* ===== PACKAGING ===== */
+.pack .wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.pack .photos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pack .photos .photo{min-height:200px}
+.checks{list-style:none;margin-top:24px;display:grid;gap:12px}
+.checks li{padding-left:32px;position:relative;color:var(--muted)}
+.checks li::before{content:"✓";position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:#E3F7F8;color:var(--teal);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.checks b{color:var(--navy)}
+
+/* ===== FAQ ===== */
+.faq-list{max-width:860px;margin:44px auto 0}
+details{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;background:#fff}
+summary{padding:20px 24px;font-weight:600;color:var(--navy);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;color:var(--blue);font-weight:400}
+details[open] summary::after{content:"–"}
+details p{padding:0 24px 20px;color:var(--muted)}
+
+/* ===== RFQ ===== */
+.rfq{background:linear-gradient(120deg,var(--navy),#0E3A6B);color:#fff}
+.rfq .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px;align-items:start}
+.rfq h2{color:#fff}.rfq .lead{color:#C2D0E4}
+.contact-list{margin-top:32px;display:grid;gap:18px;font-size:15px}
+.contact-list div{color:#C2D0E4}.contact-list strong{display:block;color:#fff}
+form{background:#fff;border-radius:var(--radius);padding:36px;color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+form h3{font-size:20px;margin-bottom:20px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px 14px;border:1px solid #D2DAE5;border-radius:8px;font:15px var(--font);margin-bottom:16px;background:#FBFCFE}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+textarea{min-height:110px;resize:vertical}
+.chk{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:16px}
+.chk label{display:flex;align-items:center;gap:6px;font-weight:500;color:var(--muted);margin:0}
+.chk input{width:auto;margin:0}
+form .btn{width:100%;justify-content:center}
+.note{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1080px){
+  .steps{grid-template-columns:repeat(4,1fr);row-gap:36px}.step:nth-child(4)::after{display:none}
+  .ind-grid{grid-template-columns:repeat(3,1fr)}
+  .quality{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:900px){
+  section{padding:72px 0}
+  .subnav nav{display:none}
+  .hero .wrap,.custom .wrap,.pack .wrap,.rfq .wrap{grid-template-columns:1fr;gap:40px}
+  .hero .photo{min-height:300px}
+  .values .grid{grid-template-columns:1fr 1fr}.values .item:nth-child(2){border-right:none}
+  .values .item{border-bottom:1px solid var(--line)}
+  .services .grid,.products{grid-template-columns:1fr 1fr}
+  .facility .gallery{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .facility .gallery .photo{min-height:180px}.facility .gallery .photo:first-child{grid-column:span 2;grid-row:auto;min-height:260px}
+}
+@media(max-width:600px){
+  .values .grid,.services .grid,.products,.quality,.row{grid-template-columns:1fr}
+  .values .item{border-right:none}
+  .steps{grid-template-columns:1fr 1fr}.step::after{display:none}
+  .ind-grid{grid-template-columns:1fr 1fr}
+  form{padding:24px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ OEM SUB-NAVIGATION (sits below your main site header) ============ -->
+<div class="subnav">
+  <div class="wrap">
+    <div class="brand">OMSONS <b>OEM</b></div>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#range">Product Range</a>
+      <a href="#customisation">Customisation</a>
+      <a href="#process">Process</a>
+      <a href="#quality">Quality</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#rfq" class="btn btn-primary">Request OEM Quote</a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">OEM &amp; Private Label Manufacturing</span>
+      <h1>Your brand. <em>Our laboratory manufacturing expertise.</em></h1>
+      <p>From borosilicate glassware and calibrated hydrometers to filtration products and laboratory instruments — OMSONS manufactures to your specification, prints your brand, and ships export-ready to your warehouse.</p>
+      <div class="actions">
+        <a href="#rfq" class="btn btn-primary">Start an OEM Project →</a>
+        <a href="#range" class="btn btn-ghost">Explore Product Range</a>
+      </div>
+      <div class="trust">
+        <div><strong>In-house manufacturing</strong>Glass, calibration &amp; finishing</div>
+        <div><strong>Your branding</strong>Printing, labels &amp; packaging</div>
+        <div><strong>Export ready</strong>Documentation &amp; global shipping</div>
+      </div>
+    </div>
+    <div class="photo">
+      <img src="images/oem/hero.jpg" alt="OMSONS OEM laboratory glassware manufacturing" onerror="this.remove()">
+      <span>HERO PHOTO<small>Glassblowing / production floor or premium product group shot · 1200 × 900 px</small></span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ VALUE STRIP ============ -->
+<section class="values">
+  <div class="wrap">
+    <div class="grid">
+      <div class="item">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 19a2 2 0 0 0 1.7 3h12.6A2 2 0 0 0 20 19l-6-10V3"/></svg></div>
+        <h3>Single-Source Range</h3>
+        <p>Glassware, measurement, filtration, plasticware and instruments from one supplier.</p>
+      </div>
+      <div class="item">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        <h3>Built to Your Spec</h3>
+        <p>Manufactured to your drawing, sample or the standard you specify.</p>
+      </div>
+      <div class="item">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7 9 18l-5-5"/></svg></div>
+        <h3>Inspected Every Batch</h3>
+        <p>Documented in-process and final inspection with batch traceability.</p>
+      </div>
+      <div class="item">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
+        <h3>Export Partner</h3>
+        <p>Experienced with international buyers, documentation and logistics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OEM SERVICES ============ -->
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">What We Offer</span>
+      <h2>Flexible OEM models for every partner</h2>
+      <p class="lead">Whether you need your logo on our proven products or a fully new product built to your drawing, we adapt to your business model.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8Z"/><circle cx="7" cy="7" r="1.5"/></svg></div>
+        <h3>Private Label</h3>
+        <p>Our standard catalogue products supplied under your brand — your logo printed on the product, your labels and your packaging.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <h3>Build to Print</h3>
+        <p>Products manufactured to your technical drawings, tolerances and material specifications, with first-article approval.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
+        <h3>Custom Development</h3>
+        <p>Joint development of new products — from concept and prototyping to validation and serial production.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <h3>Custom Calibration</h3>
+        <p>Hydrometers and thermometers calibrated to your scale, range and reference temperature.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+        <h3>Printing &amp; Marking</h3>
+        <p>Chemical-resistant graduations, logos and batch markings on glass and plastic, in your colours and layout.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></div>
+        <h3>Packaging &amp; Kitting</h3>
+        <p>Branded boxes, inserts, multilingual labels, barcodes and kits assembled ready for your shelf.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRODUCT RANGE ============ -->
+<section class="range" id="range">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">OEM Product Range</span>
+      <h2>Complete laboratory portfolio, available under your brand</h2>
+      <p class="lead">Every category below can be supplied as private label or customised to your specification.</p>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="active" data-f="all">All Products</button>
+      <button data-f="glass">Glassware</button>
+      <button data-f="measure">Measurement</button>
+      <button data-f="filter">Filtration</button>
+      <button data-f="plastic">Plasticware</button>
+      <button data-f="instr">Instruments &amp; Services</button>
+    </div>
+
+    <div class="products">
+
+      <article class="product" data-c="glass">
+        <div class="photo"><img src="images/oem/volumetric.jpg" alt="Volumetric laboratory glassware" onerror="this.remove()"><span>PRODUCT PHOTO<small>Volumetric flasks, pipettes, burettes · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Glassware</span>
+          <h3>Volumetric Glassware</h3>
+          <p>Precision volumetric ware in Class A and Class B, with individual or batch certificates on request.</p>
+          <ul><li>Volumetric flasks</li><li>Measuring &amp; volumetric pipettes</li><li>Burettes</li><li>Measuring cylinders</li></ul>
+          <div class="oem"><b>OEM options:</b> logo printing, graduation colour, certificates, packaging</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="glass">
+        <div class="photo"><img src="images/oem/general-glass.jpg" alt="General laboratory glassware" onerror="this.remove()"><span>PRODUCT PHOTO<small>Beakers, conical flasks, funnels · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Glassware</span>
+          <h3>General Laboratory Glassware</h3>
+          <p>Everyday borosilicate ware for teaching, research, QC and industrial laboratories.</p>
+          <ul><li>Beakers &amp; conical flasks</li><li>Round &amp; flat-bottom flasks</li><li>Funnels &amp; separating funnels</li><li>Test tubes, petri dishes &amp; desiccators</li></ul>
+          <div class="oem"><b>OEM options:</b> branding, sizes, wall thickness, retail packs</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="glass">
+        <div class="photo"><img src="images/oem/bottles.jpg" alt="Laboratory reagent bottles GL45" onerror="this.remove()"><span>PRODUCT PHOTO<small>GL45 &amp; reagent bottles with caps · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Glassware</span>
+          <h3>Reagent &amp; Media Bottles</h3>
+          <p>Screw-cap laboratory bottles and reagent bottles in clear and amber borosilicate glass.</p>
+          <ul><li>GL45 laboratory / media bottles</li><li>Narrow &amp; wide-mouth reagent bottles</li><li>Amber bottles</li><li>Caps, pouring rings &amp; accessories</li></ul>
+          <div class="oem"><b>OEM options:</b> cap colour, printing, labels, shrink packs</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="glass">
+        <div class="photo"><img src="images/oem/borosilicate.jpg" alt="Borosilicate glass 3.3 custom glassware" onerror="this.remove()"><span>PRODUCT PHOTO<small>Custom / scientific glassblowing · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Glassware</span>
+          <h3>Borosilicate 3.3 &amp; Custom Glass</h3>
+          <p>Special and made-to-drawing apparatus in borosilicate glass 3.3 by skilled scientific glassblowers.</p>
+          <ul><li>Condensers &amp; distillation apparatus</li><li>Interchangeable joint glassware</li><li>Reaction vessels</li><li>Custom apparatus to drawing</li></ul>
+          <div class="oem"><b>OEM options:</b> build to print, prototypes, low-volume runs</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="measure">
+        <div class="photo"><img src="images/oem/hydrometers.jpg" alt="Laboratory hydrometers" onerror="this.remove()"><span>PRODUCT PHOTO<small>Hydrometer set / close-up of scale · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Measurement</span>
+          <h3>Hydrometers</h3>
+          <p>Glass hydrometers for laboratory, petroleum, dairy, beverage and industrial applications.</p>
+          <ul><li>Density &amp; specific gravity</li><li>Baumé, Brix &amp; alcoholometers</li><li>Petroleum hydrometers</li><li>Custom ranges &amp; reference temperatures</li></ul>
+          <div class="oem"><b>OEM options:</b> custom scales, calibration, branded cases</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="measure">
+        <div class="photo"><img src="images/oem/thermometers.jpg" alt="Glass and digital thermometers" onerror="this.remove()"><span>PRODUCT PHOTO<small>Glass &amp; digital thermometers · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Measurement</span>
+          <h3>Thermometers</h3>
+          <p>Liquid-in-glass and digital thermometers for general laboratory and specialised use.</p>
+          <ul><li>General-purpose glass thermometers</li><li>Partial &amp; total immersion types</li><li>Digital thermometers &amp; probes</li><li>Custom ranges &amp; divisions</li></ul>
+          <div class="oem"><b>OEM options:</b> scale design, calibration, printing, packaging</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="filter">
+        <div class="photo"><img src="images/oem/syringe-filters.jpg" alt="Syringe filters and membranes" onerror="this.remove()"><span>PRODUCT PHOTO<small>Syringe filters &amp; membrane discs · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Filtration</span>
+          <h3>Syringe Filters &amp; Membranes</h3>
+          <p>Sample preparation filters and membrane discs in a choice of materials and pore sizes.</p>
+          <ul><li>Syringe filters (multiple diameters)</li><li>Membrane filter discs</li><li>Choice of membrane materials</li><li>Sterile &amp; non-sterile options</li></ul>
+          <div class="oem"><b>OEM options:</b> housing colour, printing, pack counts, labels</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="filter">
+        <div class="photo"><img src="images/oem/cartridges.jpg" alt="Capsule and cartridge filters" onerror="this.remove()"><span>PRODUCT PHOTO<small>Capsule, cartridge &amp; vent filters · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Filtration</span>
+          <h3>Process Filtration</h3>
+          <p>Capsule, cartridge and vent filters for pharmaceutical, biotech and process applications.</p>
+          <ul><li>Capsule filters</li><li>Cartridge filters</li><li>Vent filters</li><li>2D &amp; 3D bags</li></ul>
+          <div class="oem"><b>OEM options:</b> end-fittings, lengths, branding, documentation</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="plastic">
+        <div class="photo"><img src="images/oem/plasticware.jpg" alt="Laboratory plasticware" onerror="this.remove()"><span>PRODUCT PHOTO<small>Plastic beakers, cylinders, bottles · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Plasticware</span>
+          <h3>Laboratory Plasticware</h3>
+          <p>Durable, chemical-resistant plasticware with clear, long-lasting printed graduations.</p>
+          <ul><li>Beakers &amp; measuring cylinders</li><li>Bottles, wash bottles &amp; carboys</li><li>Funnels, jugs &amp; containers</li><li>Racks &amp; lab accessories</li></ul>
+          <div class="oem"><b>OEM options:</b> material, colour, printing, retail packs</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="instr">
+        <div class="photo"><img src="images/oem/instruments.jpg" alt="Laboratory instruments water bath" onerror="this.remove()"><span>PRODUCT PHOTO<small>Water bath / digital instruments · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Instruments</span>
+          <h3>Laboratory Instruments</h3>
+          <p>Reliable bench-top equipment for routine laboratory work.</p>
+          <ul><li>Water baths</li><li>Digital laboratory instruments</li><li>Heating &amp; temperature equipment</li><li>Accessories &amp; spares</li></ul>
+          <div class="oem"><b>OEM options:</b> front-panel branding, colour, manuals, packaging</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="instr">
+        <div class="photo"><img src="images/oem/calibration.jpg" alt="Calibration laboratory" onerror="this.remove()"><span>PRODUCT PHOTO<small>Calibration lab / certificate · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Services</span>
+          <h3>Calibration Services</h3>
+          <p>Calibration of volumetric glassware, hydrometers and thermometers, with documented results.</p>
+          <ul><li>Volumetric glassware calibration</li><li>Hydrometer calibration</li><li>Thermometer calibration</li><li>Calibration certificates</li></ul>
+          <div class="oem"><b>OEM options:</b> certificates in your brand format</div>
+        </div>
+      </article>
+
+      <article class="product" data-c="instr">
+        <div class="photo"><img src="images/oem/custom.jpg" alt="Custom OEM product development" onerror="this.remove()"><span>PRODUCT PHOTO<small>Drawing / prototype / R&amp;D bench · 800 × 600 px</small></span></div>
+        <div class="body">
+          <span class="tag">Development</span>
+          <h3>Don’t See Your Product?</h3>
+          <p>Send us a drawing, sample or specification. Our R&amp;D and engineering team will assess feasibility and propose a solution.</p>
+          <ul><li>Feasibility &amp; costing</li><li>Prototype &amp; samples</li><li>Validation support</li><li>Scale-up to production</li></ul>
+          <div class="oem"><a href="#rfq" class="btn btn-outline" style="padding:10px 18px;font-size:14px">Share Your Requirement →</a></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUSTOMISATION ============ -->
+<section class="custom" id="customisation">
+  <div class="wrap">
+    <div class="photos">
+      <div class="photo"><img src="images/oem/printing.jpg" alt="Logo printing on glassware" onerror="this.remove()"><span>PHOTO<small>Logo / graduation printing close-up · 600 × 800 px</small></span></div>
+      <div class="photo"><img src="images/oem/label.jpg" alt="Private label product" onerror="this.remove()"><span>PHOTO<small>Branded product sample · 600 × 400 px</small></span></div>
+      <div class="photo"><img src="images/oem/box.jpg" alt="Custom packaging" onerror="this.remove()"><span>PHOTO<small>Branded box / packaging · 600 × 400 px</small></span></div>
+    </div>
+    <div>
+      <span class="eyebrow">Customisation</span>
+      <h2>Make every product unmistakably yours</h2>
+      <p class="lead">Choose the level of customisation your market needs — from a simple logo to a fully engineered product.</p>
+      <table>
+        <thead><tr><th>Option</th><th>What we can customise</th></tr></thead>
+        <tbody>
+          <tr><td>Branding</td><td>Logo, brand name, colours and product code printed on the item</td></tr>
+          <tr><td>Graduations &amp; scales</td><td>Layout, colour, units, languages and scale ranges</td></tr>
+          <tr><td>Dimensions &amp; design</td><td>Capacities, sizes, joints, wall thickness and special forms</td></tr>
+          <tr><td>Calibration</td><td>Range, reference temperature, tolerance class and certificate format</td></tr>
+          <tr><td>Packaging</td><td>Branded boxes, inserts, barcodes, multilingual labels, pack quantities</td></tr>
+          <tr><td>Documentation</td><td>Certificates, instruction leaflets and product data sheets in your brand</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="process" id="process">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">How It Works</span>
+      <h2>A clear, controlled path from enquiry to delivery</h2>
+      <p class="lead">Every OEM project follows a documented process with approvals at each critical stage.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Enquiry</h3><p>Share product, quantity, target market and branding needs.</p></div>
+      <div class="step"><h3>Specification</h3><p>We review drawings, standards and technical requirements.</p></div>
+      <div class="step"><h3>Quotation</h3><p>Detailed offer with pricing, MOQ and lead time.</p></div>
+      <div class="step"><h3>Sample</h3><p>Pre-production samples and artwork proofs for approval.</p></div>
+      <div class="step"><h3>Production</h3><p>Serial manufacturing against the approved sample.</p></div>
+      <div class="step"><h3>Inspection</h3><p>In-process and final QC with batch records.</p></div>
+      <div class="step"><h3>Dispatch</h3><p>Export packing, documents and shipment to you.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACILITY & QUALITY ============ -->
+<section class="facility" id="quality">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Manufacturing &amp; Quality</span>
+      <h2>Made, measured and checked in-house</h2>
+      <p class="lead">Our manufacturing, calibration and quality teams work under one roof, giving you control, consistency and traceability.</p>
+    </div>
+    <div class="gallery">
+      <div class="photo"><img src="images/oem/facility-1.jpg" alt="OMSONS manufacturing facility" onerror="this.remove()"><span>FACILITY PHOTO<small>Main production hall · 1000 × 700 px</small></span></div>
+      <div class="photo"><img src="images/oem/facility-2.jpg" alt="Glassblowing" onerror="this.remove()"><span>PHOTO<small>Glassblowing / forming</small></span></div>
+      <div class="photo"><img src="images/oem/facility-3.jpg" alt="Printing line" onerror="this.remove()"><span>PHOTO<small>Printing / marking line</small></span></div>
+      <div class="photo"><img src="images/oem/facility-4.jpg" alt="Quality control" onerror="this.remove()"><span>PHOTO<small>QC / inspection</small></span></div>
+      <div class="photo"><img src="images/oem/facility-5.jpg" alt="Export packing" onerror="this.remove()"><span>PHOTO<small>Packing &amp; warehouse</small></span></div>
+    </div>
+
+    <div class="quality">
+      <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></div><h3>Incoming Inspection</h3><p>Raw materials and components checked before production.</p></div>
+      <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><h3>In-Process Control</h3><p>Dimensional, visual and functional checks at defined stages.</p></div>
+      <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><h3>Calibration &amp; Testing</h3><p>Measurement products verified against reference standards.</p></div>
+      <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div><h3>Batch Traceability</h3><p>Records and certificates linked to each production batch.</p></div>
+    </div>
+
+    <!-- Add ONLY certifications/accreditations you actually hold -->
+    <div class="certs">
+      <div class="photo"><img src="images/oem/cert-1.png" alt="Certification" onerror="this.remove()"><span>CERT LOGO 1</span></div>
+      <div class="photo"><img src="images/oem/cert-2.png" alt="Certification" onerror="this.remove()"><span>CERT LOGO 2</span></div>
+      <div class="photo"><img src="images/oem/cert-3.png" alt="Certification" onerror="this.remove()"><span>CERT LOGO 3</span></div>
+      <div class="photo"><img src="images/oem/cert-4.png" alt="Certification" onerror="this.remove()"><span>CERT LOGO 4</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INDUSTRIES ============ -->
+<section class="industries">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Who We Serve</span>
+      <h2>OEM partners across laboratory markets</h2>
+    </div>
+    <div class="ind-grid">
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div>Lab Distributors</div>
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7ZM8.5 8.5l7 7"/></svg></div>Pharma &amp; Biotech</div>
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5ZM6 12v5c3 2 9 2 12 0v-5"/></svg></div>Education</div>
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 19a2 2 0 0 0 1.7 3h12.6A2 2 0 0 0 20 19l-6-10V3"/></svg></div>Research Labs</div>
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.7s-6 6.3-6 11.3a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3Z"/></svg></div>Petroleum &amp; Chemical</div>
+      <div class="ind"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2h8l-1 7a4 4 0 0 1-6 0ZM12 13v9M8 22h8"/></svg></div>Food, Dairy &amp; Beverage</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGING & EXPORT ============ -->
+<section class="pack">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Packaging &amp; Export</span>
+      <h2>Delivered safely, ready for your shelf</h2>
+      <p class="lead">Laboratory glass demands careful handling. We pack for long-distance export and for your end customer.</p>
+      <ul class="checks">
+        <li><b>Protective export packing</b> — partitioned cartons, inserts and palletisation for fragile goods.</li>
+        <li><b>Retail-ready packs</b> — branded unit boxes, barcodes and multilingual labels.</li>
+        <li><b>Export documentation</b> — commercial invoice, packing list, certificate of origin and test certificates as required.</li>
+        <li><b>Consolidated shipments</b> — mixed product categories in a single container or LCL shipment.</li>
+      </ul>
+    </div>
+    <div class="photos">
+      <div class="photo"><img src="images/oem/pack-1.jpg" alt="Export carton packing" onerror="this.remove()"><span>PHOTO<small>Export cartons · 600 × 450 px</small></span></div>
+      <div class="photo"><img src="images/oem/pack-2.jpg" alt="Retail packaging" onerror="this.remove()"><span>PHOTO<small>Retail unit box · 600 × 450 px</small></span></div>
+      <div class="photo"><img src="images/oem/pack-3.jpg" alt="Palletised shipment" onerror="this.remove()"><span>PHOTO<small>Palletised shipment · 600 × 450 px</small></span></div>
+      <div class="photo"><img src="images/oem/pack-4.jpg" alt="Container loading" onerror="this.remove()"><span>PHOTO<small>Container loading · 600 × 450 px</small></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq" style="background:var(--bg)">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">FAQ</span>
+      <h2>Common OEM questions</h2>
+    </div>
+    <div class="faq-list">
+      <details open><summary>What is the minimum order quantity (MOQ) for OEM products?</summary><p>MOQ depends on the product category and level of customisation. Private-label orders on standard products typically start lower than fully custom products. Share your requirement and we will confirm the MOQ in our quotation.</p></details>
+      <details><summary>Can you manufacture to our drawings and standards?</summary><p>Yes. We manufacture to customer drawings, samples or the standard you specify. Our technical team reviews every specification for feasibility before quoting.</p></details>
+      <details><summary>Will you provide samples before bulk production?</summary><p>Yes. Pre-production samples and artwork proofs are provided for your approval. Bulk production starts only after written sample approval.</p></details>
+      <details><summary>What are your typical lead times?</summary><p>Lead time depends on the product, quantity and customisation. Standard private-label orders are faster than new developments. Confirmed lead times are stated in every quotation.</p></details>
+      <details><summary>Is our brand, artwork and design kept confidential?</summary><p>Yes. We are happy to sign a Non-Disclosure Agreement (NDA). Your artwork, drawings and branding are used only for your orders.</p></details>
+      <details><summary>Which documents and certificates are supplied?</summary><p>Standard export documents are supplied with every shipment. Product certificates, calibration certificates and test reports can be supplied as agreed in the order.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RFQ FORM ============ -->
+<section class="rfq" id="rfq">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Request an OEM Quote</span>
+      <h2>Let’s build your laboratory brand together</h2>
+      <p class="lead">Tell us about your requirement. Our international sales team will respond with feasibility, pricing and next steps.</p>
+      <div class="contact-list">
+        <div><strong>Email</strong>[oem@yourdomain.com]</div>
+        <div><strong>Phone / WhatsApp</strong>[+91 XXXXX XXXXX]</div>
+        <div><strong>Address</strong>[Company address, City, India]</div>
+      </div>
+    </div>
+
+    <!-- Connect "action" to your website's form handler / CRM -->
+    <form action="#" method="post">
+      <h3>OEM Enquiry</h3>
+      <div class="row">
+        <div><label>Full name *</label><input type="text" name="name" required></div>
+        <div><label>Company *</label><input type="text" name="company" required></div>
+      </div>
+      <div class="row">
+        <div><label>Business email *</label><input type="email" name="email" required></div>
+        <div><label>Phone / WhatsApp</label><input type="tel" name="phone"></div>
+      </div>
+      <div class="row">
+        <div><label>Country *</label><input type="text" name="country" required></div>
+        <div><label>Business type</label>
+          <select name="type"><option>Distributor / Dealer</option><option>Brand Owner</option><option>Manufacturer / OEM</option><option>Laboratory / Institution</option><option>Other</option></select>
+        </div>
+      </div>
+      <label>Product categories of interest</label>
+      <div class="chk">
+        <label><input type="checkbox" name="cat" value="Glassware"> Glassware</label>
+        <label><input type="checkbox" name="cat" value="Hydrometers"> Hydrometers</label>
+        <label><input type="checkbox" name="cat" value="Thermometers"> Thermometers</label>
+        <label><input type="checkbox" name="cat" value="Filtration"> Filtration</label>
+        <label><input type="checkbox" name="cat" value="Plasticware"> Plasticware</label>
+        <label><input type="checkbox" name="cat" value="Instruments"> Instruments</label>
+        <label><input type="checkbox" name="cat" value="Calibration"> Calibration</label>
+      </div>
+      <div class="row">
+        <div><label>OEM type</label>
+          <select name="oem"><option>Private label (our product, your brand)</option><option>Build to print (your drawing)</option><option>New product development</option><option>Not sure yet</option></select>
+        </div>
+        <div><label>Estimated annual quantity</label><input type="text" name="qty" placeholder="e.g. 5,000 pcs / year"></div>
+      </div>
+      <label>Requirement details</label>
+      <textarea name="message" placeholder="Products, specifications, standards, branding and packaging requirements…"></textarea>
+      <label>Attach drawing / specification (optional)</label>
+      <input type="file" name="file">
+      <button type="submit" class="btn btn-primary">Submit OEM Enquiry →</button>
+      <p class="note">We respect your confidentiality. NDA available on request.</p>
+    </form>
+  </div>
+</section>
+
+<script>
+// Product range filter
+document.querySelectorAll('#filters button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#filters button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const f=b.dataset.f;
+    document.querySelectorAll('.product').forEach(p=>{
+      p.classList.toggle('hide', f!=='all' && p.dataset.c!==f);
+    });
+  });
+});
+</script>
+</body>
+</html>

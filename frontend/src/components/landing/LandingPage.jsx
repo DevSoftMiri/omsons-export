@@ -10,7 +10,6 @@ import {
   stats,
   testimonials,
   whyPillars,
-  whyStats,
 } from "./landingData";
 import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
@@ -52,6 +51,13 @@ export default function LandingPage() {
       title: "Premium Filtration Products",
       description: "Syringe filters and membrane filters to Capsule, Cartridge Filters and SS Filter Housings. We provide dependable filtration solutions for diverse laboratory and industrial applications.",
       category: "filters-membrane",
+    },
+    {
+      image: "/heroimages/hero%20banner%204.webp",
+      eyebrow: "Precision, Quality & Reliability in Every Piece.",
+      title: "Premium Cartridge Filter",
+      description: "We provide reliable solutions for pharmaceutical, chemical, research and testing laboratories.",
+      category: "laboratory-solutions",
     },
   ];
 
@@ -179,6 +185,7 @@ export default function LandingPage() {
                     </span>
                     <span className={styles.categoryEyebrow}>{category.eyebrow}</span>
                     <h3>{category.title}</h3>
+                    <p className={styles.categoryDescription}>{category.description}</p>
                     <span className={styles.categoryAction}>View Products <span aria-hidden="true">→</span></span>
                   </div>
                 </Link>
@@ -232,7 +239,7 @@ export default function LandingPage() {
             accuracy and long-term reliability.
           </Reveal>
           <Reveal className={styles.whyImageWrap} delay={2}>
-            <img src="/why%20omsons%20.webp" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
+            <img src="/Why%20omsons.png" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
           </Reveal>
           <div className={styles.whyGrid}>
             {whyPillars.map((pillar, index) => (
@@ -240,15 +247,6 @@ export default function LandingPage() {
                 <span className={styles.whyIcon}><img src={pillar.icon} alt="" /></span>
                 <h3>{pillar.title}</h3>
                 <p>{pillar.description}</p>
-              </Reveal>
-            ))}
-          </div>
-          <div className={styles.whyStats}>
-            {whyStats.map((item, index) => (
-              <Reveal key={item.label} className={styles.whyStat} delay={index + 1}>
-                {item.icon ? <img src={item.icon} alt="" className={styles.whyStatIcon} /> : <strong data-counter data-target={item.target} data-suffix={item.suffix}>{item.value}</strong>}
-                <span>{item.label}</span>
-                {item.detail ? <small>{item.detail}</small> : null}
               </Reveal>
             ))}
           </div>
@@ -303,13 +301,14 @@ export default function LandingPage() {
             <video
               className={styles.video}
               data-video
+              data-video-restart
               loop
               muted
               playsInline
               preload="metadata"
               aria-label="OMSONS global presence animation"
             >
-              <source src="/World%20Map%20Animation%20Omsons%20%20(1).mp4" type="video/mp4" />
+              <source src="/sales%20network%20video%20.mp4" type="video/mp4" />
             </video>
           </Reveal>
         </div>

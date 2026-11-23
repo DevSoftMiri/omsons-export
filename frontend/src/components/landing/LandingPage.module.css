@@ -2578,6 +2578,11 @@
     margin-right: 0;
   }
 
+  .heroBannerFour .heroImage {
+    height: 100%;
+    object-position: 68% center;
+  }
+
   .heroBadge {
     right: 18px;
     top: 18px;
@@ -2598,7 +2603,8 @@
 
 @media (max-width: 640px) {
   .pageShell {
-    padding-top: 120px;
+    padding-top: 112px;
+    padding-bottom: 56px;
   }
 
   .siteNav,
@@ -2637,11 +2643,17 @@
   }
 
   .hero {
-    min-height: clamp(470px, 120vw, 540px);
+    height: calc(100dvh - 112px - 56px);
+    min-height: 0;
+    max-height: 620px;
   }
 
-  .pageShell {
-    padding-bottom: 58px;
+  .heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 68% center;
+    margin-right: 0;
   }
 
   .heroContent h1 {
@@ -2650,8 +2662,9 @@
 
   .heroContent p {
     max-width: 100%;
-    font-size: 17px;
-    line-height: 1.5;
+    margin-top: 14px;
+    font-size: clamp(15px, 4.2vw, 17px);
+    line-height: 1.42;
   }
 
   .navMobile {
@@ -2689,12 +2702,25 @@
   }
 
   .heroContent {
-    padding: 48px 0 40px;
+    padding: clamp(24px, 7vh, 56px) 0 84px;
   }
 
   .heroContent h1 {
     max-width: 560px;
-    font-size: clamp(38px, 10.5vw, 52px);
+    font-size: clamp(36px, 10.5vw, 50px);
+  }
+
+  .heroActions {
+    margin-top: clamp(18px, 4vh, 30px);
+  }
+
+  .heroControls {
+    right: auto;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    gap: 8px;
+    padding: 7px 9px;
   }
 
   .sectionBlock,
@@ -2742,5 +2768,82 @@
 @media (min-width: 700px) {
   .bannerGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .featuredDealsSection {
+    padding: 36px 0 44px;
+    background: #f7fbfc;
+  }
+
+  .featuredDealsSection .sectionInner {
+    width: 100%;
+  }
+
+  .featuredDealsSection .sectionTitle {
+    margin: 0 12px;
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.08;
+  }
+
+  .featuredDealsSection .sectionEyebrow {
+    margin-bottom: 8px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .featuredDealsSection .bannerGrid {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    width: calc(100% - 24px);
+    margin: 22px auto 0;
+  }
+
+  .featuredDealsSection .bannerCard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    min-height: 0;
+    padding: 20px 16px 14px;
+    border: 1px solid #e2e9ef;
+    border-radius: 22px;
+    background: #f7fbfc;
+    box-shadow: 0 8px 22px rgba(41, 77, 110, 0.08);
+  }
+
+  .featuredDealsSection .bannerCategory {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: #60758c;
+  }
+
+  .featuredDealsSection .bannerCard h3 {
+    margin-top: 8px;
+    font-size: clamp(23px, 6.5vw, 26px);
+    line-height: 1.12;
+  }
+
+  .featuredDealsSection .bannerTagline {
+    margin: 10px 0 16px;
+    font-size: clamp(14px, 3.9vw, 15px);
+    line-height: 1.5;
+  }
+
+  .featuredDealsSection .bannerButton {
+    min-height: 44px;
+    width: fit-content;
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+
+  .featuredDealsSection .bannerCard img {
+    width: 95%;
+    height: 210px;
+    max-height: none;
+    margin: 14px auto 0;
+    object-fit: contain;
+    object-position: center;
   }
 }

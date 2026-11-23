@@ -108,7 +108,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className={styles.sectionBlock}>
+      <section className={`${styles.sectionBlock} ${styles.featuredDealsSection}`}>
         <div className={styles.sectionInner}>
           <Reveal as="h2" className={styles.sectionTitle}>
             <small className={styles.sectionEyebrow}>Featured Deals</small>

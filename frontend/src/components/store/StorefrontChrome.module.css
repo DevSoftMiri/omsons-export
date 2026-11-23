@@ -588,20 +588,31 @@
     min-height: 0;
     height: auto;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 74px minmax(0, 1fr);
+    grid-template-rows: 54px 40px;
+    gap: 6px 8px;
+    padding: 6px 0 8px;
+  }
+
+  .compactHeader .headerInner {
+    grid-template-columns: 74px minmax(0, 1fr);
+    grid-template-rows: 54px 40px;
+    min-height: 0;
+    height: auto;
     gap: 8px;
-    padding: 8px 0 10px;
+    padding: 6px 0 8px;
   }
 
   .logo {
+    grid-column: 1;
     justify-self: start;
-    transform: translateX(-70px);
+    transform: none;
     align-self: center;
-    padding: 10px 0 10px 12px;
+    padding: 8px 0 8px 0;
   }
 
   .logo > img {
-    width: 84px !important;
+    width: 70px !important;
   }
 
   .compactHeader .logo {
@@ -609,33 +620,69 @@
   }
 
   .compactHeader .logo > img {
-    width: 72px !important;
+    width: 70px !important;
+  }
+
+  .compactHeader .logo {
+    padding: 0;
+    transform: none;
   }
 
   .searchShell {
+    grid-column: 2;
     width: 100%;
     grid-template-columns: 120px minmax(0, 1fr);
   }
 
   .headerActionsNew {
+    grid-column: 1 / -1;
     width: 100%;
-    gap: 8px;
+    gap: 4px;
     padding-left: 0;
     justify-content: center;
+    transform: none;
+  }
+
+  .compactHeader .headerActionsNew {
+    gap: 4px;
+    padding-left: 0;
     transform: none;
   }
 
   .headerActionsNew a {
     flex: 1 1 0;
     min-width: 0;
-    padding: 0 8px;
-    font-size: 10px;
+    min-height: 40px;
+    padding: 0 4px;
+    font-size: 9px;
+    line-height: 1.1;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .compactHeader .headerActionsNew a {
+    min-height: 40px;
+    padding: 0 4px;
+    font-size: 9px;
+    line-height: 1.1;
+    text-align: center;
+    white-space: normal;
   }
 
   .headerActionsNew a img {
-    width: 17px;
-    height: 17px;
-    margin-right: 4px;
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+  }
+
+  .compactHeader .headerActionsNew a img {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+  }
+
+  .headerActionsNew .oemButton {
+    flex: 0 0 30%;
   }
 
   .container,
@@ -646,7 +693,11 @@
     width: min(1380px, calc(100% - 20px));
   }
 
-  .searchShell { grid-template-columns: 82px minmax(0, 1fr); }
+  .searchShell { grid-template-columns: minmax(0, 1fr); }
+
+  .searchShell :global(.typePicker) { display: none; }
+
+  .searchInput { border-radius: 13px; }
 
   .footerInner {
     grid-template-columns: 1fr;

@@ -369,7 +369,10 @@ export default function HomeNavbar({ compact = false, hideGlassUtility = false }
             aria-expanded={mobileOpen}
             aria-controls="mobile-omsons-menu"
           >
-            <span>Browse Categories</span>
+            <span className={styles.mobileMenuToggleLabel}>
+              <img src="/omsons_header_icons/all-categories-chevron-white.svg" alt="" />
+              <span>Browse Categories</span>
+            </span>
             <span className={styles.mobileMenuToggleIcon}>{mobileOpen ? "−" : "+"}</span>
           </button>
 

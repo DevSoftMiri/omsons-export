@@ -21,3 +21,7 @@
 .typeOptionActive:hover { background: linear-gradient(135deg,#0066b0,#0088e8); }
 .typeOption img { width: 23px; height: 23px; object-fit: contain; }
 .typeCheck { margin-left: auto; font-size: 19px; }
+
+@media (max-width: 640px) {
+  .typePicker { display: none; }
+}

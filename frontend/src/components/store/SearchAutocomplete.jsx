@@ -79,7 +79,7 @@ export default function SearchAutocomplete({ shellClassName, selectClassName, in
           ) : null}
           <input type="hidden" name="searchType" value={searchType} />
         </div>
-        <input className={inputClassName} name="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpen(event.target.value.trim().length >= 2); }} onFocus={() => query.trim().length >= 2 && setOpen(true)} placeholder="Search by name, SKU, category, or specs..." aria-label="Search products and categories" autoComplete="off" />
+        <input className={inputClassName} name="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpen(event.target.value.trim().length >= 2); }} onFocus={() => query.trim().length >= 2 && setOpen(true)} placeholder="Search by name, SKU, or category..." aria-label="Search products and categories" autoComplete="off" />
       </form>
       {open && searchType !== "categories" ? (
         <div className={styles.dropdown} role="listbox">

@@ -10,57 +10,67 @@ import styles from "./LandingPage.module.css";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
+const heroImages = {
+  glassware: "/header%20images/Lab%20Glassware.png",
+  instruments: "/header%20images/Lab%20Instrument.png",
+  filters: "/header%20images/Filter%20and%20Mambrane.png",
+  hydrometers: "/header%20images/Hydrometer.png",
+  plasticware: "/header%20images/Plasticware.png",
+  thermometers: "/header%20images/Thermometer.png",
+  metalware: "/header%20images/metalware.png",
+};
+
 const categoryVisuals = {
   filtration: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/filtration_k6seas.png",
+    image: heroImages.filters,
     eyebrow: "Membrane Filtration",
     title: "Explore Filtration",
     description: "High-clarity membrane filters and filtration essentials built for precise laboratory workflows.",
   },
   "filters-membrane": {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/filtration_k6seas.png",
+    image: heroImages.filters,
     eyebrow: "Filters & Membrane",
     title: "Explore Filters & Membrane",
     description: "Professional filtration solutions for laboratory and process applications.",
   },
   "laboratory-instruments": {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/lab_instrument_bn7hj2.png",
+    image: heroImages.instruments,
     eyebrow: "Lab Instruments",
     title: "Explore Instruments",
     description: "Reliable analytical instruments, accessories, and porcelain solutions for daily lab operations.",
   },
   "lab-instruments": {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/lab_instrument_bn7hj2.png",
+    image: heroImages.instruments,
     eyebrow: "Lab Instruments",
     title: "Explore Lab Instruments",
     description: "Reliable analytical instruments and accessories for daily laboratory operations.",
   },
   plasticware: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/plasticware_bmw8k0.png",
+    image: heroImages.plasticware,
     eyebrow: "Lab Plasticware",
     title: "Explore Plasticware",
     description: "Durable bottles, tubes, and molded plasticware designed for clean, repeatable handling.",
   },
   glassware: {
-    image: "/assets/export%20catalogue%20images/1044.100.jpg",
+    image: heroImages.glassware,
     eyebrow: "Laboratory Glassware",
     title: "Explore Glassware",
     description: "Beakers, flasks, burettes, and precision borosilicate glassware for professional laboratories.",
   },
   "lab-glassware": {
-    image: "/assets/export%20catalogue%20images/1044.100.jpg",
+    image: heroImages.glassware,
     eyebrow: "Omsons Catalogue",
     title: "Explore Lab Glassware",
     description: "Browse professional lab glassware solutions for laboratory and production environments.",
   },
   hydrometers: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/hydrometer_qdqm6r.png",
+    image: heroImages.hydrometers,
     eyebrow: "Density Testing",
     title: "Explore Hydrometers",
     description: "Specialized hydrometers for accurate density and concentration measurement in lab environments.",
   },
   thermometers: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/thermometer_ealqnx.png",
+    image: heroImages.thermometers,
     eyebrow: "Temperature Control",
     title: "Explore Thermometers",
     description: "Precision laboratory thermometers for controlled testing, validation, and process monitoring.",
@@ -72,19 +82,19 @@ const categoryVisuals = {
     description: "Rubber stoppers, tubing, and support components selected for dependable lab use.",
   },
   metalware: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/metalware_qhmfj7.png",
+    image: heroImages.metalware,
     eyebrow: "Metal Lab Tools",
     title: "Explore Metalware",
     description: "Metal lab tools and utility accessories engineered for strength, handling, and longevity.",
   },
   "sintered-ware": {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592013/sintered_glassware_kvnm1u.png",
+    image: heroImages.filters,
     eyebrow: "Sintered Glass",
     title: "Explore Sintered Ware",
     description: "Sintered glassware for filtration, gas dispersion, and controlled laboratory applications.",
   },
   quartzware: {
-    image: "/assets/export%20catalogue%20images/1058.100.jpg",
+    image: heroImages.glassware,
     eyebrow: "Quartz Labware",
     title: "Explore Quartzware",
     description: "Quartz labware suited for high-temperature and high-purity scientific processes.",

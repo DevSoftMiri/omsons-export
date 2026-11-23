@@ -53,7 +53,7 @@ export default function LandingPage() {
       category: "filters-membrane",
     },
     {
-      image: "/heroimages/hero%20banner%204.webp",
+      image: "/heroimages/hero%20banner%204.png",
       eyebrow: "Precision, Quality & Reliability in Every Piece.",
       title: "Premium Cartridge Filter",
       description: "We provide reliable solutions for pharmaceutical, chemical, research and testing laboratories.",
@@ -76,9 +76,14 @@ export default function LandingPage() {
     <main className={styles.pageShell}>
       <StorefrontHeader />
 
-      <section className={styles.hero} onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)}>
+      <section className={`${styles.hero} ${slide.category === "laboratory-solutions" ? styles.heroBannerFour : ""}`} onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)}>
         <Link href="#" className={styles.heroImageLink} aria-label={slide.title}>
-          <img key={slide.category} src={slide.image} alt="" className={styles.heroImage} />
+          <img
+            key={slide.category}
+            src={slide.image}
+            alt=""
+            className={`${styles.heroImage} ${slide.category === "laboratory-solutions" ? styles.heroImageBannerFour : ""}`}
+          />
         </Link>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent} key={slide.category}>

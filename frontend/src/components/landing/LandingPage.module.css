@@ -1481,25 +1481,22 @@
 }
 
 .recommendationLayout {
+  position: relative;
   margin-top: 34px;
-  overflow: hidden;
 }
 
 .productsViewport {
-  overflow: hidden;
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 4px 0 18px;
 }
+
+.productsViewport::-webkit-scrollbar { display: none; }
 
 .productsGrid {
   display: flex;
   width: max-content;
   gap: 20px;
-  animation: featuredProductsMarquee 52s linear infinite;
-}
-
-@keyframes featuredProductsMarquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(calc(-50% - 10px)); }
 }
 
 .productCard,
@@ -1544,10 +1541,33 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .productsGrid {
-    animation: none;
-  }
+  .productsViewport { scroll-behavior: auto; }
 }
+
+.carouselArrow {
+  position: absolute;
+  z-index: 2;
+  top: 46%;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(13, 74, 131, 0.14);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--cobalt);
+  box-shadow: 0 8px 20px rgba(22, 41, 70, 0.16);
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.carouselArrow:hover:not(:disabled) { background: var(--cobalt); color: #fff; }
+.carouselArrow:focus-visible { outline: 3px solid rgba(18, 111, 176, 0.35); outline-offset: 3px; }
+.carouselArrow:disabled { opacity: 0.35; cursor: not-allowed; }
+.carouselArrowPrev { left: -18px; }
+.carouselArrowNext { right: -18px; }
 
 .productName {
   margin: 10px 0 18px;
@@ -2597,6 +2617,19 @@
 }
 
 @media (max-width: 640px) {
+  .productCard {
+    flex-basis: calc(100vw - 64px);
+  }
+
+  .carouselArrow {
+    width: 36px;
+    height: 36px;
+    font-size: 26px;
+  }
+
+  .carouselArrowPrev { left: -8px; }
+  .carouselArrowNext { right: -8px; }
+
   .pageShell {
     padding-top: 112px;
     padding-bottom: 56px;

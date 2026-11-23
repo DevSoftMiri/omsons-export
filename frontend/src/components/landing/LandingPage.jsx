@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   categories,
   featuredBanners,
@@ -30,6 +30,8 @@ function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) 
 export default function LandingPage() {
   const [activeHero, setActiveHero] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
+  const productsViewportRef = useRef(null);
+  const [productCarouselPaused, setProductCarouselPaused] = useState(false);
   const heroSlides = [
     {
       image: "/heroimages/export1.jpg",
@@ -68,6 +70,44 @@ export default function LandingPage() {
     }, 5000);
     return () => window.clearInterval(timer);
   }, [heroPaused, heroSlides.length]);
+
+  const moveProductCarousel = (direction) => {
+    const viewport = productsViewportRef.current;
+    const card = viewport?.querySelector(`.${styles.productCard}`);
+    if (!viewport || !card) return;
+    const grid = viewport.querySelector(`.${styles.productsGrid}`);
+    const gap = Number.parseFloat(window.getComputedStyle(grid).gap) || 20;
+    viewport.scrollBy({ left: direction * (card.getBoundingClientRect().width + gap), behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const viewport = productsViewportRef.current;
+    if (!viewport) return undefined;
+    const normalizeLoop = () => {
+      const loopWidth = viewport.scrollWidth / 2;
+      if (loopWidth > 0 && viewport.scrollLeft >= loopWidth) viewport.scrollLeft -= loopWidth;
+    };
+    viewport.addEventListener("scroll", normalizeLoop, { passive: true });
+    return () => {
+      viewport.removeEventListener("scroll", normalizeLoop);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (productCarouselPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    let frame;
+    const tick = () => {
+      const viewport = productsViewportRef.current;
+      if (viewport) {
+        viewport.scrollLeft += 0.45;
+        const loopWidth = viewport.scrollWidth / 2;
+        if (loopWidth > 0 && viewport.scrollLeft >= loopWidth) viewport.scrollLeft -= loopWidth;
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [productCarouselPaused]);
 
   const slide = heroSlides[activeHero];
 
@@ -143,8 +183,9 @@ export default function LandingPage() {
           <Reveal as="h2" className={styles.sectionTitle} delay={1}>
             Our product <span>recommendations</span> for you
           </Reveal>
-          <div className={styles.recommendationLayout}>
-            <div className={styles.productsViewport}>
+          <div className={styles.recommendationLayout} onMouseEnter={() => setProductCarouselPaused(true)} onMouseLeave={() => setProductCarouselPaused(false)} onFocus={() => setProductCarouselPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setProductCarouselPaused(false); }}>
+            <button type="button" className={`${styles.carouselArrow} ${styles.carouselArrowPrev}`} onClick={() => moveProductCarousel(-1)} aria-label="Previous featured products"><span aria-hidden="true">‹</span></button>
+            <div className={styles.productsViewport} ref={productsViewportRef}>
               <div className={styles.productsGrid}>
               {[...featuredProducts, ...featuredProducts].map((product, index) => (
                 <Reveal key={`${product.name}-${index}`} className={styles.productCard} delay={(index % featuredProducts.length) + 1}>
@@ -161,6 +202,7 @@ export default function LandingPage() {
               ))}
               </div>
             </div>
+            <button type="button" className={`${styles.carouselArrow} ${styles.carouselArrowNext}`} onClick={() => moveProductCarousel(1)} aria-label="Next featured products"><span aria-hidden="true">›</span></button>
           </div>
         </div>
       </section>

@@ -17,6 +17,7 @@ const heroImages = {
   hydrometers: "/header%20images/Hydrometer.png",
   plasticware: "/header%20images/Plasticware.png",
   thermometers: "/header%20images/Thermometer.png",
+  rubberware: "/header%20images/rubberware.png",
   metalware: "/header%20images/metalware.png",
 };
 
@@ -76,7 +77,7 @@ const categoryVisuals = {
     description: "Precision laboratory thermometers for controlled testing, validation, and process monitoring.",
   },
   rubberware: {
-    image: "https://res.cloudinary.com/zieluz7x/image/upload/v1783592014/ruberrware_bz1fhl.png",
+    image: heroImages.rubberware,
     eyebrow: "Sealing & Flow",
     title: "Explore Rubberware",
     description: "Rubber stoppers, tubing, and support components selected for dependable lab use.",

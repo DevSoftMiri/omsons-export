@@ -142,7 +142,7 @@ export const featuredBanners = [
     description: "High-performance filters and systems for reliable, efficient and contamination-free sample preparation.",
     title: "Filtration Products",
     tagline: "Pure results. Reliable filtration.",
-    image: "/Top%20picks%20section/Filtration_742x1024.png",
+    image: "/Top%20picks%20section/Filtration.png",
   },
   {
     tone: "sky",
@@ -150,7 +150,7 @@ export const featuredBanners = [
     description: "Precision-made borosilicate glassware (Glass 3.3) for accurate, safe and durable laboratory use.",
     title: "Glassware",
     tagline: "Borosilicate. High quality. Durable.",
-    image: "/Top%20picks%20section/Glassware_742x1024.png",
+    image: "/Top%20picks%20section/Glassware.png",
   },
   {
     tone: "peach",
@@ -158,7 +158,7 @@ export const featuredBanners = [
     description: "Reliable, high-performance instruments for precise control, measurement and routine laboratory operations.",
     title: "Lab Instruments",
     tagline: "Precision tools for modern laboratories.",
-    image: "/Top%20picks%20section/Lab%20instrument_742x1024.png",
+    image: "/Top%20picks%20section/instrument.png",
   },
 ];
 
@@ -186,7 +186,7 @@ export const featuredProducts = [
   {
     category: "Density Testing",
     name: "Hydrometer",
-    image: "/Featured%20product%20section/Hydrometer_2000x2000.png",
+    image: "/All%20products%20images%20new/Hydrometer_2000x2000.png",
   },
   {
     category: "Analytical Instruments",

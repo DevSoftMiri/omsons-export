@@ -313,7 +313,7 @@ export default function LandingPage() {
               preload="metadata"
               aria-label="OMSONS global presence animation"
             >
-              <source src="/sales%20network%20video%20.mp4" type="video/mp4" />
+              <source src="/sales%20network%20video.mp4" type="video/mp4" />
             </video>
           </Reveal>
         </div>

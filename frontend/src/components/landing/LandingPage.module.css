@@ -1497,11 +1497,6 @@
   animation: featuredProductsMarquee 52s linear infinite;
 }
 
-.productsViewport:hover .productsGrid,
-.productsViewport:focus-within .productsGrid {
-  animation-play-state: paused;
-}
-
 @keyframes featuredProductsMarquee {
   from { transform: translateX(0); }
   to { transform: translateX(calc(-50% - 10px)); }

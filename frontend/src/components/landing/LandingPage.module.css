@@ -1540,6 +1540,15 @@
   object-fit: contain;
 }
 
+/* Give featured product imagery more room without enlarging the card copy. */
+.featuredProductsSection .productImageWrap {
+  height: 230px;
+}
+
+.featuredProductsSection .productImageWrap img {
+  max-height: 220px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .productsViewport { scroll-behavior: auto; }
 }

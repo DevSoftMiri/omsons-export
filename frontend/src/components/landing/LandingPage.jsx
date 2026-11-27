@@ -34,21 +34,21 @@ export default function LandingPage() {
   const [productCarouselPaused, setProductCarouselPaused] = useState(false);
   const heroSlides = [
     {
-      image: "/heroimages/export1.jpg",
+      image: "/header%20images/labglassware2.png",
       eyebrow: "Precision, Quality & Reliability In Every Piece.",
       title: "Premium Laboratory Glassware",
       description: "We provide reliable solutions for pharmaceutical, chemical, research and testing laboratories.",
       category: "glassware",
     },
     {
-      image: "/heroimages/export2.jpg",
+      image: "/header%20images/labinstrument2.png",
       eyebrow: "Precision, Quality & Reliability In Every Piece.",
       title: "Premium Laboratory Instruments",
       description: "Our instruments are developed to meet the requirements of modern laboratories across pharmaceutical, chemical, research and testing industries.",
       category: "lab-instruments",
     },
     {
-      image: "/heroimages/export3.jpg",
+      image: "/header%20images/filter%20and%20membrane2.png",
       eyebrow: "Precision, Purity & Performance in Every Filter Product",
       title: "Premium Filtration Products",
       description: "Syringe filters and membrane filters to Capsule, Cartridge Filters and SS Filter Housings. We provide dependable filtration solutions for diverse laboratory and industrial applications.",

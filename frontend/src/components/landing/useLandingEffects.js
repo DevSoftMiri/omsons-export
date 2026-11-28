@@ -30,6 +30,13 @@ export default function useLandingEffects() {
             return;
           }
 
+          if (entry.target.dataset.counterAnimated === "true") {
+            return;
+          }
+
+          entry.target.dataset.counterAnimated = "true";
+          counterObserver.unobserve(entry.target);
+
           entry.target.querySelectorAll("[data-counter]").forEach((element) => {
             const target = Number(element.getAttribute("data-target") || 0);
             const suffix = element.getAttribute("data-suffix") || "";

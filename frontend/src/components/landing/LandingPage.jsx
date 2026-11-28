@@ -287,10 +287,10 @@ export default function LandingPage() {
             <img src="/Why%20omsons.png" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
           </Reveal>
           <Reveal className={styles.whyMetrics} delay={2}>
-            <div><strong>{stats[0].value}{stats[0].suffix}</strong><span>Years of manufacturing</span></div>
-            <div><strong>{stats[1].value}{stats[1].suffix}</strong><span>Countries with partners</span></div>
-            <div><strong>{stats[2].value.toLocaleString()}{stats[2].suffix}</strong><span>Products to sell</span></div>
-            <div><strong>{stats[3].value}{stats[3].suffix}</strong><span>Channel partners</span></div>
+            <div><strong data-counter data-target={stats[0].value} data-suffix={stats[0].suffix}>0</strong><span>Years of manufacturing</span></div>
+            <div><strong data-counter data-target={stats[1].value} data-suffix={stats[1].suffix}>0</strong><span>Countries with partners</span></div>
+            <div><strong data-counter data-target={stats[2].value} data-suffix={stats[2].suffix}>0</strong><span>Products to sell</span></div>
+            <div><strong data-counter data-target={stats[3].value} data-suffix={stats[3].suffix}>0</strong><span>Channel partners</span></div>
           </Reveal>
           <div className={styles.whyGrid}>
             {whyPillars.map((pillar, index) => (

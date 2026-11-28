@@ -2029,13 +2029,6 @@
   box-shadow: 0 16px 36px rgba(0, 71, 130, 0.06);
 }
 
-/* Keep the partner cards visible even when the section enters the viewport
-   after the page-level reveal observer has already initialized. */
-.whyGrid .reveal {
-  opacity: 1;
-  transform: none;
-}
-
 .whyCard {
   position: relative;
   display: grid;
@@ -2048,6 +2041,7 @@
   border-right: 0;
   border-radius: 0;
   box-shadow: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
 }
 
 .whyCard:nth-child(n + 4) { border-top: 1px solid #e1e7ef; }
@@ -2075,6 +2069,22 @@
 .whyCard:hover .whyIcon img {
   transform: translateY(-2px) scale(1.08);
   filter: drop-shadow(0 0 7px rgba(0, 136, 232, 0.75));
+}
+
+.whyCard:hover {
+  z-index: 1;
+  transform: translateY(-3px);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0, 71, 130, 0.1);
+}
+
+.whyMetrics div {
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.whyMetrics div:hover {
+  background: #dcecf9;
+  transform: translateY(-2px);
 }
 
 .whyCta {

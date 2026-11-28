@@ -6,13 +6,13 @@ import {
   categories,
   featuredBanners,
   featuredProducts,
-  footerColumns,
   stats,
   testimonials,
   whyPillars,
 } from "./landingData";
 import StorefrontHeader from "@/components/store/StorefrontHeader";
 import styles from "./LandingPage.module.css";
+import Footer from "./Footer";
 import useLandingEffects from "./useLandingEffects";
 
 function Reveal({ as: Tag = "div", className = "", delay, children, ...props }) {
@@ -397,69 +397,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerInfo}>
-          {[
-            {
-              title: "The Brand for Your Laboratory",
-              text: "As an independent family business based in India, OMSONS has been a trusted laboratory partner for more than four decades.",
-            },
-            {
-              title: "Consultation & Application Support",
-              text: "From liquid handling to life science consumables, OMSONS supports laboratories with product guidance and application insight.",
-            },
-            {
-              title: "Work Easily and Efficiently",
-              text: "Our goal is to make laboratory work faster, easier, and more dependable across scientific disciplines.",
-            },
-          ].map((item, index) => (
-            <Reveal key={item.title} className={styles.footerInfoCard} delay={index + 1}>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </Reveal>
-          ))}
-        </div>
-        <div className={styles.footerLinks}>
-          {footerColumns.map((column) => (
-            <div key={column.title}>
-              <h4>{column.title}</h4>
-              {column.links.map((link) => (
-                <a key={link} href="#">
-                  {link}
-                </a>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className={styles.footerBottomBar}>
-          <div className={styles.footerBottom}>
-            <div className={styles.footerPayments}>
-              <div className={styles.payBadges}>
-                {["PayPal", "VISA", "MC", "Mastercard"].map((badge) => (
-                  <span key={badge}>{badge}</span>
-                ))}
-              </div>
-              <span>Note: Our offer is directed exclusively to traders.</span>
-            </div>
-            <div className={styles.footerMetaLinks}>
-              {[
-                "Transferpette",
-                "Complaint",
-                "Terms & Conditions",
-                "Privacy Statement",
-                "Imprint",
-                "Disclaimer",
-                "Cookie Settings",
-              ].map((link) => (
-                <a key={link} href="#">
-                  {link}
-                </a>
-              ))}
-            </div>
-            <p>© 2025 OMSONS</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

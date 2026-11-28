@@ -213,11 +213,10 @@ export default function LandingPage() {
             Browse
           </Reveal>
           <Reveal as="h2" className={styles.sectionTitle} delay={1}>
-            All products for <span>Life Science</span> and <span>Liquid Handling</span>
+            Precision products for every <span>Laboratory</span> and <span>Process</span>
           </Reveal>
           <Reveal as="p" className={styles.sectionSubtitle} delay={2}>
-            From essential consumables to advanced instruments – everything you need for accurate,
-            reliable and efficient laboratory work.
+            From volumetric glassware and hydrometers to sterile filtration and lab instruments. Manufactured by OMSONS for accuracy, consistency and long-term reliability.
           </Reveal>
           <div className={styles.categoryGrid}>
             {categories.map((category, index) => (

@@ -1333,6 +1333,10 @@
   padding-top: 28px;
 }
 
+.browseProductsSection .sectionSubtitle {
+  max-width: 760px;
+}
+
 .browseProductsSection .sectionTitle {
   font-weight: 500;
 }
@@ -1796,7 +1800,7 @@
 }
 
 .categoryDescription {
-  margin: -16px 0 18px;
+  margin: -16px 0 8px;
   max-width: 260px;
   color: #5f6d82;
   font-size: 13px;

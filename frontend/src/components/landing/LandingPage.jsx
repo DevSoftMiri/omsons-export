@@ -275,27 +275,38 @@ export default function LandingPage() {
       <section className={styles.whySection} data-counter-section>
         <div className={styles.sectionInner}>
           <Reveal as="p" className={styles.whyLabel}>
-            THE OMSONS DIFFERENCE
+            PARTNER WITH OMSONS
           </Reveal>
           <Reveal as="h2" className={styles.whyTitle} delay={1}>
-            Why <em>OMSONS?</em>
+            Why <em>distributors</em> grow with <em>OMSONS</em>
           </Reveal>
           <Reveal as="p" className={styles.whyLead} delay={2}>
-            Precision laboratory products and solutions, trusted globally for quality,
-            accuracy and long-term reliability.
+            One manufacturer for glassware, filtration, measurement and instruments: built to ISO, ASTM and USP standards, export-ready and backed by dedicated partner support.
           </Reveal>
           <Reveal className={styles.whyImageWrap} delay={2}>
             <img src="/Why%20omsons.png" alt="OMSONS laboratory products and solutions" className={styles.whyImage} />
+          </Reveal>
+          <Reveal className={styles.whyMetrics} delay={2}>
+            <div><strong>{stats[0].value}{stats[0].suffix}</strong><span>Years of manufacturing</span></div>
+            <div><strong>{stats[1].value}{stats[1].suffix}</strong><span>Countries with partners</span></div>
+            <div><strong>{stats[2].value.toLocaleString()}{stats[2].suffix}</strong><span>Products to sell</span></div>
+            <div><strong>{stats[3].value}{stats[3].suffix}</strong><span>Channel partners</span></div>
           </Reveal>
           <div className={styles.whyGrid}>
             {whyPillars.map((pillar, index) => (
               <Reveal key={pillar.title} className={styles.whyCard} delay={(index % 3) + 1}>
                 <span className={styles.whyIcon}><img src={pillar.icon} alt="" /></span>
+                {pillar.badge && <span className={styles.whyBadge}>{pillar.badge}</span>}
                 <h3>{pillar.title}</h3>
                 <p>{pillar.description}</p>
+                {pillar.badges && <div className={styles.whyStandards}>{pillar.badges.map((badge) => <span key={badge}>{badge}</span>)}</div>}
               </Reveal>
             ))}
           </div>
+          <Reveal className={styles.whyCta} delay={2}>
+            <span>Looking for a reliable manufacturing partner in your market?</span>
+            <Link href="/contact" className={styles.whyCtaButton}>Become a Distributor <span aria-hidden="true">→</span></Link>
+          </Reveal>
         </div>
       </section>
 

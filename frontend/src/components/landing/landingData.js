@@ -285,34 +285,36 @@ export const stats = [
 
 export const whyPillars = [
   {
-    icon: "/OMSONS_Icons/certified-manufacturing.svg",
-    title: "Certified Manufacturing",
-    description: "Manufactured under a robust quality system with rigorous checks.",
+    icon: "/why%20omsons%20icons/01-one-source-hd.png",
+    title: "One source, one shipment",
+    description: "Glassware, filtration, hydrometers, thermometers and instruments from a single manufacturer, consolidated into one container.",
   },
   {
-    icon: "/OMSONS_Icons/life-science-focus.svg",
-    title: "Life Science Focus",
-    description: "A comprehensive portfolio for research, clinical and industrial use.",
+    icon: "/why%20omsons%20icons/02-tender-ready-quality-hd.png",
+    title: "Tender-ready quality",
+    description: "Built to ISO, ASTM and USP standards under a certified ISO 9001 system, so your quotes qualify.",
+    badges: ["ISO", "ASTM", "USP"],
   },
   {
-    icon: "/OMSONS_Icons/si-traceability.svg",
-    title: "SI Traceability",
-    description: "Volumetric products with traceable calibration and documentation.",
+    icon: "/why%20omsons%20icons/03-qr-coded-glassware-hd.png",
+    title: "QR-coded glassware",
+    description: "Every piece carries a printed QR code. Your customers scan it and get the certificate instantly, with no paperwork requests to you.",
+    badge: "Scan and verify",
   },
   {
-    icon: "/OMSONS_Icons/material-reliability.svg",
-    title: "Material Reliability",
-    description: "High-quality borosilicate glass, polymers and durable materials.",
+    icon: "/why%20omsons%20icons/04-export-documentation-hd.png",
+    title: "Export-ready documentation",
+    description: "Certificates of origin, COAs, technical data sheets and accurate packing lists with every shipment for smooth customs clearance.",
   },
   {
-    icon: "/OMSONS_Icons/global-support.svg",
-    title: "Global Support",
-    description: "A growing international presence with responsive technical support.",
+    icon: "/why%20omsons%20icons/05-oem-private-label-hd.png",
+    title: "OEM and private label",
+    description: "Build your own brand with our manufacturing: custom specifications, printing and packaging.",
   },
   {
-    icon: "/OMSONS_Icons/data-integrity.svg",
-    title: "Data Integrity",
-    description: "Reliable performance for auditable and compliant laboratory workflows.",
+    icon: "/why%20omsons%20icons/06-partner-support-hd.png",
+    title: "Partner support",
+    description: "Catalogues, product images, technical training and a dedicated export account manager for your team.",
   },
 ];
 

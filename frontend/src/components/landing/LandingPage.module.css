@@ -1486,7 +1486,8 @@
 
 .recommendationLayout {
   position: relative;
-  margin-top: 34px;
+  margin-top: 28px;
+  z-index: 1;
 }
 
 .productsViewport {
@@ -1919,7 +1920,7 @@
 }
 
 .whySection {
-  padding: 42px 0 36px;
+  padding: 24px 0 24px;
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
 }
 
@@ -1956,14 +1957,14 @@
 
 .whyTitle {
   margin: 10px 0 0;
-  font-size: clamp(36px, 4vw, 58px);
+  font-size: clamp(34px, 3.6vw, 50px);
   letter-spacing: -0.055em;
 }
 
 .whyLead {
   max-width: 650px;
-  margin-top: 14px;
-  font-size: 17px;
+  margin-top: 10px;
+  font-size: 16px;
   line-height: 1.45;
 }
 
@@ -1977,7 +1978,7 @@
 .whyImage {
   display: block;
   width: 100%;
-  max-height: 300px;
+  max-height: 250px;
   object-fit: contain;
   object-position: center;
   filter: drop-shadow(0 18px 26px rgba(0, 71, 130, 0.1));
@@ -1994,24 +1995,55 @@
   max-width: 880px;
 }
 
+.whyMetrics {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #eaf3fb;
+}
+
+.whyMetrics div {
+  min-height: 68px;
+  padding: 11px 14px;
+  border-right: 1px solid #d2e1ef;
+  text-align: center;
+}
+
+.whyMetrics div:last-child { border-right: 0; }
+.whyMetrics strong,
+.whyMetrics span { display: block; }
+.whyMetrics strong { color: #11254f; font-size: 21px; line-height: 1.1; }
+.whyMetrics span { margin-top: 5px; color: #52677d; font-size: 11px; line-height: 1.2; }
+
 .whyGrid {
   grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  margin-top: 34px;
+  margin-top: 18px;
   overflow: hidden;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 16px 36px rgba(0, 71, 130, 0.06);
 }
 
+/* Keep the partner cards visible even when the section enters the viewport
+   after the page-level reveal observer has already initialized. */
+.whyGrid .reveal {
+  opacity: 1;
+  transform: none;
+}
+
 .whyCard {
+  position: relative;
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
   column-gap: 20px;
   row-gap: 6px;
-  min-height: 104px;
-  padding: 16px 22px;
+  min-height: 94px;
+  padding: 13px 18px;
   border: 0;
   border-right: 0;
   border-radius: 0;
@@ -2030,10 +2062,34 @@
 .whyIcon img { width: 48px; height: 48px; object-fit: contain; transition: filter 0.25s ease, transform 0.25s ease, drop-shadow 0.25s ease; }
 .whyCard h3 { margin: 0; font-size: 17px; line-height: 1.2; font-weight: 800; }
 .whyCard p { margin: 0; font-size: 14px; line-height: 1.35; }
+.whyBadge { position: absolute; top: 14px; right: 18px; padding: 3px 8px; border-radius: 10px; background: #2f70b9; color: #fff; font-size: 10px; font-weight: 800; }
+.whyStandards {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+.whyStandards span { padding: 3px 7px; border-radius: 3px; background: #dbeaf7; color: #174878; font-size: 10px; font-weight: 800; }
 .whyCard:hover .whyIcon img {
   transform: translateY(-2px) scale(1.08);
   filter: drop-shadow(0 0 7px rgba(0, 136, 232, 0.75));
 }
+
+.whyCta {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.whyCtaButton { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 20px; background: #2f70b9; color: #fff; font-weight: 800; }
+.whyCtaButton:hover { background: #3d82ca; }
 
 .testimonialsSection {
   position: relative;
@@ -2540,12 +2596,47 @@
   }
 
   .whyImage {
-    max-height: 280px;
+    max-height: 220px;
+  }
+
+  .whyMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 24px;
+  }
+
+  .whyMetrics div:nth-child(2) { border-right: 0; }
+  .whyMetrics div:nth-child(n + 3) { border-top: 1px solid #d2e1ef; }
+
+  .whyCta {
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
   }
 
   .whyGrid {
     display: grid;
     margin-top: 42px;
+  }
+
+  .whyCard {
+    min-height: 0;
+    padding: 16px 18px;
+  }
+
+  .whyBadge {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+  }
+
+  .whyCard p {
+    grid-column: 2;
+  }
+
+  .whyIcon {
+    align-self: center;
   }
 
   .whyCard,
